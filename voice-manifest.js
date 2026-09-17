@@ -1,0 +1,1 @@
+window.DREAM_VOICE={"intro":4,"firstMemory":2,"town":8,"bossIntro":2,"finale":6,"after":2,"friendship":3,"bakerFirst":3,"cooked":3,"postFirst":3,"restoredLetter":2,"captainTruth":5,"bossRecovered":3,"journalHome":4,"relight":5,"herbsDone":1,"mailDone":2,"lampsDone":1,"tideSolved":2,"windSolved":2,"chartSolved":2,"archiveRead":3,"bridgeSolved":2,"worldPrimer":3};

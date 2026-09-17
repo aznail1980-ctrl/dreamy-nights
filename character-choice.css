@@ -1,0 +1,46 @@
+/* The selected keeper wears a small star seal, in the palette of the story art. */
+#modal[data-kind="character"] h2{margin-bottom:14px}
+#modal[data-kind="character"] .choose-lead{margin:8px 0 22px}
+.hero-choice{
+ isolation:isolate;min-height:365px;padding:60px 23px 18px 4px;border:2px solid #e3d5c9;
+ border-radius:25px;background:linear-gradient(145deg,#fffaf0,#f6eee5);color:#67536b;
+ box-shadow:0 4px 0 #d8c9b51c;transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.hero-choice::before{
+ content:"";position:absolute;inset:55px 44% 20px 14px;z-index:-1;border-radius:50%;
+ background:radial-gradient(ellipse,#ecddc44d,transparent 68%);pointer-events:none;
+}
+.hero-choice.selected{
+ border-color:#8fa99a;background:linear-gradient(135deg,#fffae9 12%,#f2f2df 65%,#e8eee2);
+ box-shadow:0 0 0 3px #92ab9621,0 8px 22px #7a887221,inset 0 0 0 4px #fff9eaaa;
+}
+.hero-choice.selected::before{background:radial-gradient(ellipse,#f9da8e60,transparent 68%)}
+.hero-choice:hover{filter:none;border-color:#b6ac90;box-shadow:0 6px 20px #89745718}
+.hero-choice.selected:hover{border-color:#718f7f;box-shadow:0 0 0 3px #92ab9621,0 8px 22px #7a887221,inset 0 0 0 4px #fff9eaaa}
+.hero-choice:active{transform:none}
+.hero-choice:focus-visible{outline:3px solid #80658e;outline-offset:5px}
+.hero-choice>img{height:275px;filter:drop-shadow(0 9px 8px #9b7e931c)}
+.hero-choice .hero-choice-copy>span{color:#937984}
+.hero-choice .hero-choice-copy p{word-break:keep-all;overflow-wrap:break-word}
+.hero-choice .hero-choice-status{
+ position:absolute;top:17px;right:19px;display:flex;align-items:center;justify-content:center;
+ gap:7px;min-width:154px;height:38px;padding:0 14px;border-radius:20px;
+ background:#ece4db;color:#817465;line-height:1;pointer-events:none;
+}
+.hero-choice .hero-choice-status-text{color:inherit;font-size:14px;line-height:1.2;font-weight:600;white-space:nowrap;letter-spacing:.015em}
+.hero-choice .hero-choice-seal{display:none;flex:0 0 39px;width:39px;height:45px;margin-left:-21px;filter:drop-shadow(0 2px 1px #85724928)}
+.hero-choice-seal svg{display:block;width:100%;height:100%}
+.hero-choice.selected .hero-choice-status{background:#dbe7d6;color:#486650;box-shadow:inset 0 1px 0 #fffff09c;padding-left:21px}
+.hero-choice.selected .hero-choice-seal{display:block}
+.hero-choice-announcement{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#modal[data-kind="character"] .hero-confirm .primary{background:linear-gradient(125deg,#f8e2af,#edcc91);border-color:#cfb17d;box-shadow:0 3px 0 #c9ab7f40;color:#5d514e}
+.reduced-motion .hero-choice{transition:none}
+@media(pointer:coarse){
+ .hero-choice{min-height:370px;padding-top:71px}
+ .hero-choice .hero-choice-status{top:17px;right:21px;min-width:220px;height:49px;padding:0 19px;border-radius:27px}
+ .hero-choice .hero-choice-status-text{font-size:22px}
+ .hero-choice .hero-choice-seal{flex-basis:48px;width:48px;height:57px;margin-left:-26px}
+ .hero-choice.selected .hero-choice-status{padding-left:27px}
+ #modal[data-kind="character"] .hero-confirm .primary{min-height:var(--touch-size,94px);font-size:25px}
+}
+@media(prefers-reduced-motion:reduce){.hero-choice{transition:none}}
