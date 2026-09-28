@@ -273,13 +273,19 @@
     }
     function fit() {
         const padding = getComputedStyle(document.body);
-        const availableW = innerWidth - (parseFloat(padding.paddingLeft) || 0) - (parseFloat(padding.paddingRight) || 0);
-        const availableH = innerHeight - (parseFloat(padding.paddingTop) || 0) - (parseFloat(padding.paddingBottom) || 0);
-        const compact = innerHeight < 530, w = Math.min(1440, availableW * (compact ? 1 : .96)), h = availableH - (compact ? 0 : 86), s = Math.max(.1, Math.min(w / W, h / H));
-        $('shell').style.width = W * s + 'px';
-        $('shell').style.height = H * s + 'px';
-        $('stage').style.transform = `scale(${s})`;
-        $('stage').style.setProperty('--touch-size', Math.ceil(44 / s) + 'px');
+        const view = window.visualViewport;
+        const layout = window.dreamViewport({ width: view?.width || innerWidth, height: view?.height || innerHeight,
+            coarse: matchMedia('(pointer:coarse)').matches,
+            left: parseFloat(padding.paddingLeft) || 0, right: parseFloat(padding.paddingRight) || 0,
+            top: parseFloat(padding.paddingTop) || 0, bottom: parseFloat(padding.paddingBottom) || 0 });
+        document.documentElement.style.setProperty('--viewport-height', (view?.height || innerHeight) + 'px');
+        $('shell').style.width = layout.width + 'px';
+        $('shell').style.height = layout.height + 'px';
+        $('stage').style.height = layout.stageHeight + 'px';
+        $('stage').style.transform = `scale(${layout.scale})`;
+        $('stage').style.setProperty('--touch-size', layout.touchSize + 'px');
+        $('stage').style.setProperty('--stage-height', layout.stageHeight + 'px');
+        $('stage').dataset.layout = layout.portrait ? 'portrait' : layout.coarse ? 'landscape' : 'desktop';
     }
     function show(id, on = true) {
         $(id).classList.toggle('hidden', !on);
@@ -1144,6 +1150,18 @@
         cameraY += (clamp(player.y - 570, -650, 0) - cameraY) * Math.min(1, dt * 5);
         camera += (clamp(player.x - W * .42 + player.vx * .055, 0, currentMap().width - W) - camera) * Math.min(1, dt * 5.5);
     }
+    function advanceEnemyAttack(e, distance) {
+        const next = e.x + distance, gap = 23 + enemyRadius(e);
+        // Sweep the short rush segment so a low frame rate cannot carry a foe through the hero.
+        if (player.dodgeT <= 0 && !player.climbing && Math.abs(player.y - e.y) < 110) {
+            const side = Math.sign(player.x - e.x);
+            if (side && distance * side > 0 && Math.abs(player.x - e.x) >= gap && (player.x - next) * side < gap) {
+                e.x = player.x - side * gap;
+                return;
+            }
+        }
+        e.x = next;
+    }
     function updateEnemy(e, dt) {
         e.elapsed += dt;
         if (e.knockV) {
@@ -1220,12 +1238,12 @@
             e.actionT -= dt;
             const progress = 1 - e.actionT / e.actionLength;
             if (e.type === 'sand') {
-                e.x += e.attackFace * 360 * dt;
                 e.y = floor - Math.sin(progress * Math.PI) * 35;
+                advanceEnemyAttack(e, e.attackFace * 360 * dt);
             }
             if (e.type === 'crab') {
-                e.x += e.attackFace * 270 * dt;
                 e.y = floor - Math.sin(progress * Math.PI) * 150;
+                advanceEnemyAttack(e, e.attackFace * 270 * dt);
             }
             if (e.type === 'box')
                 e.y = floor - Math.sin(progress * Math.PI) * 17;
@@ -1613,7 +1631,16 @@
             releaseInputs();
     });
     addEventListener('pagehide', save);
-    addEventListener('resize', () => { clearControls(); fit(); });
+    function refitViewport() {
+        const previousScale = $('stage').style.transform;
+        fit();
+        // Browser chrome height changes must not release a held move/attack input.
+        if ($('stage').style.transform !== previousScale) clearControls();
+    }
+    addEventListener('resize', refitViewport);
+    window.visualViewport?.addEventListener('resize', refitViewport);
+    addEventListener('orientationchange', () => { clearControls(); fit(); });
+    document.addEventListener('fullscreenchange', fit);
     controls = window.createDreamControls({
         keys, keyMap, playing: () => mode === 'play',
         action, activate: () => { autoWalk = false; audio.unlock(); },
@@ -1679,7 +1706,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.12.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.13.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
