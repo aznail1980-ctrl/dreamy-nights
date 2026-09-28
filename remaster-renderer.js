@@ -178,7 +178,7 @@
     };
     R.previewHero = function (canvas, state) {
         const preview = new window.DreamRenderer(canvas, this.images, this.C);
-        preview.r = { state, clock: 1, settings: { reducedMotion: true }, player: { grounded: true, groundY: 210, y: 210, walkBlend: 0, attackT: 0, invincible: 0 }, companion: {} };
+        preview.r = { state, clock: 1, settings: { reducedMotion: true }, player: { grounded: true, groundY: 210, y: 210, walkBlend: 0, walkTime: 0, motionSpeed: 0, attackT: 0, dodgeT: 0, chargeT: 0, chargeHeld: false, invincible: 0 }, companion: {} };
         const c = preview.ctx;
         c.clearRect(0, 0, 360, 390);
         c.save();
