@@ -121,6 +121,12 @@
         }
         sfx(kind) {
             this.events = (this.events || []).concat({ event: kind, time: clock }).slice(-24);
+            const region={regionRush:[150,210,550],regionFan:[660,990,1900],regionHop:[190,285,950],regionSeed:[440,880,2600],regionInk:[120,240,650],regionWake:[330,660,1200]};
+            if(region[kind]){
+                const [low,high,noise]=region[kind];
+                this.tone(low,.16,.16,'triangle');this.tone(high,.2,.12,'sine',.045);
+                this.noise(kind==='regionFan'?.35:.14,.14,noise);return;
+            }
             const special = { loot: [880, 1175, 1568, 2093], chest: [392, 587, 784, 1175, 1568], camp: [262, 330, 392, 523], arrive: [659, 880, 1047], mechanism: [147, 220, 294, 440], wind: [740, 988, 1318], rattle: [196, 247, 294], claw: [110, 220], sandRush: [146, 196], step: [90], gather: [784, 988, 1175] };
             if (special[kind]) {
                 special[kind].forEach((f, i) => this.tone(f, kind === 'camp' ? .7 : .24, kind === 'step' ? .025 : .18, kind === 'mechanism' ? 'triangle' : 'sine', i * .06));
@@ -1227,6 +1233,7 @@
             e.face = e.zone?.face || e.face;
         else if (Math.abs(dx) > 12)
             e.face = Math.sign(dx);
+        if (C.regionCreatures?.[e.variant]) return window.updateDreamRegionEnemy(e,dt,{player,waves,advance:advanceEnemyAttack,damage,sound:name=>audio.sfx(name)});
         if (e.variant === 'tideBell') return updateTideBell(e, dt);
         if (e.type === 'boss') {
             if (!state.flags.bossIntroduced)
@@ -1511,12 +1518,12 @@
                     w.x += w.vx * dt;
                     w.y += (w.vy || 0) * dt;
                     if (w.gravity)
-                        w.vy += 600 * dt;
+                        w.vy += (typeof w.gravity === 'number' ? w.gravity : 600) * dt;
                     w.life -= dt;
                     if (!w.hit && Math.abs(player.x - w.x) < 42 && Math.abs(player.y - 55 - w.y) < 65) {
                         damage(w.damage ?? 1.5, w.x - Math.sign(w.vx) * 10);
                         w.hit = true;
-                        if (w.kind === 'tideBubble') {
+                        if (w.kind === 'tideBubble' || w.kind === 'region') {
                             w.life = 0;
                             ring(w.x,w.y,38,'#bceee5');
                         }
@@ -1743,7 +1750,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.14.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.15.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

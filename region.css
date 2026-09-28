@@ -1,0 +1,31 @@
+.region-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:22px 0}
+.region-card{min-width:0;padding:22px;border-radius:22px;background:linear-gradient(140deg,#fffaf0,#e9e3cf);box-shadow:0 3px 0 #a4937550;color:#4c4954;overflow-wrap:anywhere}
+.region-card h3{margin:12px 0;font-size:23px}.region-card p{font-size:16px;line-height:1.6}.region-card small{display:block;color:#77677e;line-height:1.5}
+.region-card ul{padding:0;list-style:none;font-size:15px}.region-card li{display:flex;justify-content:space-between;gap:8px;margin:9px 0}.region-card button{width:100%;white-space:normal;min-height:48px}
+.region-card button:disabled{opacity:.5;cursor:default}.region-portrait{display:block;width:145px;height:130px;margin:auto}.region-card .item-art{vertical-align:middle}
+.region-tip{padding:10px;background:#d9e9db;border-radius:10px}.region-actions{display:flex;gap:14px;flex-wrap:wrap}.region-actions button{flex:1;min-width:0;white-space:normal}
+@media(pointer:coarse){.region-card button,.region-actions button{min-height:var(--touch-size,94px)}}
+#stage[data-layout="portrait"] #modal .modal-card{width:calc(100% - var(--u)*.5);max-width:none;max-height:calc(var(--screen-h) - var(--u)*.5);padding:calc(var(--u)*.4);font-size:calc(var(--u)*.32)}
+#stage[data-layout="portrait"] #modalTitle{font-size:calc(var(--u)*.5);padding-right:var(--u)}
+#stage[data-layout="portrait"] #modalClose{width:var(--u);height:var(--u);min-width:var(--u);font-size:calc(var(--u)*.65)}
+#stage[data-layout="portrait"] .region-grid{grid-template-columns:1fr;gap:calc(var(--u)*.35)}
+#stage[data-layout="portrait"] .region-card{padding:calc(var(--u)*.35)}
+#stage[data-layout="portrait"] .region-card h3{font-size:calc(var(--u)*.43)}
+#stage[data-layout="portrait"] .region-card p,#stage[data-layout="portrait"] .region-card ul,#stage[data-layout="portrait"] .region-card small,#stage[data-layout="portrait"] #modal[data-kind^="region"] p{font-size:calc(var(--u)*.32)}
+#stage[data-layout="portrait"] .region-card>.item-art,#stage[data-layout="portrait"] .region-portrait{width:calc(var(--u)*2.5);height:calc(var(--u)*2.3)}
+#stage[data-layout="portrait"] .region-card button,#stage[data-layout="portrait"] .region-actions button{font-size:calc(var(--u)*.34);min-height:var(--u)}
+#stage[data-layout="portrait"] .region-actions{flex-direction:column}
+/* Existing bag/NPC screens also need readable text and thumb-sized controls. */
+#stage[data-layout="portrait"] .bag-layout,#stage[data-layout="portrait"] .npc-dialog-layout{display:grid;grid-template-columns:1fr;gap:calc(var(--u)*.3);height:auto;min-height:0}
+#stage[data-layout="portrait"] .bag-character{display:none}
+#stage[data-layout="portrait"] .bag-center,#stage[data-layout="portrait"] .item-detail{min-width:0;width:100%;max-height:none}
+#stage[data-layout="portrait"] .item-grid{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(calc(var(--u)*2.2),auto);max-height:calc(var(--u)*6);overflow:auto}
+#stage[data-layout="portrait"] .item-slot{width:auto;min-width:0;min-height:calc(var(--u)*2);padding:calc(var(--u)*.12)}
+#stage[data-layout="portrait"] .item-slot b,#stage[data-layout="portrait"] .item-slot small,#stage[data-layout="portrait"] .grade-badge{font-size:calc(var(--u)*.23)}
+#stage[data-layout="portrait"] .item-slot .item-art{width:calc(var(--u)*.85);height:calc(var(--u)*.85)}
+#stage[data-layout="portrait"] .bag-tabs{flex-wrap:wrap}
+#stage[data-layout="portrait"] .bag-tabs button,#stage[data-layout="portrait"] .drop-guide,#stage[data-layout="portrait"] .item-actions button,#stage[data-layout="portrait"] .npc-choice{min-height:var(--u);font-size:calc(var(--u)*.32)}
+#stage[data-layout="portrait"] .item-detail h3{font-size:calc(var(--u)*.44)}
+#stage[data-layout="portrait"] .item-detail p,#stage[data-layout="portrait"] .item-effect,#stage[data-layout="portrait"] .npc-quote,#stage[data-layout="portrait"] .npc-choice small{font-size:calc(var(--u)*.3)}
+#stage[data-layout="portrait"] .npc-illustration img{height:calc(var(--u)*2.5);width:auto;max-width:100%;object-fit:contain}
+#stage[data-layout="portrait"] .bag-money,#stage[data-layout="portrait"] .bag-money span,#stage[data-layout="portrait"] .item-rarity,#stage[data-layout="portrait"] .item-context{font-size:calc(var(--u)*.27)}

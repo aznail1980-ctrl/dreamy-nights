@@ -434,6 +434,7 @@
         this.actor(r.state.active, r.player.x, r.player.y, r.player.facing, true);
         this.drawHitEffects(r);
         for (const w of r.waves) {
+            if (w.kind === 'region') { this.item(w.icon,w.x,w.y,26,26,r.clock*2); continue; }
             if (w.kind === 'tideBubble') {
                 c.save();c.fillStyle='#93dfeb70';c.strokeStyle='#e1fffa';c.lineWidth=2;
                 c.beginPath();c.arc(w.x,w.y,w.r,0,Math.PI*2);c.fill();c.stroke();

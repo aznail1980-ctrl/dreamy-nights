@@ -5,6 +5,7 @@ window.createDreamRPG = function (api) {
     const extraFlags = ['cookedFirst', 'letterRead', 'readyForBoss', 'journalReturned', 'herbsDelivered', 'replyDelivered', 'beaconsRewarded', 'metBaker', 'metPost', 'bakerGift', 'bossRecovered'];
     let selection = 'baton', bagTab = 'all', mini = null, loot = [], comboTime = 0, combo = 0;
     const state = () => api.state, own = id => state()?.rpg.inventory[id] || 0;
+    const regionUI=window.createDreamRegionUI({C,api,state,own,add,take,icon,bag});
     function initialize(s) {
         extraFlags.forEach(f => s.flags[f] = false);
         s.version = 2;
@@ -101,6 +102,11 @@ window.createDreamRPG = function (api) {
         return true;
     }
     function icon(kind, size = 34) {
+        const regionIndex=C.regionIcons?.[kind];
+        if(regionIndex!==undefined){
+            const spec=window.DREAM_REGION_ART.regionItems,b=spec.frames[regionIndex];
+            return `<svg class="item-art" width="${size}" height="${size}" viewBox="${b.join(' ')}" aria-hidden="true"><image href="assets/regionItemsV415.png" width="${spec.size[0]}" height="${spec.size[1]}"/></svg>`;
+        }
         const wearable = window.DREAM_WEAR.icons[kind];
         if (wearable) {
             const asset = window.DREAM_WEAR.items[wearable].asset, spec = window.DREAM_WEAR.assets[asset], b = spec.frames[1];
@@ -131,6 +137,8 @@ window.createDreamRPG = function (api) {
         }).join('')}</div></aside><div class="bag-center"><div class="bag-tabs">${[['all', '전체'], ...Object.entries(labels)].map(([key, label]) => `<button data-bag-tab="${key}" class="${key === tab ? 'active' : ''}">${label}</button>`).join('')}</div><div class="item-grid">${ids.map(key => `<button data-item="${key}" data-grade="${C.items[key].grade}" class="item-slot ${key === id ? 'selected' : ''} ${Object.values(state().rpg.equipment).includes(key) ? 'equipped' : ''}" aria-label="${C.grades[C.items[key].grade].name} ${C.items[key].name} ${own(key)}개">${icon(C.items[key].icon, 43)}<em class="grade-badge">${C.grades[C.items[key].grade].symbol} ${C.grades[C.items[key].grade].name}</em><b>${C.items[key].name}</b><small>${Object.values(state().rpg.equipment).includes(key) ? '장착 중' : '× ' + own(key)}</small></button>`).join('')}${ids.length === 0 ? '<p class="empty-bag">아직 담긴 물건이 없어요.<br>꿈길에서 새로운 기억을 찾아보세요.</p>' : ''}</div><button id="dropGuide" class="drop-guide">등급 · 드롭 안내 ↗</button><div class="bag-money">${icon('dust', 25)} 꿈빛 <b>${state().light}</b><span>보유 물건 ${Object.keys(state().rpg.inventory).filter(k => own(k) > 0).length}종</span></div></div><aside class="item-detail">${it ? `<div class="item-preview">${icon(it.icon, 88)}</div><span class="item-rarity" data-grade="${it.grade}">${C.grades[it.grade].symbol} ${C.grades[it.grade].name} · ${labels[it.type]}</span><h3>${it.name}</h3><p>${it.lore}</p><div class="item-effect">${it.effect}</div>${it.slot ? `<p class="equip-compare">현재 ${slots[it.slot]}<br><b>${C.items[state().rpg.equipment[it.slot]]?.name || '비어 있음'}</b></p>` : ''}<div class="item-actions">${it.type === 'equipment' ? `<button id="equipItem" class="primary">${equipped ? '장착 중' : '장착하기'}</button>${equipped && it.slot !== 'weapon' ? '<button id="unequipItem" class="secondary">장착 해제</button>' : ''}` : it.type === 'supply' ? '<button id="useItem" class="primary">사용하기</button>' : it.type === 'costume' ? '<button id="openWardrobe" class="primary">옷장에서 착용하기</button>' : `<div class="item-context">${it.type === 'story' ? '이야기 속에서 사용할 물건이에요.' : '마을에서 재료를 사용해보세요.'}</div>`}</div>` : '<p>물건을 선택하면 이야기를 읽을 수 있어요.</p>'}</aside></div>`;
         api.openModal('bag', '순찰 가방', html, 'LITTLE THINGS, MEANINGFUL JOURNEYS');
         $('dropGuide').onclick = dropGuide;
+        $('dropGuide').insertAdjacentHTML('afterend','<button id="regionGuide" class="drop-guide">지역 생태 · 재료 · 제작법 ↗</button>');
+        $('regionGuide').onclick=regionUI.guide;
         if ($('openWardrobe'))
             $('openWardrobe').onclick = () => api.wardrobe(id);
         api.preview($('bagHeroPreview'));
@@ -191,7 +199,7 @@ window.createDreamRPG = function (api) {
         return true;
     }
     function quickHeal() {
-        const id = own('cookie') ? 'cookie' : own('lunch') ? 'lunch' : own('tea') ? 'tea' : null;
+        const id = ['cookie','shoreBiscuit','lunch','canalCake','tea','bloomTea'].find(id=>own(id)>0);
         if (id)
             use(id);
         else
@@ -333,7 +341,7 @@ window.createDreamRPG = function (api) {
     }
     function npcMenu(id) {
         const s = state(), n = C.npcs[id];
-        let choices = '', message = n.greeting;
+        let choices = choice('regionWorkshop','지역 재료로 만들고 싶어요.','순찰 간식 3종 · 항구 기념 장비 3종'), message = n.greeting;
         if (id === 'lumen') {
             if (s.flags.letterRead && !s.flags.readyForBoss)
                 choices += choice('truth', '반장님, 이 편지를 봐주세요.', '뒤뚱이 이어 붙인 편지의 주인을 만나요.');
@@ -367,6 +375,7 @@ window.createDreamRPG = function (api) {
     }
     function npcAction(id, action) {
         const s = state();
+        if(action==='regionWorkshop')return regionUI.workshop();
         if (action === 'truth' && !s.flags.readyForBoss && own('oldLetter')) {
             api.closeModal();
             api.dialogue('captainTruth', () => {

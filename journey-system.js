@@ -4,7 +4,7 @@ window.createDreamJourney=function(api){
  const names={herb:'별잎',chest:'보물상자',treasure:'기억 상자',beacon:'길등',altar:'꿈종',tideBell:'조수종',windVane:'풍향계',starChart:'별지도',archiveBook:'순찰 기록',waterWheel:'수차'};
  function enemyTarget(ids,mapOnly){
   const options=[];C.maps.forEach((m,map)=>m.enemies.forEach(e=>{if(!e.wild&&(ids?ids.includes(e.id):map===mapOnly)&&!s().killed.includes(e.id)){
-   const live=map===s().map?api.enemies.find(v=>v.id===e.id&&!v.dead):e;if(live)options.push({map,x:live.x,y:live.floorY??e.y??651,label:C.creatures[e.type].name+' 정화하기',kind:'enemy'});
+   const live=map===s().map?api.enemies.find(v=>v.id===e.id&&!v.dead):e;if(live)options.push({map,x:live.x,y:live.floorY??e.y??651,label:(C.regionCreatures?.[e.variant]?.name||(e.variant==='tideBell'?'조수종 소라게':C.creatures[e.type].name))+' 정화하기',kind:'enemy'});
   }}));return options.sort((a,b)=>(a.map===s().map?0:1)-(b.map===s().map?0:1)||Math.abs(a.x-api.player.x)-Math.abs(b.x-api.player.x))[0];
  }
  function target(){
