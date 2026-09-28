@@ -32,8 +32,8 @@ window.createDreamControls = function ({ keys, keyMap, playing, action, activate
         pointers.delete(id);
         if (id === stickId) { stickId = null; x = y = 0; knob.style.transform = 'translate(-50%, -50%)'; }
         value.element.classList.toggle('pressed', [...pointers.values()].some(p => p.element === value.element));
-        if (value.action === 'jump' && !held('jump')) releaseJump();
         syncKeys();
+        if (value.action === 'jump' && !held('jump')) releaseJump();
         if (value.action === 'attack' && !held('attack')) releaseAttack(cancelled);
     }
     function bind(element, kind, name) {
@@ -42,11 +42,12 @@ window.createDreamControls = function ({ keys, keyMap, playing, action, activate
             event.preventDefault();
             activate();
             element.setPointerCapture(event.pointerId);
+            const alreadyHeld = kind === 'action' && held(name);
             pointers.set(event.pointerId, { element, hold: kind === 'hold' ? name : null, action: kind === 'action' ? name : null });
             element.classList.add('pressed');
-            if (kind === 'stick') { stickId = event.pointerId; move(event); }
-            else if (kind === 'action') action(name === 'attack' ? 'attackPress' : name);
             syncKeys();
+            if (kind === 'stick') { stickId = event.pointerId; move(event); }
+            else if (kind === 'action' && !alreadyHeld) action(name === 'attack' ? 'attackPress' : name);
         });
         for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
             element.addEventListener(type, event => release(event.pointerId, type !== 'pointerup'));

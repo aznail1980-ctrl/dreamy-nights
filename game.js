@@ -756,11 +756,11 @@
         const size = C.creatures[e.type].size;
         return player.y - 105 < e.y - 8 && player.y - 18 > e.y - size * .9;
     }
-    function meleeTarget() {
+    function meleeTarget(reach = state.active === 'ari' ? 140 : 130) {
         const moving = Math.abs(moveAxis()) > .15;
         return enemies.filter(e => {
             const dx = e.x - player.x;
-            return !e.dead && withinMeleeHeight(e) && Math.abs(dx) < 150 + enemyRadius(e)
+            return !e.dead && withinMeleeHeight(e) && Math.abs(dx) < reach + enemyRadius(e)
                 && (dx * player.facing >= 0 || (!moving && Math.abs(dx) < 95));
         }).sort((a, b) => {
             const score = e => Math.abs(e.x - player.x) + ((e.x - player.x) * player.facing < 0 ? 32 : 0);
@@ -807,11 +807,11 @@
         cancelCharge();
         if (cancelled || mode !== 'play' || player.climbing || player.dodgeT > 0 || player.hitT > 0) return;
         if (held < .35) {
-            player.attackBuffer = .22;
+            player.attackBuffer = Math.max(.22, cooldowns.attack + .08);
             attack();
             return;
         }
-        const target = meleeTarget();
+        const target = meleeTarget(held >= 1.05 ? 255 : 195);
         if (target && Math.abs(target.x - player.x) > 10) player.facing = Math.sign(target.x - player.x);
         player.chargeLevel = held >= 1.05 ? 2 : 1;
         player.combo = 3;
@@ -867,7 +867,7 @@
         audio.unlock();
         if (name === 'attackPress') return beginCharge();
         if (name === 'attack') {
-            player.attackBuffer = .22;
+            player.attackBuffer = Math.max(.22, cooldowns.attack + .08);
             return attack();
         }
         if (name === 'burst') {
@@ -1507,12 +1507,12 @@
         renderer.draw({ state, player, enemies, particles, texts, waves, rings, camera, cameraY, clock, companion, pet, mode, shake, transition, settings, rpgInfo: rpg.view(), impacts });
         requestAnimationFrame(loop);
     }
-    const keyMap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyJ: 'attack' };
+    const keyMap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyJ: 'attack', Space: 'jump' };
     addEventListener('keydown', e => {
         if (['INPUT', 'TEXTAREA'].includes(e.target.tagName) && e.code !== 'Escape')
             return;
         const dialogueControl = mode === 'dialogue' && e.target.closest('button') && e.target.id !== 'dialogueNext';
-        if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code) && !(e.code === 'Space' && dialogueControl))
+        if ((mode === 'play' || mode === 'dialogue') && ['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code) && !(e.code === 'Space' && dialogueControl))
             e.preventDefault();
         if (e.code === 'Tab' && (mode === 'modal' || mode === 'dialogue')) {
             const root = mode === 'modal' ? $('modal') : $('dialogue'), items = [...root.querySelectorAll('button:not(:disabled),input')].filter(x => x.offsetParent !== null), first = items[0], last = items[items.length - 1];
@@ -1585,7 +1585,7 @@
         if (e.code === 'Space') releaseJump();
     });
     function releaseJump() {
-        if (!player) return;
+        if (!player || keys.has('jump') || controls?.held('jump')) return;
         player.jumpReleased = true;
         if (player.vy < -320 && !player.climbing) player.vy *= .64;
     }
@@ -1679,7 +1679,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.11.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.11.1' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
