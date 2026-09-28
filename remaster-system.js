@@ -58,9 +58,11 @@ window.createDreamRemaster = function (api) {
             p.climbing = null;
             p.climbSpeed = 0;
             p.climbDetachT = .35;
-            p.vy = -620;
+            p.vy = p.jumpReleased ? -480 : -620;
             p.grounded = false;
+            p.coyote = 0;
             p.jumpBuffer = 0;
+            api.sound('jump');
             return false;
         }
         let l = p.climbing;

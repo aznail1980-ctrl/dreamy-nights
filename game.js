@@ -1104,7 +1104,7 @@
         if (player.hitT > 0)
             target *= .25;
         player.recoilV = approach(player.recoilV, 0, dt * 1250);
-        player.vx = player.dodgeT > 0 ? player.dodgeFacing * (580 + 280 * Math.sin(Math.PI * (1 - player.dodgeT / .26)))
+        player.vx = player.dodgeT > 0 ? dashVelocity(player.dodgeT, player.dodgeFacing)
             : approach(player.vx, target, dt * (dir ? (player.grounded ? 2400 : 1450) : 3200));
         if (player.grounded)
             player.coyote = .11;
@@ -1162,6 +1162,38 @@
         }
         e.x = next;
     }
+    function dashVelocity(remaining, facing) {
+        const phase = clamp(1 - remaining / .26, 0, 1);
+        return facing * (240 + 140 * phase + 650 * Math.sin(Math.PI * phase));
+    }
+    function updateTideBell(e, dt) {
+        const floor = e.floorY ?? GROUND, dx = player.x - e.x;
+        e.y = floor;
+        e.timer -= dt;
+        if (e.action) {
+            e.actionT -= dt;
+            if (e.actionT <= 0) {
+                if (e.action === 'strike') { e.action = 'recover'; e.actionT = 1.15; }
+                else { e.action = null; e.timer = 1.3; }
+            }
+            return;
+        }
+        if (e.windup > 0) {
+            e.windup -= dt;
+            if (e.windup <= 0) {
+                e.action = 'strike'; e.actionT = .38;
+                waves.push({x:e.x+e.attackFace*60,y:floor-53,vx:e.attackFace*205,life:1.65,r:19,damage:1,kind:'tideBubble',hit:false});
+                audio.sfx('claw');
+            }
+            return;
+        }
+        if (Math.abs(player.y-floor)<110 && !player.climbing && Math.abs(dx)<350 && e.timer<=0) {
+            e.attackFace = Math.sign(dx) || e.face;
+            e.face = e.attackFace;
+            e.windup = 1.05;
+        }
+        else e.x = approach(e.x,e.home+Math.sin(e.elapsed*.65)*28,22*dt);
+    }
     function updateEnemy(e, dt) {
         e.elapsed += dt;
         if (e.knockV) {
@@ -1195,6 +1227,7 @@
             e.face = e.zone?.face || e.face;
         else if (Math.abs(dx) > 12)
             e.face = Math.sign(dx);
+        if (e.variant === 'tideBell') return updateTideBell(e, dt);
         if (e.type === 'boss') {
             if (!state.flags.bossIntroduced)
                 return;
@@ -1481,8 +1514,12 @@
                         w.vy += 600 * dt;
                     w.life -= dt;
                     if (!w.hit && Math.abs(player.x - w.x) < 42 && Math.abs(player.y - 55 - w.y) < 65) {
-                        damage(1.5, w.x - Math.sign(w.vx) * 10);
+                        damage(w.damage ?? 1.5, w.x - Math.sign(w.vx) * 10);
                         w.hit = true;
+                        if (w.kind === 'tideBubble') {
+                            w.life = 0;
+                            ring(w.x,w.y,38,'#bceee5');
+                        }
                     }
                 }
                 waves = waves.filter(w => w.life > 0 && w.x > 0 && w.x < currentMap().width);
@@ -1706,7 +1743,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.13.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.14.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

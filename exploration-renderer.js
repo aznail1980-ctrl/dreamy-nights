@@ -55,7 +55,7 @@
   const r=this.r,p=r.player;if(!active||p.dodgeT<=0)return oldActor.call(this,who,x,y,face,active);
   const c=this.ctx,key=who+'DashV49',sheet=A.sheets[key],phase=1-p.dodgeT/.26;
   const frame=phase<.13?0:phase<.47?1:phase<.82?2:3,b=sheet.frames[frame],[px,py]=sheet.pivots[frame],sc=sheet.scale,direction=p.dodgeFacing||face;
-  this.ellipse(x,p.groundY??y,27,4,'#4b415d30');c.save();c.translate(x,y);c.scale(direction,1);
+  this.ellipse(x,p.groundY??y,27,4,'#4b415d30');c.save();c.translate(x,y-(p.grounded&&!r.settings.reducedMotion?Math.sin(phase*Math.PI)*5:0));c.scale(direction,1);
   const pose={who,kind:'dash',frame,pins:sheet.pins[frame]},body=()=>c.drawImage(this.images[key],...b,(b[0]-px)*sc,(b[1]-py)*sc,b[2]*sc,b[3]*sc);
   if(!r.settings.reducedMotion){
    for(let i=2;i>=1;i--){c.save();c.translate(-i*19,0);c.globalAlpha=.08/i;body();c.restore();}

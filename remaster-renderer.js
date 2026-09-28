@@ -434,6 +434,12 @@
         this.actor(r.state.active, r.player.x, r.player.y, r.player.facing, true);
         this.drawHitEffects(r);
         for (const w of r.waves) {
+            if (w.kind === 'tideBubble') {
+                c.save();c.fillStyle='#93dfeb70';c.strokeStyle='#e1fffa';c.lineWidth=2;
+                c.beginPath();c.arc(w.x,w.y,w.r,0,Math.PI*2);c.fill();c.stroke();
+                this.ellipse(w.x-6,w.y-7,5,3,'#ffffffda');c.restore();
+                continue;
+            }
             this.glow(w.x, w.y, w.kind === 'button' ? 23 : 53, '#d9c5ed');
             this.item(w.kind === 'button' ? 'badge' : 'dust', w.x, w.y, w.kind === 'button' ? 23 : 55, undefined, r.clock * 4);
         }
