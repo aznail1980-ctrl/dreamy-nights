@@ -33,6 +33,16 @@
         else{const b=t%5.7;frame=b>3.2&&b<3.29?1:b>=3.29&&b<3.39?2:b>=3.39&&b<3.47?1:0;}
         return {frame,lean:Math.sin(t*1.13)*.009+(greeting>=0?Math.sin(greeting*Math.PI/1.65)*.018:0),breath:1+Math.sin(t*1.65)*.005,offset:Math.sin(t*1.3)*1.2};
     }
+    function sampleChoice(time,id,reaction,reduced=false){
+        const pose=sample(time,id,reaction,reduced),t=time-reaction;
+        if(reduced||t<0||t>1.65)return pose;
+        const beat=Math.sin(Math.PI*t/1.65);
+        pose.lean+=(id==='popo'?-1:1)*beat*.055;
+        // A brief spring and landing for Popo; Ari keeps her feet planted and bows.
+        pose.offset=id==='popo'?-Math.max(0,Math.sin(Math.PI*Math.min(1,t/.65)))*9:0;
+        pose.breath=1+(id==='popo'?-.018:.012)*beat;
+        return pose;
+    }
     function draw(canvas,image,id,pose,parallax=0){
         const a=DREAM_LOBBY_ART[id],b=a.frames[pose.frame],pivot=a.pivots[pose.frame],ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
         ctx.clearRect(0,0,w,h);
@@ -42,9 +52,9 @@
         ctx.drawImage(image,...b,(b[0]-pivot[0])*sc,(b[1]-pivot[1])*sc+pose.offset,b[2]*sc,b[3]*sc);ctx.restore();
     }
     window.DREAM_LOBBY_UI={button,title,svg};
-    window.DREAM_LOBBY_MOTION={sample,draw};
+    window.DREAM_LOBBY_MOTION={sample,sampleChoice,draw};
     window.createDreamLobby=function({stage,settings}){
-        const root=document.getElementById('title'),portraits={},reactions={ari:-100,popo:-100},query=matchMedia('(prefers-reduced-motion: reduce)');
+        const root=document.getElementById('title'),portraits={},reactions={ari:-100,popo:-100},choiceReactions={ari:-100,popo:-100},query=matchMedia('(prefers-reduced-motion: reduce)');
         let elapsed=0,lastDraw=-1,paused=false,targetX=0,shift=0,lastReduced=null,selectionRoot=null,selection=[],lastSurface=null;
         try{paused=localStorage.getItem('dreamy-nights-lobby-motion-v1')==='off';}catch{}
         for(const id of ['ari','popo']){
@@ -59,6 +69,10 @@
         }
         button(document.getElementById('openingReplay'),'인트로 다시 보기','replay');
         button(document.getElementById('titleHelp'),'조작 방법','help');
+        stage.addEventListener('dream-hero-choice',event=>{
+            const id=event.detail?.id;if(!Object.hasOwn(choiceReactions,id))return;
+            choiceReactions[id]=elapsed;lastDraw=-1;
+        });
         const motion=document.getElementById('lobbyMotion');
         motion.onclick=()=>{paused=!paused;try{localStorage.setItem('dreamy-nights-lobby-motion-v1',paused?'off':'on');}catch{}lastDraw=-1;};
         root.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const b=root.getBoundingClientRect();targetX=Math.max(-1,Math.min(1,(e.clientX-b.left)/b.width*2-1));});
@@ -83,10 +97,10 @@
             }
             if(mode==='modal'&&modalKind==='character'){
                 const modal=document.getElementById('modalContent');
-                if(selectionRoot!==modal.firstElementChild){selectionRoot=modal.firstElementChild;selection=[...modal.querySelectorAll('[data-choice-canvas]')];}
-                for(const canvas of selection){const id=canvas.dataset.choiceCanvas,p=portraits[id];if(!p?.ready)continue;const selected=canvas.closest('.hero-choice').getAttribute('aria-pressed')==='true';draw(canvas,p.image,id,sample(elapsed,id,reactions[id],reduced||!selected));canvas.parentElement.classList.add('motion-ready');}
+                if(selectionRoot!==modal.firstElementChild){selectionRoot=modal.firstElementChild;selection=[...modal.querySelectorAll('[data-choice-canvas]')];const selected=modal.querySelector('.hero-choice.selected');if(selected)choiceReactions[selected.dataset.hero]=elapsed;}
+                for(const canvas of selection){const id=canvas.dataset.choiceCanvas,p=portraits[id];if(!p?.ready)continue;const selected=canvas.closest('.hero-choice').getAttribute('aria-pressed')==='true';draw(canvas,p.image,id,sampleChoice(elapsed,id,choiceReactions[id],reduced||!selected));canvas.parentElement.classList.add('motion-ready');}
             }
         }
-        return {update,inspect:()=>({ready:Object.fromEntries(Object.entries(portraits).map(([id,p])=>[id,p.ready])),paused:!!lastReduced,frames:Object.fromEntries(['ari','popo'].map(id=>[id,sample(elapsed,id,reactions[id],!!lastReduced).frame]))})};
+        return {update,inspect:()=>({ready:Object.fromEntries(Object.entries(portraits).map(([id,p])=>[id,p.ready])),paused:!!lastReduced,choiceFrames:Object.fromEntries(['ari','popo'].map(id=>[id,sampleChoice(elapsed,id,choiceReactions[id],!!lastReduced).frame])),frames:Object.fromEntries(['ari','popo'].map(id=>[id,sample(elapsed,id,reactions[id],!!lastReduced).frame]))})};
     };
 })();

@@ -53,21 +53,23 @@ window.createDreamWorld = function (api) {
             <path d="m25 26 2 2 4-5" fill="none" stroke="#fff9df" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>`;
         api.openModal('character', '꿈 지킴이 선택', `
-            <p class="choose-lead">첫 번째 밤을 함께할 친구를 골라주세요.</p>
-            <div class="hero-choices" role="group" aria-label="함께할 꿈 지킴이 선택">
+            <p class="choose-lead">친구를 골라, 첫 순찰을 떠나게 된 이야기를 만나보세요.</p>
+            <div class="keeper-selection"><div class="hero-choices" role="group" aria-label="함께할 꿈 지킴이 선택">
                 ${['ari', 'popo'].map(id => `<button type="button" class="hero-choice ${choice === id ? 'selected' : ''}" data-hero="${id}" aria-pressed="${choice === id}" aria-label="${name(id)} 선택" aria-describedby="heroDescription-${id}">
                     <span class="hero-choice-status" aria-hidden="true"><span class="hero-choice-seal">${keeperSeal}</span><span class="hero-choice-status-text">${choice === id ? '출격 준비' : '지킴이 선택'}</span></span>
-                    <span class="hero-choice-art"><img src="assets/${id === 'popo' ? 'popoFrontV41' : id}.webp" alt=""><canvas data-choice-canvas="${id}" width="440" height="560" aria-hidden="true"></canvas></span>
-                    <div class="hero-choice-copy"><span>${id === 'ari' ? '작은 용기를 모으는' : '호기심으로 길을 찾는'} 꿈 지킴이</span><h3>${name(id)}</h3><p id="heroDescription-${id}">${id === 'ari' ? '침착한 관찰자. 걱정 속의 소중한 기억을 찾아요.' : '활기찬 탐험가. 처음 걷는 길에서도 재미를 찾아요.'}</p></div>
+                    <span class="hero-choice-art"><span class="keeper-choice-spark" aria-hidden="true">✦</span><img src="assets/${id === 'popo' ? 'popoFrontV41' : id}.webp" alt=""><canvas data-choice-canvas="${id}" width="440" height="560" aria-hidden="true"></canvas></span>
+                    <div class="hero-choice-copy"><span>${DREAM_HERO_PROFILES[id].keyword}</span><h3>${name(id)}</h3><p id="heroDescription-${id}">${DREAM_HERO_PROFILES[id].weapon}</p></div>
                 </button>`).join('')}
             </div>
-            <div class="hero-confirm"><p>선택한 지킴이로 첫 번째 밤을 함께하세요.<br>능력은 동등해요. 탐험으로 모은 아이템으로 나만의 모습을 꾸며보세요.</p><button id="confirmHero" class="primary">${name(choice)}와 모험 시작 →</button></div>
+            <div id="keeperProfile">${renderDreamHeroProfile(choice)}</div></div>
+            <div class="hero-confirm"><p>두 지킴이 모두 같은 이야기와 성장 기회를 가져요.<br>마음이 가는 친구를 골라주세요.</p><button id="confirmHero" class="primary">${name(choice)}와 모험 시작 →</button></div>
             <span id="heroChoiceAnnouncement" class="hero-choice-announcement" role="status" aria-live="polite"></span>`, 'YOUR FIRST FOOTSTEP');
         if(window.DREAM_LOBBY_UI)DREAM_LOBBY_UI.button($('confirmHero'),`${name(choice)}와 모험 시작`,'star','선택한 지킴이로 출발');
         const buttons = [...document.querySelectorAll('[data-hero]')];
         function choose(id) {
-            if (choice === id) return;
+            const changed = choice !== id;
             choice = id;
+            if (changed) $('keeperProfile').innerHTML = renderDreamHeroProfile(id);
             for (const button of buttons) {
                 const selected = button.dataset.hero === choice;
                 button.classList.toggle('selected', selected);
@@ -75,7 +77,13 @@ window.createDreamWorld = function (api) {
                 button.querySelector('.hero-choice-status-text').textContent = selected ? '출격 준비' : '지킴이 선택';
             }
             if(window.DREAM_LOBBY_UI)DREAM_LOBBY_UI.button($('confirmHero'),`${name(choice)}와 모험 시작`,'star','선택한 지킴이로 출발');else $('confirmHero').textContent = `${name(choice)}와 모험 시작 →`;
-            $('heroChoiceAnnouncement').textContent = `${name(choice)}를 선택했어요.`;
+            const selectedButton = buttons.find(b => b.dataset.hero === id);
+            selectedButton.classList.remove('choice-reveal');
+            void selectedButton.offsetWidth;
+            selectedButton.classList.add('choice-reveal');
+            selectedButton.dispatchEvent(new CustomEvent('dream-hero-choice', {bubbles:true, detail:{id}}));
+            if (changed) api.sound('stamp');
+            $('heroChoiceAnnouncement').textContent = `${name(choice)} 선택. ${DREAM_HERO_PROFILES[id].quote} 아래에서 이 친구의 이야기를 읽어보세요.`;
         }
         for (const button of buttons) {
             button.onclick = () => choose(button.dataset.hero);
