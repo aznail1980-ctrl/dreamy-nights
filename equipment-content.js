@@ -40,6 +40,13 @@
     E.hands.ari.attack=[28,-38,1.1];E.hands.popo.attack=[35,-43,1.1];
     W.anchors.ari.attack=pin([8,-66],[5,-107],.18);
     W.anchors.popo.attack=pin([5,-72],[6,-112],.18);
+    // Popo's ribbon attaches to the rear hair bun, clear of the eye during a lunge.
+    const bowOnBun=(p,dx,dy)=>{p.bow=[p.head[0]+dx,p.head[1]+dy];};
+    bowOnBun(W.anchors.popo.idle,-14,-6);
+    W.anchors.popo.walk.forEach(p=>bowOnBun(p,-10,-4));
+    bowOnBun(W.anchors.popo.attack,-19,-10);
+    DREAM_ART_V49.sheets.popoDashV49.pins.forEach(p=>bowOnBun(p,-28,-15));
+    DREAM_ART_V44.sheets.popoChargeV44.pins.forEach(p=>bowOnBun(p,-17,-10));
     const previousSync=C.syncHeroItems;
     C.syncHeroItems=who=>{
         previousSync?.(who);
