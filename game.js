@@ -3,7 +3,7 @@
     const C = window.DREAM_CONTENT, AIR = window.DREAM_AIR, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
     const $ = id => document.getElementById(id), clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const imageKeys = [...new Set([...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'])];
-    let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby;
+    let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby, growthUI;
     let cameraY = 0, dialogueKey = '', autoClimb = 0;
     let images = {}, renderer, mode = 'loading', modalKind = '', beforeModal = 'play', state, player, enemies = [], particles = [], texts = [], waves = [], rings = [], camera = 0, clock = 0, lastTime = 0, uiTime = 0, saveTime = 0, hitstop = 0, shake = 0, transition = 0, autoWalk = false, interaction = null, dialogue = null, dialogueIndex = 0, dialogueDone = null, lastQuest = -1, dialogueBefore = 'play';
     let impacts = [];
@@ -210,7 +210,8 @@
     }
     const audio = new DreamAudio();
     function defaultState() {
-        return remaster.initialize(world.initialize(rpg.initialize({ version: 3, map: 0, x: 185, hp: 6, active: 'ari', xp: 0, light: 0, snacks: 3, killed: [], memories: [], claimed: [], visited: [0], flags: { introSeen: false, firstMemory: false, metLumen: false, bossIntroduced: false, completed: false, walkHint: false, skillHint: false, jumped: false, pomiRescue: false }, time: 0 })));
+        const s = remaster.initialize(world.initialize(rpg.initialize({ version: 3, map: 0, x: 185, hp: 6, active: 'ari', xp: 0, light: 0, snacks: 3, killed: [], memories: [], claimed: [], visited: [0], flags: { introSeen: false, firstMemory: false, metLumen: false, bossIntroduced: false, completed: false, walkHint: false, skillHint: false, jumped: false, pomiRescue: false }, time: 0 })));
+        return window.DREAM_PROGRESS.initialize(s);
     }
     function validateSave(raw) {
         if (!raw || ![1, 2, 3, 4].includes(raw.version) || !Number.isInteger(raw.map) || raw.map < 0 || raw.map >= C.maps.length)
@@ -235,7 +236,8 @@
         s.y = raw.version === 4 && Number.isFinite(raw.y) ? clamp(raw.y, 31, GROUND) : GROUND;
         const migrated=remaster.initialize(world.migrate(rpg.migrate(s, raw), raw), raw);
         const gearHP=['weapon','charm','keepsake'].reduce((n,slot)=>n+(DREAM_GEAR.stats(DREAM_GEAR.equipped(s.rpg,slot)).hp||0),0);
-        const limit=Math.min(8,6+Math.floor(Math.floor(s.xp/75)/3))+gearHP;
+        window.DREAM_PROGRESS.initialize(s, raw);
+        const limit=Math.min(8,6+Math.floor((window.DREAM_PROGRESS.level(s)-1)/3))+gearHP;
         s.hp=clamp(Number(raw.hp)||6,.5,limit);
         return migrated;
     }
@@ -250,6 +252,9 @@
     function save() {
         if (!sessionStarted || !state || state.hp <= 0)
             return;
+        const previousLevel = level();
+        window.DREAM_PROGRESS.sync(state);
+        growthNotice(previousLevel);
         state.x = clamp(player?.x || state.x, 90, C.maps[state.map].width - 90);
         state.y = player?.grounded ? player.y : (player?.groundY ?? GROUND);
         try {
@@ -304,7 +309,14 @@
         return Math.min(8, 6 + Math.floor((level() - 1) / 3)) + (rpg?.stats().hp || 0);
     }
     function level() {
-        return 1 + Math.floor((state?.xp || 0) / 75);
+        return window.DREAM_PROGRESS.level(state);
+    }
+    function growthNotice(before) {
+        if (level() <= before) return;
+        state.hp = maxHP();
+        const points = window.DREAM_PROGRESS.info(state).available;
+        toast('Lv. ' + level() + ' · ' + (points ? '성장 포인트 ' + points + '개! 캐릭터 → 꿈빛 성장에서 배워요.' : '마음이 한층 더 단단해졌어요!'), 4);
+        audio.sfx('memory');
     }
     function toast(text, duration = 3) {
         $('toast').textContent = text;
@@ -391,7 +403,7 @@
         rings = [];
         texts = [];
         autoWalk = false;
-        Object.keys(cooldowns).forEach(k => cooldowns[k] = 0);
+        Object.keys(cooldowns).forEach(k => cooldowns[k] = k === 'skill' ? state.growth.skillCD : 0);
         if (!state.visited.includes(index))
             state.visited.push(index);
         if (index === 2)
@@ -671,8 +683,16 @@
     function damage(amount = 1, sourceX = player.x + player.facing) {
         if (player.invincible > 0 || player.dodgeT > 0 || mode !== 'play')
             return;
-        if (rpg.absorb())
-            return;
+        if (player.skillShield && player.skillShieldT > 0) {
+            player.skillShield = false; player.skillShieldT = 0; player.invincible = .45;
+            ring(player.x, player.y - 65, 90, '#bfffe9'); audio.sfx('memory');
+            floatText('꿈빛이 지켜줬어요!', player.x, player.y - 150, '#c8ffe9'); return;
+        }
+        if (rpg.absorb()) return;
+        if (window.DREAM_PROGRESS.passive(state,'guard') && state.hp <= maxHP() * .4 && state.growth.guardCD <= 0) {
+            amount *= .5; state.growth.guardCD = 25;
+            floatText('다시 일어설 용기', player.x, player.y - 155, '#c8ffe9');
+        }
         state.hp = Math.max(0, state.hp - amount);
         player.invincible = 1.4;
         const away = Math.sign(player.x - sourceX) || -player.facing;
@@ -693,6 +713,7 @@
         }
         if (state.hp <= 0)
             fail();
+        else save();
         updateHUD();
     }
     function defeat(e) {
@@ -703,16 +724,13 @@
                 state.killed.push(e.id);
         rpg.rewardKill(e);
         const c = C.creatures[e.type], oldLevel = level();
-        state.xp += c.exp;
+        window.DREAM_PROGRESS.gain(state, c.exp);
         state.light += c.light;
         spark(e.x, e.y - c.size * .55, e.type === 'boss' ? 85 : 28, '#ffe6a0', e.type === 'boss' ? 440 : 230);
         ring(e.x, e.y - c.size * .5, c.size * 1.2);
         audio.sfx('purify');
         floatText('정화 완료!  +' + c.light + ' ✧', e.x, e.y - c.size - 25);
-        if (level() > oldLevel) {
-            state.hp = maxHP();
-            toast('Lv. ' + level() + ' · 마음이 한층 더 단단해졌어요!');
-        }
+        growthNotice(oldLevel);
         if (e.type === 'boss') {
             waves = [];
             rpg.recoverJournal();
@@ -809,7 +827,8 @@
         player.attackFacing = player.facing;
         cooldowns.attack = player.attackLength;
         // Each swing has a short active interval, and can hit each enemy only once.
-        player.pendingStrike = { delay: player.combo === 3 ? .12 : .085, active: .12, combo: player.combo, facing: player.facing, hits: [], started: false };
+        player.pendingStrike = { delay: player.combo === 3 ? .12 : .085, active: .12, combo: player.combo, facing: player.facing, hits: [], started: false, dreamStep: player.dashGift > 0 };
+        player.dashGift = 0;
         audio.sfx('attack');
     }
     function startPlunge() {
@@ -896,8 +915,8 @@
         swing.delay -= dt;
         if (swing.delay > 0)
             return;
-        const reach = swing.reach || (state.active === 'ari' ? 140 : 130);
-        const power = swing.power || (swing.combo === 3 ? 4 : 2) + rpg.stats().attack;
+        const reach = (swing.reach || (state.active === 'ari' ? 140 : 130)) + (swing.dreamStep ? 45 : 0);
+        const power = (swing.power || (swing.combo === 3 ? 4 : 2) + rpg.stats().attack) + (swing.combo === 3 && window.DREAM_PROGRESS.passive(state,'attack') ? 1 : 0);
         if (!swing.started) {
             swing.started = true;
             if (swing.impact === 'charged') {
@@ -916,6 +935,7 @@
             if (!e.dead && !swing.hits.includes(e.id) && withinMeleeHeight(e) && dx >= -radius * .5 && dx < reach + radius) {
                 swing.hits.push(e.id);
                 hit(e, power, swing.impact || (swing.combo === 3 ? 'finisher' : 'light'));
+                if(swing.dreamStep)e.growthSlow=e.type==='boss'?.35:.8;
             }
         }
         swing.active -= dt;
@@ -949,6 +969,7 @@
             cancelCharge();
             dodgeCooldownDuration = Math.max(.35, 1.35 - rpg.stats().dodge);
             cooldowns.dodge = dodgeCooldownDuration;
+            if(window.DREAM_PROGRESS.passive(state,'control'))player.dashGift=1.8;
             player.pendingStrike = null;
             player.attackT = 0;
             if (enemies.some(e => !e.dead && (e.windup > 0 || e.phase === 'warn') && Math.abs(e.x - player.x) < 350) || waves.some(w => Math.abs(w.x - player.x) < 170))
@@ -969,27 +990,30 @@
             spark(player.x, player.y - 50, 10, '#ddd0ff', 120);
             updateDashHUD();
         }
-        if (name === 'skill' && cooldowns.skill <= 0 && !player.climbing && !player.lift) {
-            player.plunge = null;
-            cancelCharge();
-            cooldowns.skill = 5;
-            player.pendingStrike = null;
-            player.attackLength = .38;
-            player.attackT = .38;
-            player.attackFacing = player.facing;
-            player.invincible = .35;
-            autoWalk = false;
-            ring(player.x, player.y - 80, 300, '#ffe2a2');
-            spark(player.x, player.y - 80, 36, '#f9dbff', 390);
-            audio.sfx('skill');
-            for (const e of enemies) {
-                if (mode !== 'play')
-                    break;
-                if (!e.dead && Math.abs(e.x - player.x) < 285 && Math.abs(e.y - player.y) < 190)
-                    hit(e, 7 + rpg.stats().skill);
+        if (name === 'skill' && state.growth.skillCD <= 0 && !player.climbing && !player.lift && player.hitT <= 0 && player.dodgeT <= 0) {
+            player.plunge = null; cancelCharge();
+            const P = window.DREAM_PROGRESS, spec = P.cast(state,player);
+            if (!spec) return;
+            cooldowns.skill = state.growth.skillCD;
+            player.pendingStrike = null; player.attackLength = .55; player.attackT = .55;
+            player.attackFacing = player.facing; player.invincible = .3; autoWalk = false;
+            audio.sfx(spec.id === 'guard' ? 'camp' : spec.id === 'control' ? 'wind' : 'skill');
+            if(state.active==='popo'&&spec.id==='attack')audio.thump(85,.6,.25);
+            ring(player.x,player.y-45,spec.range,spec.color);spark(player.x,player.y-75,28,spec.color,260);
+            if(spec.damage)for(const e of enemies){
+                if(mode!=='play')break;
+                const dx=e.x-player.x, forward=spec.id==='attack'&&state.active==='ari';
+                if(!e.dead&&Math.abs(dx)<spec.range&&Math.abs(e.y-player.y)<160&&(!forward||dx*player.facing>=-30)){
+                    hit(e,spec.damage+rpg.stats().skill);
+                    if(spec.id==='control'){
+                        e.growthSlow=e.type==='boss'?.7:spec.master?3.2:2.2;
+                        if(state.active==='popo')e.knockV=Math.sign(dx||player.facing)*(e.type==='boss'?60:240);
+                    }
+                }
             }
-            say(state.active === 'popo' ? '반짝반짝 온다온다—!' : '걱정은 바람에, 기억은 마음에!', 2, state.active === 'ari' ? '아리' : '포포');
+            say(spec.name+'!',1.5,state.active==='ari'?'아리':'포포');save();updateHUD();
         }
+        if (name === 'growth') return growthUI.open();
         if (name === 'pets')return rpg.pets();
         if (name === 'wardrobe')
             rpg.details();
@@ -1151,7 +1175,8 @@
         pet.landSquash=Math.max(0,(pet.landSquash||0)-dt);
     }
     function updatePlayer(dt) {
-        Object.keys(cooldowns).forEach(k => cooldowns[k] = Math.max(0, cooldowns[k] - dt));
+        window.DREAM_PROGRESS.tick(state,player,dt);
+        Object.keys(cooldowns).forEach(k => cooldowns[k] = k === 'skill' ? state.growth.skillCD : Math.max(0, cooldowns[k] - dt));
         for (const k of ['invincible', 'attackT', 'dodgeT', 'comboT', 'jumpBuffer', 'landSquash', 'attackBuffer', 'hitT', 'climbDetachT', 'airJumpT', 'plungeLandT'])
             player[k] = Math.max(0, player[k] - dt);
         autoClimb = 0;
@@ -1218,7 +1243,7 @@
         }
         if (state.map === 1 && player.x > 460 && !state.flags.skillHint) {
             state.flags.skillHint = true;
-            say(controls?.touch ? '꿈빛 버튼으로 걱정을 털어줘! 공명이 차면 공명 버튼, 모은 옷은 왼쪽 위 얼굴에서 입어보자.' : 'K는 꿈빛 파동! 공명이 차면 F, 모은 옷은 C에서 입어보자.');
+            say(controls?.touch ? '스킬 버튼으로 배운 힘을 사용해! 왼쪽 위 얼굴 → 꿈빛 성장에서 기술을 고를 수 있어.' : 'K는 선택 스킬, F는 공명 정화! C → 꿈빛 성장 또는 U로 새 기술을 배워보자.');
         }
         if (state.map === 4 && !state.flags.bossIntroduced && player.x > 580) {
             state.flags.bossIntroduced = true;
@@ -1277,6 +1302,7 @@
         else e.x = approach(e.x,e.home+Math.sin(e.elapsed*.65)*28,22*dt);
     }
     function updateEnemy(e, dt) {
+        if(e.growthSlow>0){e.growthSlow=Math.max(0,e.growthSlow-dt);dt*=e.type==='boss'?.85:.6;}
         e.elapsed += dt;
         if (e.knockV) {
             e.x += e.knockV * dt;
@@ -1510,7 +1536,14 @@
         $('hearts').innerHTML = `<span class="hp-symbol">♥</span><span class="hp-meter"><i style="width:${state.hp / maxHP() * 100}%"></i></span><small>${state.hp}/${maxHP()}</small>`;
         $('hearts').setAttribute('aria-label', `마음 체력 ${state.hp} / ${maxHP()}`);
         $('levelText').textContent = 'Lv. ' + level();
-        $('xpFill').style.width = (state.xp % 75) / 75 * 100 + '%';
+        const growthInfo=window.DREAM_PROGRESS.info(state), equippedSkill=window.DREAM_PROGRESS.skill(state);
+        $('xpFill').style.width = Math.min(100,growthInfo.current/growthInfo.total*100) + '%';
+        $('levelText').textContent='Lv. '+level();
+        $('levelText').title='꿈빛 성장 · 남은 포인트 '+growthInfo.available;
+        $('levelText').classList.toggle('has-points',growthInfo.available>0);
+        $('levelText').setAttribute('aria-label','꿈빛 성장 · 레벨 '+level()+' · 남은 성장 포인트 '+growthInfo.available);
+        $('skillControl').querySelector('b').textContent=equippedSkill.name;
+        $('burstControl').querySelector('b').textContent='공명 정화';
         $('lightCount').textContent = state.light;
         $('snackCount').textContent = rpg.own('cookie') + rpg.own('lunch') + rpg.own('tea');
         $('locationName').textContent = currentMap().name;
@@ -1531,7 +1564,7 @@
         }
         journey?.update();
         show('rewardDot', C.quests.some((_, i) => questComplete(i) && !state.claimed.includes(i)));
-        for (const [id, key, duration] of [['skillControl', 'skill', 5]]) {
+        for (const [id, key, duration] of [['skillControl', 'skill', equippedSkill.cooldown]]) {
             $(id).querySelector('i').style.height = cooldowns[key] / duration * 100 + '%';
             $(id).setAttribute('aria-label', $(id).querySelector('b').textContent + (cooldowns[key] > .1 ? ' · ' + Math.ceil(cooldowns[key]) + '초 남음' : ''));
         }
@@ -1710,7 +1743,7 @@
             if (keyMap[e.code] !== 'attack')
                 autoWalk = false;
         }
-        const acts = { KeyJ: 'attackPress', Space: 'jump', ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyK: 'skill', KeyQ: 'wardrobe', KeyC: 'wardrobe', KeyP:'pets' };
+        const acts = { KeyJ: 'attackPress', Space: 'jump', ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyK: 'skill', KeyQ: 'wardrobe', KeyC: 'wardrobe', KeyP:'pets', KeyU:'growth' };
         if (acts[e.code])
             action(acts[e.code]);
         if (e.code === 'KeyE')
@@ -1846,7 +1879,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.22.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.23.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1884,6 +1917,10 @@
         }
         lobby=window.createDreamLobby({stage:$('stage'),settings});
         renderer = new window.DreamRenderer($('world'), images, C);
+        growthUI=window.createDreamProgressUI({get state(){return state;},get player(){return player;},get mode(){return mode;},openModal,save,refresh:updateHUD,sound:k=>audio.sfx(k),back:()=>rpg.details(),preview:(canvas,options)=>renderer.previewHero(canvas,state,options),changed:()=>{player.skillShield=false;player.skillShieldT=0;player.dashGift=0;}});
+        $('levelText').classList.add('growth-hud-link');$('levelText').setAttribute('role','button');$('levelText').tabIndex=0;
+        $('levelText').onclick=()=>{if(mode==='play')growthUI.open();};
+        $('levelText').onkeydown=e=>{if(['Enter',' '].includes(e.key)&&mode==='play'){e.preventDefault();e.stopPropagation();growthUI.open();}};
         state = defaultState();
         player = makePlayer(185);
         enemies = [];
@@ -1902,7 +1939,7 @@
             return mode;
         }, get modalKind() {
             return modalKind;
-        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), pets:()=>rpg.pets(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
+        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), pets:()=>rpg.pets(), growth:()=>growthUI.open(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     world = window.createDreamWorld({ get state() {
             return state;
         }, get player() {

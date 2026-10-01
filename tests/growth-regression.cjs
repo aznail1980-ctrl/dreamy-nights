@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
 const root=require('path').resolve(__dirname,'..')+'/',c=vm.createContext({});c.window=c;
 const load=n=>vm.runInContext(fs.readFileSync(root+n+'.js','utf8'),c);
-for(const n of ['story','rpg-content','world-content','remaster-content','illustrated-content','exploration-content','art-v49','art-v44','motion-assets','wear-content','loot-content','tide-content','region-art','region-content','region-layout','equipment-art','equipment-content','pet-art','pet-system','pet-ui','gear-system','gear-ui','equipment-ui','region-ui','rpg-system','world-system','remaster-system'])load(n);
+for(const n of ['story','rpg-content','world-content','remaster-content','illustrated-content','exploration-content','art-v49','art-v44','motion-assets','wear-content','loot-content','tide-content','region-art','region-content','region-layout','equipment-art','equipment-content','pet-art','pet-system','pet-ui','gear-system','gear-ui','equipment-ui','region-ui','rpg-system','world-system','remaster-system','progression-system'])load(n);
 const P=c.DREAM_PETS,G=c.DREAM_GEAR,C=c.DREAM_CONTENT,plain=v=>JSON.parse(JSON.stringify(v));
 let n=0;function test(name,f){f();console.log('PASS',name);n++;}
 const fresh=()=>{const s={flags:{metLumen:true},visited:[0,1,2]};P.initialize(s);return s;};
