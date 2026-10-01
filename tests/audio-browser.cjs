@@ -11,9 +11,10 @@ const base=process.env.GAME_URL||'http://127.0.0.1:8769/',root=path.resolve(__di
  for(const theme of ['beach','trail','town','alley','boss','tide','garden','observatory','archive','waterway']){
   await p.evaluate(theme=>{__mix.getScene=()=>({...__actualScene(),mode:'play',theme});},theme);
   await p.waitForFunction(theme=>__mix.inspect().tracks.some(t=>t.theme===theme&&t.playing&&!t.failed),theme,{timeout:20000});
+  await p.waitForFunction(theme=>__mix.decks.some(d=>d.theme===theme&&d.started),theme,{timeout:30000});
   assert.equal(await p.evaluate(()=>__mix.scoreTheme),theme);assert((await p.evaluate(()=>__mix.decks.length))<=2);
  }
- await p.waitForTimeout(1800);assert.equal(await p.evaluate(()=>__mix.decks.length),1);
+ await p.waitForFunction(()=>__mix.decks.length===1&&__mix.decks[0].started,null,{timeout:10000});assert.equal(await p.evaluate(()=>__mix.decks.length),1);
  // A real media source feeds the music bus with non-zero samples.
  const power=await p.evaluate(async()=>{const d=__mix.decks.at(-1),a=__mix.ctx.createAnalyser();a.fftSize=1024;d.gain.connect(a);d.audio.currentTime=35;await new Promise(r=>setTimeout(r,550));const v=new Float32Array(a.fftSize);a.getFloatTimeDomainData(v);d.gain.disconnect(a);return Math.max(...v.map(Math.abs));});assert(power>.00001,'music signal');
  await p.evaluate(()=>{__mix.ducked=true;});await p.waitForTimeout(300);assert((await p.evaluate(()=>__mix.musicLevel))<.35);await p.evaluate(()=>__mix.ducked=false);
