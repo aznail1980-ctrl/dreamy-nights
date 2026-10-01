@@ -113,9 +113,11 @@
         $('shell').style.width = layout.width + 'px';
         $('shell').style.height = layout.height + 'px';
         $('stage').style.height = layout.stageHeight + 'px';
+        $('stage').style.width = layout.stageWidth + 'px';
         $('stage').style.transform = `scale(${layout.scale})`;
         $('stage').style.setProperty('--touch-size', layout.touchSize + 'px');
         $('stage').style.setProperty('--stage-height', layout.stageHeight + 'px');
+        $('stage').style.setProperty('--stage-width', layout.stageWidth + 'px');
         $('stage').dataset.layout = layout.portrait ? 'portrait' : layout.coarse ? 'landscape' : 'desktop';
     }
     function show(id, on = true) {
@@ -568,9 +570,10 @@
         save();
         updateHUD();
     }
-    function hit(e, power, impact = 'skill') {
+    function hit(e, power, impact = 'skill', feedback = null) {
         if (e.dead)
             return;
+        feedback = feedback || window.DREAM_COMBAT.profile(state, impact);
         const charged = impact === 'charged', heavy = impact !== 'light', finish = e.hp <= power, dir = Math.sign(e.x - player.x) || player.facing;
         rpg.hit();
         e.hp = Math.max(0, e.hp - power);
@@ -601,9 +604,9 @@
         }
         hitstop = settings.reducedMotion ? 0 : charged ? .11 : heavy ? .085 : .055;
         shake = settings.reducedMotion ? 0 : charged ? 10 : heavy ? 6.5 : 3.3;
-        impacts.push({ x: e.x, y: e.y - C.creatures[e.type].size * .5, life: charged ? .46 : heavy ? .32 : .24, max: charged ? .46 : heavy ? .32 : .24, charged, heavy, dir, seed: Math.random() * 6 });
+        impacts.push({ x: e.x, y: e.y - C.creatures[e.type].size * .5, life: charged ? .46 : heavy ? .32 : .24, max: charged ? .46 : heavy ? .32 : .24, charged, heavy, dir, feedback, floorY:e.floorY??e.y, seed: Math.random() * 6 });
         spark(e.x, e.y - C.creatures[e.type].size * .5, heavy ? 20 : 11, heavy ? '#fff1ca' : '#ffe4ac', heavy ? 320 : 220);
-        audio.impact(e.variant||e.type, heavy, finish, e.x);
+        audio.impact(e.variant||e.type, heavy, finish, e.x, feedback);
         if (e.hp <= 0)
             defeat(e);
         else
@@ -651,13 +654,15 @@
         // Each swing has a short active interval, and can hit each enemy only once.
         player.pendingStrike = { delay: player.combo === 3 ? .12 : .085, active: .12, combo: player.combo, facing: player.facing, hits: [], started: false, dreamStep: player.dashGift > 0 };
         player.dashGift = 0;
-        audio.sfx('attack');
+        player.pendingStrike.feedback = DREAM_COMBAT.profile(state,player.combo===3?'finisher':'light');
+        audio.combatSwing(player.pendingStrike.feedback);
     }
     function startPlunge() {
         if (mode !== 'play' || cooldowns.attack > 0 || !AIR.begin(player)) return;
         cancelCharge();
         autoWalk = false;
-        audio.sfx('attack');
+        player.plunge.feedback = DREAM_COMBAT.profile(state,'plunge');
+        audio.combatSwing(player.plunge.feedback);
         spark(player.x, player.y - 55, 9, '#fff0c2', 100);
     }
     function resolvePlunge(oldY) {
@@ -669,7 +674,7 @@
             if (AIR.canHit(player, e, oldY, C.creatures[e.type].size, enemyRadius(e), currentMap().platforms, landed)) {
                 plunge.hits.push(e.id);
                 player.invincible = Math.max(player.invincible, .2);
-                hit(e, 4 + rpg.stats().attack, 'finisher');
+                hit(e, 4 + rpg.stats().attack, 'plunge', plunge.feedback);
             }
         }
         if (landed) {
@@ -680,8 +685,8 @@
             AIR.reset(player);
             ring(player.x, player.y - 4, 150, '#ffe7a3');
             spark(player.x, player.y - 5, 24, '#fff2c6', 260);
-            audio.thump(115, .7, .22);
-            audio.sfx('stamp');
+            if (!plunge.hits.length) audio.combatLanding(plunge.feedback);
+            impacts.push({x:player.x,y:player.y-5,floorY:player.y,life:.35,max:.35,heavy:true,feedback:plunge.feedback,seed:0,dir:player.facing});
             shake = settings.reducedMotion ? 0 : Math.max(shake, 4);
         } else if (plunge.age > 2) {
             player.plunge = null;
@@ -728,7 +733,8 @@
             reach: player.chargeLevel === 2 ? 255 : 195,
             power: (player.chargeLevel === 2 ? 14 : 8) + Math.round(rpg.stats().attack * 1.5), impact: 'charged'
         };
-        audio.sfx('chargeRelease');
+        player.pendingStrike.feedback = DREAM_COMBAT.profile(state,'charged');
+        audio.combatSwing(player.pendingStrike.feedback);
     }
     function strike(dt) {
         const swing = player.pendingStrike;
@@ -745,7 +751,7 @@
                 spark(player.x + swing.facing * 95, player.y - 18, player.chargeLevel === 2 ? 55 : 32, '#fff0b6', 420);
                 ring(player.x + swing.facing * 95, player.y - 7, swing.reach, '#fff0bf');
                 shake = settings.reducedMotion ? 0 : 7;
-                audio.thump(90, .7, .27);
+
             }
             if (swing.combo === 3)
                 ring(player.x + swing.facing * 78, player.y - 75, 95, '#ffe4b9');
@@ -756,7 +762,7 @@
             const dx = (e.x - player.x) * swing.facing, radius = enemyRadius(e);
             if (!e.dead && !swing.hits.includes(e.id) && withinMeleeHeight(e) && dx >= -radius * .5 && dx < reach + radius) {
                 swing.hits.push(e.id);
-                hit(e, power, swing.impact || (swing.combo === 3 ? 'finisher' : 'light'));
+                hit(e, power, swing.impact || (swing.combo === 3 ? 'finisher' : 'light'), swing.feedback);
                 if(swing.dreamStep)e.growthSlow=e.type==='boss'?.35:.8;
             }
         }
@@ -820,7 +826,7 @@
             player.pendingStrike = null; player.attackLength = .55; player.attackT = .55;
             player.attackFacing = player.facing; player.invincible = .3; autoWalk = false;
             audio.sfx(spec.id === 'guard' ? 'camp' : spec.id === 'control' ? 'wind' : 'skill');
-            if(state.active==='popo'&&spec.id==='attack')audio.thump(85,.6,.25);
+
             ring(player.x,player.y-45,spec.range,spec.color);spark(player.x,player.y-75,28,spec.color,260);
             if(spec.damage)for(const e of enemies){
                 if(mode!=='play')break;
@@ -1639,7 +1645,11 @@
     }
     addEventListener('resize', refitViewport);
     window.visualViewport?.addEventListener('resize', refitViewport);
-    addEventListener('orientationchange', () => { clearControls(); fit(); });
+    let orientationFitTimer;
+    addEventListener('orientationchange', () => {
+        clearControls(); fit(); requestAnimationFrame(fit);
+        clearTimeout(orientationFitTimer); orientationFitTimer=setTimeout(fit,250);
+    });
     document.addEventListener('fullscreenchange', fit);
     controls = window.createDreamControls({
         keys, keyMap, playing: () => mode === 'play',
@@ -1706,7 +1716,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.26.1' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.27.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

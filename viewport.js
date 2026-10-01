@@ -8,7 +8,8 @@ window.dreamViewport = function ({ width, height, coarse, left = 0, right = 0, t
     const w = Math.min(1440, availableW * (compact ? 1 : .96));
     const h = Math.max(1, availableH - (compact ? 0 : 86));
     const scale = portrait ? w / 1440 : Math.min(w / 1440, h / 810);
-    const stageHeight = portrait ? h / scale : 810;
-    return { scale, stageHeight, width: 1440 * scale, height: stageHeight * scale,
+    const stageHeight = coarse ? h / scale : 810;
+    const stageWidth = coarse && !portrait ? w / scale : 1440;
+    return { scale, stageHeight, stageWidth, width: stageWidth * scale, height: stageHeight * scale,
         touchSize: 44 / scale, portrait, coarse };
 };

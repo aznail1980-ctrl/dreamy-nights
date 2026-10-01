@@ -58,7 +58,29 @@ window.DreamAudioEngine=class DreamAudioEngine{
         this.cooldowns.set(key,now+(kind==='attack'?.85:.45));
         this.play('cry-'+species,{gain:kind==='attack'?.38:.17,rate:kind==='attack'?1:1.07,pan:((subject?.x||0)-this.getScene().playerX)/800});
     }
-    impact(type,heavy,finish,x=0){
+    combatSwing(profile){
+        this.record({combatSwing:profile.kind,hero:profile.hero,grade:profile.grade,level:profile.level});
+        this.play('swing-'+profile.kind+'-'+profile.hero,{gain:.65});
+    }
+    combatLanding(profile){
+        this.play(this.variant('strike-plunge-'+profile.hero,2),{gain:.5});
+    }
+    impact(type,heavy,finish,x=0,profile=null){
+        if(profile){
+            this.record({combatHit:profile.kind,hero:profile.hero,grade:profile.grade,level:profile.level,type});
+            const now=this.ctx?.currentTime||0;
+            // A charged sweep can hit a crowd: do not stack the same transient at full volume.
+            if(now-(this.lastCombatHit??-1)<.055)return;
+            this.lastCombatHit=now;
+            const pan=(x-this.getScene().playerX)/800;
+            this.play(this.variant('strike-'+profile.kind+'-'+profile.hero,2),{gain:profile.kind==='basic'?.86:1,rate:(profile.rank===0?.96:1)+profile.level*.012,pan});
+            const material={crab:'shell',tideBell:'shell',shoreSnail:'shell',box:'wood',parcelBat:'wood',inkMimic:'shell'}[type];
+            if(material)this.play(this.variant('hit-'+material),{gain:.16,rate:1.25,pan});
+            if(profile.rank===1)this.play('forge-spark',{gain:.075,pan});
+            if(profile.rank>=2)this.play('grade-'+profile.grade,{gain:profile.rank===3?.23:.17,pan});
+            if(profile.level>=2)this.play(profile.level>=4?'forge-resonance':'forge-spark',{gain:.09+profile.level*.015,pan});
+            return;
+        }
         this.record({type,heavy,finish});
         const material={crab:'shell',tideBell:'shell',shoreSnail:'shell',box:'wood',parcelBat:'wood',inkMimic:'shell',boss:'heavy'}[type]||'soft';
         this.play(this.variant('hit-'+material),{gain:heavy?.98:.72,rate:.97+Math.random()*.06,pan:(x-this.getScene().playerX)/800});

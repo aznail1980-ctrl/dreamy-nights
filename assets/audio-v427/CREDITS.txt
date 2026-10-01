@@ -1,0 +1,6 @@
+Combat effects adapted from Kenney Impact Sounds and RPG Audio (CC0).
+https://kenney.nl/assets/impact-sounds
+https://kenney.nl/assets/rpg-audio
+Edits: cut, high-pass filter, pitch, transient layers, normalize.
+Original licenses: ../audio-v426/Kenney-impact-LICENSE.txt and Kenney-rpg-LICENSE.txt.
+No voice actor recordings or third-party game recordings.

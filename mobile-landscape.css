@@ -1,0 +1,53 @@
+/* Landscape gets the whole safe viewport for controls. The world retains 16:9;
+   scaling its height independently stretched the scene after orientation changes. */
+#stage[data-layout="landscape"]{background:#1c3043}
+#stage[data-layout="landscape"] #world{width:1440px;height:810px;left:calc(50% - 720px);top:calc(50% - 405px)}
+#stage[data-layout="landscape"] .party-card{top:calc(var(--u)*.15);left:calc(var(--u)*.2);width:calc(var(--u)*3.65);height:var(--u);padding:0;transform:none}
+#stage[data-layout="landscape"] .portrait{width:calc(var(--u)*.88);height:calc(var(--u)*.88);flex:none}
+#stage[data-layout="landscape"] .portrait img{width:100%}
+#stage[data-layout="landscape"] .party-info{width:calc(var(--u)*1.65);padding-left:calc(var(--u)*.12)}
+#stage[data-layout="landscape"] .party-info b{font-size:calc(var(--u)*.28)}
+#stage[data-layout="landscape"] #levelText{font-size:calc(var(--u)*.22)}
+#stage[data-layout="landscape"] .hearts{font-size:calc(var(--u)*.24);line-height:1.2;letter-spacing:0}
+#stage[data-layout="landscape"] .tag-portrait{width:var(--u);height:var(--u);min-width:var(--u);margin-left:0}
+#stage[data-layout="landscape"] .tag-portrait img{width:100%;left:0}
+#stage[data-layout="landscape"] .location{display:none}
+#stage[data-layout="landscape"] .toolbar{top:calc(var(--u)*.15);right:calc(var(--u)*.2);left:auto;max-width:none;gap:calc(var(--u)*.06)}
+#stage[data-layout="landscape"] .toolbar .round{width:var(--u);height:var(--u);min-width:var(--u);margin:0;font-size:calc(var(--u)*.48)}
+#stage[data-layout="landscape"] .toolbar svg{width:calc(var(--u)*.52);height:calc(var(--u)*.52)}
+#stage[data-layout="landscape"] .quest-card{top:calc(var(--u)*1.38);left:calc(var(--u)*.2);width:calc(var(--u)*5.3);max-height:calc(var(--u)*1.45);min-height:var(--u);overflow:auto;padding:calc(var(--u)*.15);border-radius:calc(var(--u)*.2)}
+#stage[data-layout="landscape"] .quest-card>b{font-size:calc(var(--u)*.25);line-height:1.25;margin:0 0 calc(var(--u)*.08)}
+#stage[data-layout="landscape"] .quest-card .next-action{font-size:calc(var(--u)*.28);line-height:1.3;margin:0}
+#stage[data-layout="landscape"] .quest-card .eyebrow,#stage[data-layout="landscape"] .quest-foot,#stage[data-layout="landscape"] .quest-progress{display:none}
+#stage[data-layout="landscape"] .journey-mini{top:calc(var(--u)*1.38);right:calc(var(--u)*.2);width:calc(var(--u)*3.2);padding:0;z-index:8}
+#stage[data-layout="landscape"] .journey-toggle{min-height:var(--u);font-size:calc(var(--u)*.25);padding:calc(var(--u)*.12)}
+#stage[data-layout="landscape"] .journey-mini:not(.is-collapsed){width:calc(var(--u)*6);max-height:calc(var(--screen-h) - var(--u)*2.7);overflow:auto;padding:calc(var(--u)*.2)}
+#stage[data-layout="landscape"] .resonance-meter{top:calc(var(--u)*2.95);left:calc(var(--u)*.25);font-size:calc(var(--u)*.21);width:calc(var(--u)*2.6)}
+#stage[data-layout="landscape"] .resonance-meter>div{width:calc(var(--u)*1.7)}
+#stage[data-layout="landscape"] .speech{display:none}
+#stage[data-layout="landscape"] .bottom-hud{left:calc(var(--u)*.2);right:calc(var(--u)*.2);bottom:calc(var(--u)*.2);height:calc(var(--u)*2.5);align-items:flex-end}
+#stage[data-layout="landscape"] .move-stick{width:calc(var(--u)*1.85);height:calc(var(--u)*1.85)}
+#stage[data-layout="landscape"] .stick-label{font-size:calc(var(--u)*.23)}
+#stage[data-layout="landscape"] .combat-controls{width:calc(var(--u)*4.2);height:calc(var(--u)*2.5)}
+#stage[data-layout="landscape"] .bottom-hud .skill-button{width:var(--u);height:var(--u);min-height:var(--u)}
+#stage[data-layout="landscape"] #attackControl{right:0;bottom:0;width:calc(var(--u)*1.35);height:calc(var(--u)*1.35);padding-top:calc(var(--u)*.18)}
+#stage[data-layout="landscape"] #jumpControl{right:calc(var(--u)*1.5);bottom:0;left:auto;top:auto;width:calc(var(--u)*1.15);height:calc(var(--u)*1.15)}
+#stage[data-layout="landscape"] #dodgeControl{right:calc(var(--u)*2.82);bottom:0;left:auto;top:auto}
+#stage[data-layout="landscape"] #skillControl{right:calc(var(--u)*1.6);bottom:calc(var(--u)*1.35);left:auto;top:auto}
+#stage[data-layout="landscape"] #burstControl{right:calc(var(--u)*.1);bottom:calc(var(--u)*1.5);left:auto;top:auto}
+#stage[data-layout="landscape"] .energy-counter{top:auto;bottom:calc(var(--u)*.2);left:calc(var(--u)*2.5);font-size:calc(var(--u)*.25);padding:calc(var(--u)*.1);max-width:calc(var(--u)*3.4)}
+#stage[data-layout="landscape"] #snackButton{min-height:var(--u);min-width:var(--u)}
+#stage[data-layout="landscape"] .interact-hint{bottom:calc(var(--u)*2.85);right:calc(var(--u)*.25);left:auto;max-width:calc(var(--u)*4.5)}
+#stage[data-layout="landscape"] #interactButton{min-height:var(--u);font-size:calc(var(--u)*.28)}
+#stage[data-layout="landscape"] #hud:has(#bossHud:not(.hidden)) .quest-card{display:none}
+#stage[data-layout="landscape"] .boss-hud{top:calc(var(--u)*1.35);left:28%;width:40%}
+#stage[data-layout="landscape"] #modal .modal-card{max-width:calc(100% - var(--u)*.5);max-height:calc(var(--screen-h) - var(--u)*.5)}
+#stage[data-layout="landscape"] #dialogue .conversation{width:min(1150px,calc(100% - var(--u)));bottom:calc(var(--u)*.25)}
+#stage[data-layout="landscape"] #dialogue .dialogue-portrait{width:calc(var(--u)*2);height:calc(var(--u)*3);flex-basis:calc(var(--u)*2)}
+#stage[data-layout="landscape"] #dialogue .dialogue-card{padding:calc(var(--u)*.25);max-height:calc(var(--screen-h) - var(--u)*1.6);overflow:auto}
+#stage[data-layout="landscape"] #dialogue #dialogueText{font-size:calc(var(--u)*.32);line-height:1.55}
+#stage[data-layout="landscape"] #dialogue #dialogueSpeaker{font-size:calc(var(--u)*.3)}
+#stage[data-layout="landscape"] #dialogue .dialogue-footer button,#stage[data-layout="landscape"] #dialogue .skip{min-height:var(--u);font-size:calc(var(--u)*.28)}
+
+#stage[data-layout="landscape"] .resonance-meter>span:first-child{display:none}
+#stage[data-layout="landscape"] .resonance-meter>b{font-size:calc(var(--u)*.24)}

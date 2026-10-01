@@ -5,7 +5,7 @@ const base=process.env.GAME_URL||'http://127.0.0.1:8769/',root=path.resolve(__di
  await p.addInitScript(()=>{localStorage.setItem('dreamy-nights-opening-v1','seen');localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:true,voice:false,volume:.24}));window.__oscillators=0;const old=AudioContext.prototype.createOscillator;AudioContext.prototype.createOscillator=function(){__oscillators++;return old.call(this);};});
  await p.goto(base);await p.waitForFunction(()=>window.DreamGame?.inspect().mode==='title',null,{timeout:60000});
  await p.evaluate(()=>{const old=DreamAudioEngine.prototype.update;DreamAudioEngine.prototype.update=function(dt){window.__mix=this;return old.call(this,dt);};});
- await p.click('#startButton');await p.click('#confirmHero');await p.waitForFunction(()=>DreamGame.inspect().mode==='dialogue');await p.click('#dialogueSkip');await p.waitForFunction(()=>window.__mix?.buffers.size===41,null,{timeout:30000});
+ await p.click('#startButton');await p.click('#confirmHero');await p.waitForFunction(()=>DreamGame.inspect().mode==='dialogue');await p.click('#dialogueSkip');await p.waitForFunction(()=>window.__mix?.buffers.size===Object.keys(DREAM_AUDIO_ASSETS.effects).length,null,{timeout:30000});
  await p.waitForFunction(()=>DreamGame.inspect().audioMix.tracks.some(t=>t.playing));
  const scene=await p.evaluate(()=>{const real=__mix.getScene;window.__actualScene=real;return real();});
  for(const theme of ['beach','trail','town','alley','boss','tide','garden','observatory','archive','waterway']){
@@ -16,7 +16,7 @@ const base=process.env.GAME_URL||'http://127.0.0.1:8769/',root=path.resolve(__di
  }
  await p.waitForFunction(()=>__mix.decks.length===1&&__mix.decks[0].started,null,{timeout:10000});assert.equal(await p.evaluate(()=>__mix.decks.length),1);
  // A real media source feeds the music bus with non-zero samples.
- const power=await p.evaluate(async()=>{const d=__mix.decks.at(-1),a=__mix.ctx.createAnalyser();a.fftSize=1024;d.gain.connect(a);d.audio.currentTime=35;await new Promise(r=>setTimeout(r,550));const v=new Float32Array(a.fftSize);a.getFloatTimeDomainData(v);d.gain.disconnect(a);return Math.max(...v.map(Math.abs));});assert(power>.00001,'music signal');
+ const power=await p.evaluate(async()=>{const d=__mix.decks.at(-1),a=__mix.ctx.createAnalyser();a.fftSize=1024;d.gain.connect(a);d.audio.currentTime=35;const v=new Float32Array(a.fftSize);let peak=0;for(let i=0;i<30&&peak<=.00001;i++){await new Promise(r=>setTimeout(r,100));if(!d.audio.seeking){a.getFloatTimeDomainData(v);peak=Math.max(peak,...v.map(Math.abs));}}d.gain.disconnect(a);return peak;});assert(power>.00001,'music signal');
  await p.evaluate(()=>{__mix.ducked=true;});await p.waitForTimeout(300);assert((await p.evaluate(()=>__mix.musicLevel))<.35);await p.evaluate(()=>__mix.ducked=false);
  await p.evaluate(()=>{for(const type of ['sand','crab','box','boss','shoreSnail','windMoth','parcelBat','gardenBud','inkMimic','waterOtter','tideBell'])__mix.enemy({type,x:100});});
  const cries=await p.evaluate(()=>__mix.events.filter(e=>e.sample?.startsWith('cry-')).map(e=>e.sample));assert.equal(new Set(cries).size,11);
@@ -31,5 +31,5 @@ const base=process.env.GAME_URL||'http://127.0.0.1:8769/',root=path.resolve(__di
  assert.equal(voice.good.source,'character-synthesis');assert(voice.good.playing);assert.equal(voice.wrong.source,'captions');assert.equal(voice.missing.source,'captions');assert.equal(voice.generic,0);assert.equal(voice.duck,false);
  await p.goto(new URL('audio-room.html',base).href);await p.waitForSelector('#track');assert.equal(await p.locator('#track option').count(),10);await p.locator('#track').selectOption('town');await p.waitForFunction(()=>!document.querySelector('#music').paused);await p.locator('details summary').click();assert.equal(await p.locator('details li').count(),10);await p.screenshot({path:path.join(root,'test-results/audio-room.png')});
  await p.setViewportSize({width:390,height:844});await p.screenshot({path:path.join(root,'test-results/audio-room-mobile.png')});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
- console.log('PASS 10 streamed scores and crossfades; 41 decoded effects; 11 creature voices; impact variants; 0 oscillators; music signal/duck/mute/sliders; actor matching, cancel, no generic TTS; listening room and credits');
+ console.log('PASS 10 streamed scores and crossfades; all recorded effects decoded; 11 creature voices; impact variants; 0 oscillators; music signal/duck/mute/sliders; actor matching, cancel, no generic TTS; listening room and credits');
 }finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});

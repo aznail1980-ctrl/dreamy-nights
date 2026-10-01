@@ -1,0 +1,486 @@
+{
+  "strike-basic-ari-0": {
+    "file": "assets/audio-v427/strike-basic-ari-0.wav",
+    "parts": [
+      [
+        "impact/Audio/impactMetal_light_000.ogg",
+        0.7,
+        0,
+        1.25
+      ],
+      [
+        "impact/Audio/impactPunch_medium_000.ogg",
+        0.65,
+        0,
+        1.3
+      ],
+      [
+        "impact/Audio/impactGlass_light_000.ogg",
+        0.22,
+        0.008,
+        1.8
+      ]
+    ],
+    "seconds": 0.22616666666666665,
+    "peak": 0.88
+  },
+  "strike-plunge-ari-0": {
+    "file": "assets/audio-v427/strike-plunge-ari-0.wav",
+    "parts": [
+      [
+        "impact/Audio/impactPlate_heavy_000.ogg",
+        0.65,
+        0,
+        1.35
+      ],
+      [
+        "impact/Audio/impactWood_heavy_000.ogg",
+        0.55,
+        0.012,
+        1.18
+      ],
+      [
+        "impact/Audio/impactGlass_heavy_000.ogg",
+        0.35,
+        0.036,
+        1.5
+      ]
+    ],
+    "seconds": 0.31375,
+    "peak": 0.8800000000000001
+  },
+  "strike-charged-ari-0": {
+    "file": "assets/audio-v427/strike-charged-ari-0.wav",
+    "parts": [
+      [
+        "impact/Audio/impactMetal_light_000.ogg",
+        0.75,
+        0,
+        1.05
+      ],
+      [
+        "impact/Audio/impactMetal_heavy_000.ogg",
+        0.65,
+        0.01,
+        1.2
+      ],
+      [
+        "impact/Audio/impactGlass_medium_000.ogg",
+        0.35,
+        0.04,
+        1.65
+      ],
+      [
+        "impact/Audio/impactBell_heavy_000.ogg",
+        0.15,
+        0.085,
+        1.7
+      ]
+    ],
+    "seconds": 0.7199583333333334,
+    "peak": 0.88
+  },
+  "strike-basic-ari-1": {
+    "file": "assets/audio-v427/strike-basic-ari-1.wav",
+    "parts": [
+      [
+        "impact/Audio/impactMetal_light_001.ogg",
+        0.7,
+        0,
+        1.25
+      ],
+      [
+        "impact/Audio/impactPunch_medium_001.ogg",
+        0.65,
+        0,
+        1.3
+      ],
+      [
+        "impact/Audio/impactGlass_light_001.ogg",
+        0.22,
+        0.008,
+        1.8
+      ]
+    ],
+    "seconds": 0.21325,
+    "peak": 0.8799999999999999
+  },
+  "strike-plunge-ari-1": {
+    "file": "assets/audio-v427/strike-plunge-ari-1.wav",
+    "parts": [
+      [
+        "impact/Audio/impactPlate_heavy_001.ogg",
+        0.65,
+        0,
+        1.35
+      ],
+      [
+        "impact/Audio/impactWood_heavy_001.ogg",
+        0.55,
+        0.012,
+        1.18
+      ],
+      [
+        "impact/Audio/impactGlass_heavy_001.ogg",
+        0.35,
+        0.036,
+        1.5
+      ]
+    ],
+    "seconds": 0.23708333333333334,
+    "peak": 0.88
+  },
+  "strike-charged-ari-1": {
+    "file": "assets/audio-v427/strike-charged-ari-1.wav",
+    "parts": [
+      [
+        "impact/Audio/impactMetal_light_001.ogg",
+        0.75,
+        0,
+        1.05
+      ],
+      [
+        "impact/Audio/impactMetal_heavy_001.ogg",
+        0.65,
+        0.01,
+        1.2
+      ],
+      [
+        "impact/Audio/impactGlass_medium_001.ogg",
+        0.35,
+        0.04,
+        1.65
+      ],
+      [
+        "impact/Audio/impactBell_heavy_001.ogg",
+        0.15,
+        0.085,
+        1.7
+      ]
+    ],
+    "seconds": 0.72,
+    "peak": 0.88
+  },
+  "swing-basic-ari": {
+    "file": "assets/audio-v427/swing-basic-ari.wav",
+    "parts": [
+      [
+        "rpg/Audio/knifeSlice.ogg",
+        0.75,
+        0,
+        1.3
+      ]
+    ],
+    "seconds": 0.22,
+    "peak": 0.8800000000000001
+  },
+  "swing-plunge-ari": {
+    "file": "assets/audio-v427/swing-plunge-ari.wav",
+    "parts": [
+      [
+        "rpg/Audio/drawKnife2.ogg",
+        0.75,
+        0,
+        1.4
+      ]
+    ],
+    "seconds": 0.22945833333333332,
+    "peak": 0.88
+  },
+  "swing-charged-ari": {
+    "file": "assets/audio-v427/swing-charged-ari.wav",
+    "parts": [
+      [
+        "rpg/Audio/knifeSlice2.ogg",
+        0.75,
+        0,
+        0.85
+      ],
+      [
+        "impact/Audio/impactGlass_light_001.ogg",
+        0.2,
+        0.05,
+        1.8
+      ]
+    ],
+    "seconds": 0.48,
+    "peak": 0.88
+  },
+  "strike-basic-popo-0": {
+    "file": "assets/audio-v427/strike-basic-popo-0.wav",
+    "parts": [
+      [
+        "impact/Audio/impactWood_medium_000.ogg",
+        0.7,
+        0,
+        1.25
+      ],
+      [
+        "impact/Audio/impactPunch_medium_000.ogg",
+        0.65,
+        0,
+        1.3
+      ],
+      [
+        "impact/Audio/impactGlass_light_000.ogg",
+        0.22,
+        0.008,
+        1.8
+      ]
+    ],
+    "seconds": 0.22616666666666665,
+    "peak": 0.88
+  },
+  "strike-plunge-popo-0": {
+    "file": "assets/audio-v427/strike-plunge-popo-0.wav",
+    "parts": [
+      [
+        "impact/Audio/impactWood_heavy_000.ogg",
+        0.65,
+        0,
+        1.05
+      ],
+      [
+        "impact/Audio/impactWood_heavy_000.ogg",
+        0.55,
+        0.012,
+        1.18
+      ],
+      [
+        "impact/Audio/impactGlass_heavy_000.ogg",
+        0.35,
+        0.036,
+        1.5
+      ]
+    ],
+    "seconds": 0.202125,
+    "peak": 0.8799999999999999
+  },
+  "strike-charged-popo-0": {
+    "file": "assets/audio-v427/strike-charged-popo-0.wav",
+    "parts": [
+      [
+        "impact/Audio/impactWood_medium_000.ogg",
+        0.75,
+        0,
+        1.05
+      ],
+      [
+        "impact/Audio/impactMetal_heavy_000.ogg",
+        0.65,
+        0.01,
+        1.2
+      ],
+      [
+        "impact/Audio/impactGlass_medium_000.ogg",
+        0.35,
+        0.04,
+        1.65
+      ],
+      [
+        "impact/Audio/impactBell_heavy_000.ogg",
+        0.15,
+        0.085,
+        1.3
+      ]
+    ],
+    "seconds": 0.72,
+    "peak": 0.88
+  },
+  "strike-basic-popo-1": {
+    "file": "assets/audio-v427/strike-basic-popo-1.wav",
+    "parts": [
+      [
+        "impact/Audio/impactWood_medium_001.ogg",
+        0.7,
+        0,
+        1.25
+      ],
+      [
+        "impact/Audio/impactPunch_medium_001.ogg",
+        0.65,
+        0,
+        1.3
+      ],
+      [
+        "impact/Audio/impactGlass_light_001.ogg",
+        0.22,
+        0.008,
+        1.8
+      ]
+    ],
+    "seconds": 0.21325,
+    "peak": 0.88
+  },
+  "strike-plunge-popo-1": {
+    "file": "assets/audio-v427/strike-plunge-popo-1.wav",
+    "parts": [
+      [
+        "impact/Audio/impactWood_heavy_001.ogg",
+        0.65,
+        0,
+        1.05
+      ],
+      [
+        "impact/Audio/impactWood_heavy_001.ogg",
+        0.55,
+        0.012,
+        1.18
+      ],
+      [
+        "impact/Audio/impactGlass_heavy_001.ogg",
+        0.35,
+        0.036,
+        1.5
+      ]
+    ],
+    "seconds": 0.21945833333333334,
+    "peak": 0.88
+  },
+  "strike-charged-popo-1": {
+    "file": "assets/audio-v427/strike-charged-popo-1.wav",
+    "parts": [
+      [
+        "impact/Audio/impactWood_medium_001.ogg",
+        0.75,
+        0,
+        1.05
+      ],
+      [
+        "impact/Audio/impactMetal_heavy_001.ogg",
+        0.65,
+        0.01,
+        1.2
+      ],
+      [
+        "impact/Audio/impactGlass_medium_001.ogg",
+        0.35,
+        0.04,
+        1.65
+      ],
+      [
+        "impact/Audio/impactBell_heavy_001.ogg",
+        0.15,
+        0.085,
+        1.3
+      ]
+    ],
+    "seconds": 0.72,
+    "peak": 0.88
+  },
+  "swing-basic-popo": {
+    "file": "assets/audio-v427/swing-basic-popo.wav",
+    "parts": [
+      [
+        "rpg/Audio/knifeSlice.ogg",
+        0.75,
+        0,
+        0.95
+      ]
+    ],
+    "seconds": 0.22,
+    "peak": 0.88
+  },
+  "swing-plunge-popo": {
+    "file": "assets/audio-v427/swing-plunge-popo.wav",
+    "parts": [
+      [
+        "rpg/Audio/drawKnife2.ogg",
+        0.75,
+        0,
+        1.4
+      ]
+    ],
+    "seconds": 0.22945833333333332,
+    "peak": 0.88
+  },
+  "swing-charged-popo": {
+    "file": "assets/audio-v427/swing-charged-popo.wav",
+    "parts": [
+      [
+        "rpg/Audio/knifeSlice2.ogg",
+        0.75,
+        0,
+        0.85
+      ],
+      [
+        "impact/Audio/impactGlass_light_001.ogg",
+        0.2,
+        0.05,
+        1.8
+      ]
+    ],
+    "seconds": 0.48,
+    "peak": 0.88
+  },
+  "grade-rare": {
+    "file": "assets/audio-v427/grade-rare.wav",
+    "parts": [
+      [
+        "impact/Audio/impactGlass_light_002.ogg",
+        0.6,
+        0,
+        1.9
+      ],
+      [
+        "impact/Audio/impactBell_heavy_000.ogg",
+        0.1,
+        0.05,
+        1.9
+      ]
+    ],
+    "seconds": 0.46,
+    "peak": 0.88
+  },
+  "grade-unique": {
+    "file": "assets/audio-v427/grade-unique.wav",
+    "parts": [
+      [
+        "impact/Audio/impactBell_heavy_001.ogg",
+        0.6,
+        0,
+        1.45
+      ],
+      [
+        "impact/Audio/impactGlass_medium_001.ogg",
+        0.35,
+        0.07,
+        1.9
+      ]
+    ],
+    "seconds": 0.72,
+    "peak": 0.88
+  },
+  "forge-spark": {
+    "file": "assets/audio-v427/forge-spark.wav",
+    "parts": [
+      [
+        "impact/Audio/impactMetal_light_002.ogg",
+        0.5,
+        0,
+        1.9
+      ]
+    ],
+    "seconds": 0.09358333333333334,
+    "peak": 0.8800000000000001
+  },
+  "forge-resonance": {
+    "file": "assets/audio-v427/forge-resonance.wav",
+    "parts": [
+      [
+        "impact/Audio/impactGlass_light_000.ogg",
+        0.4,
+        0,
+        1.4
+      ],
+      [
+        "impact/Audio/impactBell_heavy_002.ogg",
+        0.12,
+        0.04,
+        2
+      ]
+    ],
+    "seconds": 0.2936666666666667,
+    "peak": 0.88
+  }
+}
