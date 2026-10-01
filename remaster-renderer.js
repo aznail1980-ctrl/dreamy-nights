@@ -420,12 +420,8 @@
         this.drawIllustratedBuildings(map);
         this.terrain(map);
         for (const ex of this.C.exits[r.state.map]) {
-            c.save();
-            c.translate(ex.x, 651);
-            c.scale(.78, .78);
-            c.translate(-ex.x, -651);
-            this.portal(ex.x, this.C.maps[ex.to].name, ex.x < 500, !this.gateOpen(ex.gate));
-            c.restore();
+            const destination = this.C.maps[ex.to];
+            this.portal(ex.x, destination.name, ex.x < 500, !this.gateOpen(ex.gate), ex.y ?? 651, destination.theme);
         }
         this.drawDecorations(map);
         this.collectible(map.memory);

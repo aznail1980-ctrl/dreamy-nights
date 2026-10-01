@@ -2,6 +2,7 @@
 (() => {
     const R = window.DreamRenderer.prototype, actor = R.actor, world = R.drawRPGWorld;
     R.gateOpen = function (gate) {
+        if (this.r.gateOpen) return this.r.gateOpen(gate);
         const f = this.r.state.flags;
         return !gate || gate === 'bossReady' ? (!gate || (f.readyForBoss && f.bridgeOpened)) : !!f[gate];
     };
