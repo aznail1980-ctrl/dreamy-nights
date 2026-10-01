@@ -1,0 +1,129 @@
+/* v4.18 · A small mobile RPG lobby: readable actions, planted characters, gentle motion. */
+#title{--lobby-gold:#ffe5a0;--lobby-teal:#8ce2cf}
+#title .title-shade{background:linear-gradient(90deg,#0c1933f5 0%,#162d46dc 38%,#28486035 74%),linear-gradient(0deg,#0a1733ed,transparent 65%),url('assets/backdrop-town-v49.png') 58% 50%/cover}
+#title .title-copy{top:114px;left:76px;width:652px;z-index:3}
+#title .title-copy h1{font-size:73px;margin:22px 0 13px;letter-spacing:-3px}
+#title .title-en{margin:14px 0 18px;font-size:13px}
+#title .title-description{font-size:19px}
+#title .chapter-pill{padding:10px 17px;border-radius:18px 18px 18px 4px;background:#224754c7;border:1px solid #abf4d756;color:#d3f9e9;font-size:14px}
+#title .start-actions{gap:16px;margin-top:28px;flex-wrap:nowrap}
+#title .save-summary{margin-top:22px;line-height:1.4;color:#bbd2d9}
+#title .title-characters{right:22px;top:83px;width:650px;height:587px;z-index:2}
+#title .halo{top:50px;right:39px;width:535px;height:465px;transform:rotate(-9deg);border-color:#aadfd74d;background:radial-gradient(ellipse,#aedeb52e,#6ed7d515 56%,transparent 70%)}
+#title .halo::before{border-style:solid;border-color:#b7dfbf24;border-top-color:#f9e29c9e;inset:34px}
+#title .lobby-keeper{position:absolute;padding:0;background:none;border:0;border-radius:30px;cursor:pointer;isolation:isolate;overflow:visible;transition:filter .2s;filter:drop-shadow(0 18px 20px #030c294a)}
+#title .title-popo{left:-12px;right:auto;top:71px;width:345px;height:477px}
+#title .title-ari{right:1px;left:auto;top:25px;width:345px;height:477px}
+#title .lobby-keeper>img,#title .lobby-keeper>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;animation:none;filter:none;transform:none;translate:none;pointer-events:none}
+#title .lobby-keeper>canvas{opacity:0}
+#title .lobby-keeper.motion-ready>img{visibility:hidden}
+#title .lobby-keeper.motion-ready>canvas{opacity:1}
+#title .keeper-stage{position:absolute;bottom:2%;left:12%;right:12%;height:10%;border:1px solid #ebedb047;background:radial-gradient(ellipse,#9ff8d51c,#a4d6c508 63%,transparent 70%);border-radius:50%;transform:rotate(-3deg);box-shadow:0 0 38px #72d9c319;z-index:-1}
+#title .lobby-keeper-name{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);min-width:116px;padding:7px 18px;background:linear-gradient(100deg,#224555ed,#182c46ed);border:1px solid #b4e6d37a;border-radius:8px 17px 8px 17px;color:#f8edca;box-shadow:0 4px 0 #09172e80;font-size:18px;font-weight:800;white-space:nowrap;letter-spacing:.1em}
+#title .lobby-keeper-name small{display:block;margin-top:3px;font-weight:500;font-size:10px;letter-spacing:0;color:#accbcf}
+#title .character-note{bottom:-6px;left:28px;right:16px;padding:12px 18px;font-size:14px;text-align:center;background:#193348bf;border-color:#9acebf4d;border-left:1px solid #9acebf4d;border-radius:22px;pointer-events:none}
+#title .title-top{z-index:5;left:76px;right:48px;top:25px}
+#title .title-top>div{display:flex;align-items:center;gap:10px}
+#title .lobby-motion-toggle{display:flex;align-items:center;gap:7px;padding:10px 14px;min-height:45px;border:1px solid #b6e5d14d;border-radius:14px;background:#152d42bf;color:#d5e7d9;font-size:12px}
+#title .lobby-motion-toggle svg{width:17px;height:17px}
+#title .lobby-motion-toggle:disabled{opacity:.7;cursor:default}
+#title .title-bottom{bottom:23px;left:76px;right:48px;padding-top:20px;align-items:center}
+.lobby-stardust{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.lobby-stardust i{position:absolute;width:5px;height:5px;border-radius:50%;background:#d9efd0;box-shadow:0 0 13px #eff5b4aa;opacity:.4;animation:dream-drift 9s ease-in-out infinite}
+.lobby-stardust i:nth-child(1){left:49%;top:68%;animation-delay:-2s}.lobby-stardust i:nth-child(2){left:88%;top:47%;animation-delay:-5s}.lobby-stardust i:nth-child(3){left:77%;top:24%;animation-delay:-1s}.lobby-stardust i:nth-child(4){left:64%;top:66%;animation-delay:-6s}.lobby-stardust i:nth-child(5){left:94%;top:80%;animation-delay:-4s}.lobby-stardust i:nth-child(6){left:52%;top:28%;animation-delay:-7s}.lobby-stardust i:nth-child(7){left:18%;top:87%;animation-delay:-3s}.lobby-stardust i:nth-child(8){left:72%;top:84%;animation-delay:-8s}
+/* Shared ornamental button components; labels remain real, accessible text. */
+#title .start-actions .dream-game-button,.dream-opening .opening-play.dream-game-button,#modal[data-kind="character"] #confirmHero.dream-game-button{--button-rim:#fff0b9;display:flex;align-items:center;justify-content:center;gap:17px;min-height:91px;padding:15px 20px;border:3px solid var(--button-rim);border-radius:20px;background:linear-gradient(180deg,#fff0b7 0%,#ffda79 48%,#efae4f 100%);box-shadow:inset 0 2px 0 #fffbe6, inset 0 -4px 0 #bc7c2733,0 6px 0 #93602e,0 10px 0 #09182e75,0 15px 28px #050c2745;color:#3b2a42;line-height:1.15;white-space:normal;font-weight:850;transform:none;transition:transform .13s,box-shadow .13s,filter .13s}
+#title .start-actions .dream-game-button{flex:1;min-width:0;text-align:left}
+.dream-game-button .game-button-icon{display:grid;place-items:center;flex-shrink:0;width:45px;height:45px;border:1px solid #995d2e38;border-radius:15px;background:linear-gradient(140deg,#fffcdd9c,#dba03c4a);box-shadow:inset 0 2px 0 #ffffff59,0 2px 0 #a168233b;transform:rotate(-5deg)}
+.dream-game-button .game-button-icon svg{width:28px;height:28px;stroke-width:1.8}
+.dream-game-button .game-button-copy{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;text-align:left}
+.dream-game-button .game-button-copy b{font:inherit;font-size:23px;letter-spacing:-.04em;line-height:1.2;overflow-wrap:break-word}
+.dream-game-button .game-button-copy small{font-size:11px;font-weight:600;letter-spacing:.06em;opacity:.7;line-height:1.1}
+.dream-game-button .game-button-arrow{display:grid;place-items:center;width:26px;height:26px;flex-shrink:0;opacity:.7}
+.dream-game-button .game-button-arrow svg{width:24px;height:24px}
+#title .start-actions .dream-game-button::before,.dream-opening .opening-play.dream-game-button::before,#modal[data-kind="character"] #confirmHero.dream-game-button::before{inset:-90% auto -90% -80%;width:35%;background:linear-gradient(90deg,transparent,#fffbe85c,transparent);animation:mobile-button-sheen 7s ease-in-out infinite;z-index:-1}
+#title[data-has-save="true"] #startButton{order:2;flex:.86;background:linear-gradient(#315e6c,#244152);border-color:#a9d6c6;color:#e4f4e8;box-shadow:inset 0 2px 0 #d9fff02b,0 6px 0 #112c40,0 10px 0 #09182e75,0 15px 28px #050c2733}
+#title[data-has-save="true"] #startButton .game-button-icon{border-color:#bddccb66;background:#c1fce21a;color:#dbf5de;box-shadow:inset 0 2px #d9fff02b}
+#title #continueButton{order:1;min-width:0}
+#title #continueButton .game-button-copy b{font-size:23px}
+#title .title-bottom .dream-game-button,.dream-opening .opening-bottom .dream-game-button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:9px 17px;border:1px solid #a8d3c871;border-radius:14px;background:linear-gradient(#28465bbf,#172d47dd);color:#e7f1e1;box-shadow:inset 0 1px 0 #d3f4e628,0 3px 0 #07182c80;transform:none}
+#title .title-bottom .dream-game-button .game-button-icon,.dream-opening .opening-bottom .dream-game-button .game-button-icon{width:26px;height:26px;transform:none;border:0;background:none;box-shadow:none}
+#title .title-bottom .dream-game-button svg,.dream-opening .opening-bottom .dream-game-button svg{width:22px;height:22px}
+#title .title-bottom .dream-game-button b,.dream-opening .opening-bottom .dream-game-button b{font-size:15px;letter-spacing:0}
+#title .title-bottom .game-button-arrow,.dream-opening .opening-bottom .game-button-arrow{display:none}
+.dream-opening .opening-play.dream-game-button{width:390px;max-width:100%;padding:17px 22px;border-radius:22px;min-height:96px}
+.dream-opening .opening-play .game-button-icon{width:54px;height:54px;border-radius:50%;color:#654026}
+.dream-opening .opening-play .game-button-icon svg{width:29px;height:29px;padding:0;background:none;border-radius:0;fill:currentColor;stroke:none;margin-left:3px}
+.dream-opening .opening-play .game-button-arrow svg{width:24px;height:24px;background:none;padding:0;border-radius:0}
+.dream-opening .opening-play .game-button-copy b{font-size:27px}.dream-opening .opening-play .game-button-copy small{font-size:12px}
+.dream-opening .opening-invitation{top:132px;left:80px}
+.dream-opening .opening-invitation h2{font-size:53px;margin:24px 0 30px}
+.dream-opening .opening-status{font-size:17px;margin-top:24px}
+.dream-opening .opening-bottom .opening-skip{border-color:#e5d7a487;color:#fff1c8;background:linear-gradient(#5b5266c9,#323850e8)}
+.dream-opening .opening-play.dream-game-button:disabled{opacity:.8;cursor:wait;transform:none}
+.dream-game-button[hidden]{display:none!important}
+#title .start-actions .dream-game-button:active,.dream-opening .opening-play.dream-game-button:active,#modal[data-kind="character"] #confirmHero.dream-game-button:active{transform:translateY(5px);box-shadow:inset 0 2px 0 #fffbe6,0 1px 0 #93602e,0 4px 0 #09182e75}
+#title .title-bottom .dream-game-button:active,.dream-opening .opening-bottom .dream-game-button:active{transform:translateY(2px);box-shadow:inset 0 2px 5px #0003}
+#title button:focus-visible,.dream-opening button:focus-visible,#modal[data-kind="character"] #confirmHero:focus-visible{outline:3px solid #fff8d4;outline-offset:6px}
+#modal[data-kind="character"] .hero-choice-art{position:relative;display:block;width:100%;height:260px;pointer-events:none}
+#modal[data-kind="character"] .hero-choice-art>img,#modal[data-kind="character"] .hero-choice-art>canvas{position:absolute;inset:0;object-fit:contain;width:100%;height:100%;filter:drop-shadow(0 12px 12px #09152c70);pointer-events:none}
+#modal[data-kind="character"] .hero-choice-art>canvas{opacity:0}#modal[data-kind="character"] .hero-choice-art.motion-ready>canvas{opacity:1}#modal[data-kind="character"] .hero-choice-art.motion-ready>img{visibility:hidden}
+#modal[data-kind="character"] #confirmHero.dream-game-button{min-width:330px;max-width:100%}
+@media(hover:hover){#title .dream-game-button:hover,.dream-opening .dream-game-button:hover,#modal[data-kind="character"] #confirmHero:hover{filter:brightness(1.07)}#title .lobby-keeper:hover{filter:drop-shadow(0 8px 20px #9affda30)}}
+@keyframes dream-drift{0%,100%{translate:0 0;opacity:.2}50%{translate:10px -30px;opacity:.65}}
+@keyframes mobile-button-sheen{0%,72%{left:-80%}94%,100%{left:145%}}
+/* Scaled touch sizes use the same 44px minimum as in-game controls. */
+@media(pointer:coarse){
+ #title .lobby-motion-toggle{min-height:var(--u);padding:calc(var(--u)*.15);font-size:calc(var(--u)*.25)}#title .lobby-motion-toggle svg{width:calc(var(--u)*.36);height:calc(var(--u)*.36)}
+ #title .start-actions .dream-game-button,.dream-opening .opening-play.dream-game-button,#modal[data-kind="character"] #confirmHero.dream-game-button{min-height:calc(var(--u)*1.15);gap:calc(var(--u)*.18);padding:calc(var(--u)*.18)}
+ .dream-game-button .game-button-icon{width:calc(var(--u)*.64);height:calc(var(--u)*.64);border-radius:calc(var(--u)*.2)}.dream-game-button .game-button-icon svg{width:calc(var(--u)*.43);height:calc(var(--u)*.43)}
+ #title .start-actions .game-button-copy b,#title #continueButton .game-button-copy b,.dream-opening .opening-play .game-button-copy b,#modal[data-kind="character"] #confirmHero .game-button-copy b{font-size:calc(var(--u)*.4)}
+ .dream-game-button .game-button-copy small,.dream-opening .opening-play .game-button-copy small{font-size:calc(var(--u)*.22)}.dream-game-button .game-button-arrow,.dream-game-button .game-button-arrow svg{width:calc(var(--u)*.4);height:calc(var(--u)*.4)}
+ #title .title-bottom .dream-game-button,.dream-opening .opening-bottom .dream-game-button{min-height:var(--u);gap:calc(var(--u)*.14);padding:calc(var(--u)*.16)}
+ #title .title-bottom .dream-game-button b,.dream-opening .opening-bottom .dream-game-button b{font-size:calc(var(--u)*.3)}
+ #title .title-bottom .dream-game-button .game-button-icon,.dream-opening .opening-bottom .dream-game-button .game-button-icon{width:calc(var(--u)*.38);height:calc(var(--u)*.38)}
+ #title .title-bottom .dream-game-button svg,.dream-opening .opening-bottom .dream-game-button svg{width:calc(var(--u)*.36);height:calc(var(--u)*.36)}
+ .dream-opening .opening-play .game-button-icon{width:calc(var(--u)*.76);height:calc(var(--u)*.76)}.dream-opening .opening-play .game-button-icon svg{width:calc(var(--u)*.42);height:calc(var(--u)*.42)}
+ #title .lobby-keeper-name{font-size:calc(var(--u)*.27)}#title .lobby-keeper-name small{font-size:calc(var(--u)*.2)}
+}
+#stage[data-layout="portrait"] #title .title-top{top:calc(var(--u)*.25);left:calc(var(--u)*.35);right:calc(var(--u)*.35)}
+#stage[data-layout="portrait"] #title .title-top .eyebrow{max-width:40%;font-size:calc(var(--u)*.19);line-height:1.6}
+#stage[data-layout="portrait"] #title .title-copy{top:calc(var(--u)*1.6);left:calc(var(--u)*.45);right:calc(var(--u)*.45);bottom:calc(var(--u)*1.82);width:auto;display:flex;flex-direction:column;pointer-events:none}
+#stage[data-layout="portrait"] #title .lobby-heading{pointer-events:auto}
+#stage[data-layout="portrait"] #title .chapter-pill{font-size:calc(var(--u)*.25);padding:calc(var(--u)*.14);border-radius:calc(var(--u)*.17)}
+#stage[data-layout="portrait"] #title .title-copy h1{font-size:calc(var(--u)*.94);line-height:1.07;margin:calc(var(--u)*.25) 0 calc(var(--u)*.15);letter-spacing:-.04em}
+#stage[data-layout="portrait"] #title .title-en{display:none}
+#stage[data-layout="portrait"] #title .title-description{font-size:calc(var(--u)*.28);line-height:1.5}
+#stage[data-layout="portrait"] #title .start-actions{display:flex;flex-direction:column;margin-top:auto;gap:calc(var(--u)*.22);pointer-events:auto}
+#stage[data-layout="portrait"] #title .start-actions .dream-game-button{flex:none;width:100%;min-height:calc(var(--u)*1.2);border-radius:calc(var(--u)*.28);padding:calc(var(--u)*.18) calc(var(--u)*.28)}
+#stage[data-layout="portrait"] #title .save-summary{font-size:calc(var(--u)*.23);margin:calc(var(--u)*.3) 0 0;line-height:1.4}
+#stage[data-layout="portrait"] #title .title-characters{top:calc(var(--u)*5.4);bottom:auto;left:0;right:0;width:100%;height:clamp(calc(var(--u)*3),calc(var(--screen-h) - var(--u)*11),calc(var(--u)*7.2));opacity:1;pointer-events:none}
+#stage[data-layout="portrait"] #title .lobby-keeper{height:100%;width:51%;top:0;pointer-events:auto}
+#stage[data-layout="portrait"] #title .title-popo{left:0;right:auto;top:calc(var(--u)*.16)}#stage[data-layout="portrait"] #title .title-ari{right:0;left:auto}
+#stage[data-layout="portrait"] #title .halo{width:82%;height:83%;right:9%;top:8%}
+#stage[data-layout="portrait"] #title .lobby-keeper-name{bottom:calc(var(--u)*-.1);min-width:0;padding:calc(var(--u)*.1) calc(var(--u)*.3);border-radius:calc(var(--u)*.12)}
+#stage[data-layout="portrait"] #title .lobby-keeper-name small{display:none}
+#stage[data-layout="portrait"] #title .title-bottom{bottom:calc(var(--u)*.3);left:calc(var(--u)*.35);right:calc(var(--u)*.35);padding-top:calc(var(--u)*.18);gap:calc(var(--u)*.2)}
+#stage[data-layout="portrait"] #title .title-bottom .dream-game-button{padding:calc(var(--u)*.15);border-radius:calc(var(--u)*.2)}
+#stage[data-layout="portrait"] .dream-opening .opening-invitation{left:calc(var(--u)*.45);right:calc(var(--u)*.45);top:24%;max-width:none}
+#stage[data-layout="portrait"] .dream-opening .opening-invitation h2{font-size:calc(var(--u)*.75);margin:calc(var(--u)*.4) 0 calc(var(--u)*.5)}
+#stage[data-layout="portrait"] .dream-opening .opening-play{width:100%;max-width:none;border-radius:calc(var(--u)*.28)}
+#stage[data-layout="portrait"] .dream-opening .opening-status{font-size:calc(var(--u)*.28);margin-top:calc(var(--u)*.4)}
+#stage[data-layout="portrait"] .dream-opening .opening-bottom{bottom:calc(var(--u)*.35);left:calc(var(--u)*.35);right:calc(var(--u)*.35)}
+#stage[data-layout="portrait"] .dream-opening .opening-bottom .dream-game-button{min-width:0;flex:1;border-radius:calc(var(--u)*.2)}
+#stage[data-layout="portrait"] #modal[data-kind="character"] .hero-choice-art{height:calc(var(--u)*3.25)}
+#stage[data-layout="portrait"] #modal[data-kind="character"] #confirmHero.dream-game-button{width:100%;min-width:0;border-radius:calc(var(--u)*.28)}
+@media(max-height:690px){
+ #stage[data-layout="portrait"] #title .title-copy{top:calc(var(--u)*1.45);bottom:calc(var(--u)*1.7)}
+ #stage[data-layout="portrait"] #title .title-copy h1{font-size:calc(var(--u)*.74);margin:calc(var(--u)*.18) 0}
+ #stage[data-layout="portrait"] #title .title-description{display:none}
+ #stage[data-layout="portrait"] #title .title-characters{top:calc(var(--u)*3.95);height:clamp(calc(var(--u)*2.8),calc(var(--screen-h) - var(--u)*9.25),calc(var(--u)*5.8))}
+ #stage[data-layout="portrait"] #title .start-actions .dream-game-button{min-height:calc(var(--u)*1.06)}
+ #stage[data-layout="portrait"] #title .save-summary{margin-top:calc(var(--u)*.2)}
+}
+#stage.lobby-still .lobby-stardust i,#stage.lobby-still #title *,#stage.lobby-still #title *::before,#stage.lobby-still #title *::after,#stage.lobby-still .dream-opening *::before{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.lobby-stardust i{animation:none!important}}
+#title .title-shade{pointer-events:none}
+#title .lobby-keeper{pointer-events:auto;transform:none;animation:none}
+#title[data-has-save="true"] #continueButton{background:linear-gradient(180deg,#fff0b7 0%,#ffda79 48%,#efae4f 100%);border-color:#fff0b9;color:#3b2a42;box-shadow:inset 0 2px 0 #fffbe6,inset 0 -4px 0 #bc7c2733,0 6px 0 #93602e,0 10px 0 #09182e75,0 15px 28px #050c2745}
+#modal[data-kind="character"] h2{word-break:keep-all}

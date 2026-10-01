@@ -3,7 +3,7 @@
     const C = window.DREAM_CONTENT, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
     const $ = id => document.getElementById(id), clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const imageKeys = [...new Set([...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'])];
-    let sessionStarted = false, rpg, world, remaster, controls, journey, opening;
+    let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby;
     let cameraY = 0, dialogueKey = '', autoClimb = 0;
     let images = {}, renderer, mode = 'loading', modalKind = '', beforeModal = 'play', state, player, enemies = [], particles = [], texts = [], waves = [], rings = [], camera = 0, clock = 0, lastTime = 0, uiTime = 0, saveTime = 0, hitstop = 0, shake = 0, transition = 0, autoWalk = false, interaction = null, dialogue = null, dialogueIndex = 0, dialogueDone = null, lastQuest = -1, dialogueBefore = 'play';
     let impacts = [];
@@ -443,7 +443,7 @@
         show('title');
         const s = loadSave();
         show('continueButton', !!s);
-        $('startButton').textContent = s ? '새 순찰 시작 →' : '첫 순찰 떠나기 →';
+        DREAM_LOBBY_UI.title(!!s);
         $('saveSummary').textContent = s ? `${C.maps[s.map].name} · 반짝 기억 ${s.memories.length}/${C.memories.length} · 자동 저장됨` : '키보드와 터치로 플레이 · 자동 저장';
     }
     function newGame() {
@@ -1582,6 +1582,7 @@
         const dt = Math.min(.04, (time - lastTime) / 1000 || .016);
         lastTime = time;
         tick(dt);
+        lobby?.update(dt,mode,modalKind);
         renderer.draw({ state, player, enemies, particles, texts, waves, rings, camera, cameraY, clock, companion, pet, mode, shake, transition, settings, rpgInfo: rpg.view(), impacts });
         requestAnimationFrame(loop);
     }
@@ -1766,7 +1767,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.17.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.18.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1802,6 +1803,7 @@
             $('loadingText').textContent = '그림 파일을 열지 못했어요. 압축을 모두 푼 뒤 index.html을 다시 열어주세요. (' + failed.join(', ') + ')';
             return;
         }
+        lobby=window.createDreamLobby({stage:$('stage'),settings});
         renderer = new window.DreamRenderer($('world'), images, C);
         state = defaultState();
         player = makePlayer(185);

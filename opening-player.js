@@ -14,10 +14,13 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
         <p class="opening-caption" aria-live="off"></p>
         <div class="opening-bottom"><span class="opening-label">첫 번째 밤 · 작은 빛의 약속</span><div><button type="button" class="opening-pause" hidden>잠시 멈추기</button><button type="button" class="opening-sound">소리 끄기</button><button type="button" class="opening-skip">건너뛰기 <span aria-hidden="true">›</span></button></div></div>`;
     const video = root.querySelector('video'), play = root.querySelector('.opening-play'), pause = root.querySelector('.opening-pause'), sound = root.querySelector('.opening-sound'), skip = root.querySelector('.opening-skip'), status = root.querySelector('.opening-status'), caption = root.querySelector('.opening-caption');
+    const paint=(node,label,icon,caption='')=>{if(window.DREAM_LOBBY_UI)DREAM_LOBBY_UI.button(node,label,icon,caption);else if(node.querySelector('b'))node.querySelector('b').textContent=label;else node.textContent=label;};
+    paint(play,'꿈의 문 열기','play','첫 번째 밤의 프롤로그');
+    paint(skip,'건너뛰기','skip');
     video.poster = poster;
     mount.append(root);
     function updateSound() {
-        sound.textContent = video.muted ? '소리 켜기' : '소리 끄기';
+        paint(sound,video.muted?'소리 켜기':'소리 끄기',video.muted?'mute':'sound');
         sound.setAttribute('aria-pressed', String(!video.muted));
     }
     function stopTimer() { clearTimeout(loadTimer); loadTimer = 0; }
@@ -62,7 +65,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
             root.classList.add('is-playing');
             play.disabled = false;
             pause.hidden = false;
-            pause.textContent = '잠시 멈추기';
+            paint(pause,'잠시 멈추기','pause');
             pause.focus({preventScroll:true});
         } catch (error) {
             if (!active) return;
@@ -93,7 +96,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
     skip.onclick = () => close();
     pause.onclick = () => {
         if (video.paused) startVideo();
-        else { video.pause(); pause.textContent = '계속 보기'; }
+        else { video.pause(); paint(pause,'계속 보기','play'); }
     };
     sound.onclick = () => { video.muted = !video.muted; updateSound(); };
     video.onended = () => close();
@@ -116,7 +119,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
         }
     });
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden && active && played && !video.paused) { video.pause(); pause.textContent = '계속 보기'; }
+        if (document.hidden && active && played && !video.paused) { video.pause(); paint(pause,'계속 보기','play'); }
     });
     return {open, maybeShow: () => !seen && open(), close, inspect: () => ({active, seen, played, paused:video.paused, error:root.classList.contains('has-error')})};
 };

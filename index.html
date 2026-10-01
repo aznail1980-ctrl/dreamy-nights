@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#25253d"><title>우리의 드리미 나이츠 · 리마스터 v4.17.0</title>
+<meta name="theme-color" content="#25253d"><title>우리의 드리미 나이츠 · 리마스터 v4.18.0</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="favicon-32.png?v=2" type="image/png" sizes="32x32">
 <link rel="icon" href="icon.svg?v=2" type="image/svg+xml">
@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="mobile.css?v=4.13">
 <link rel="stylesheet" href="region.css?v=4.15">
 <link rel="stylesheet" href="equipment.css?v=4.16.0"><link rel="stylesheet" href="growth.css?v=4.17.0">
+<link rel="stylesheet" href="lobby-motion.css?v=4.18.0">
 <script src="viewport.js?v=4.13"></script>
 </head>
 <body>
@@ -22,9 +23,9 @@
 <canvas id="world" width="1440" height="810" aria-label="방향키로 이동하고 Space로 점프, J로 정화하는 꿈속 항구"></canvas>
 <div id="loading" class="layer loading"><div class="moon-mark">☾</div><h1>꿈의 문을 여는 중</h1><p id="loadingText">잠의 항구에 별빛을 켜고 있어요.</p><div class="load-track"><i id="loadBar"></i></div></div>
 <section id="title" class="layer hidden" aria-label="시작 화면">
-<div class="title-shade"></div><div class="title-top"><span class="eyebrow">DREAMLIGHT EXPEDITION</span><div><button class="round sound-toggle" aria-label="소리 켜기 또는 끄기">♫</button><button class="round fullscreen" aria-label="전체 화면">⛶</button></div></div>
-<div class="title-copy"><span class="chapter-pill">✦ &nbsp; 첫 번째 밤 · 다시 켜는 우리의 등대</span><h1>우리의<br><span>드리미 나이츠</span></h1><p class="title-en">OUR DREAMY NIGHTS</p><p class="title-description">잊힌 꿈을 깨우는 작은 순찰.<br>나만의 지킴이로 오늘 밤의 빛을 되찾아주세요.</p><div class="start-actions"><button id="startButton" class="primary">모험 시작 <span>→</span></button><button id="continueButton" class="secondary hidden">모험 계속 <span>↗</span></button></div><p id="saveSummary" class="save-summary">키보드와 터치로 플레이 · 자동 저장</p></div>
-<div class="title-characters"><div class="halo"></div><img class="title-popo" src="assets/popoFrontV41.webp" alt="꿈도장 해머를 든 동료 포포"><img class="title-ari" src="assets/ari.webp" alt="별빛 배턴을 든 꿈 지킴이 아리"><span class="character-note">“좋아, 정했어! 오늘도 순찰 완료—!”</span></div>
+<div class="title-shade"></div><div class="lobby-stardust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="title-top"><span class="eyebrow">DREAMLIGHT EXPEDITION</span><div><button id="lobbyMotion" class="lobby-motion-toggle" aria-label="로비 움직임 멈추기" aria-pressed="true">모션 ON</button><button class="round sound-toggle" aria-label="소리 켜기 또는 끄기">♫</button><button class="round fullscreen" aria-label="전체 화면">⛶</button></div></div>
+<div class="title-copy"><div class="lobby-heading"><span class="chapter-pill">✦ &nbsp; 첫 번째 밤 · 다시 켜는 우리의 등대</span><h1>우리의<br><span>드리미 나이츠</span></h1><p class="title-en">OUR DREAMY NIGHTS</p><p class="title-description">잊힌 꿈을 깨우는 작은 순찰.<br>나만의 지킴이로 오늘 밤의 빛을 되찾아주세요.</p></div><div class="start-actions"><button id="startButton" class="primary">모험 시작 <span>→</span></button><button id="continueButton" class="secondary hidden">모험 계속 <span>↗</span></button></div><p id="saveSummary" class="save-summary">키보드와 터치로 플레이 · 자동 저장</p></div>
+<div class="title-characters"><div class="halo"></div><button type="button" class="lobby-keeper title-popo" data-lobby-hero="popo" aria-label="포포에게 인사하기"><span class="keeper-stage" aria-hidden="true"></span><img src="assets/popoFrontV41.webp" alt=""><canvas width="540" height="700" aria-hidden="true"></canvas><span class="lobby-keeper-name">포포<small>터치해서 인사</small></span></button><button type="button" class="lobby-keeper title-ari" data-lobby-hero="ari" aria-label="아리에게 인사하기"><span class="keeper-stage" aria-hidden="true"></span><img src="assets/ari.webp" alt=""><canvas width="540" height="700" aria-hidden="true"></canvas><span class="lobby-keeper-name">아리<small>터치해서 인사</small></span></button><span class="character-note" aria-live="polite">“좋아, 정했어! 오늘도 순찰 완료—!”</span></div>
 <div class="title-bottom"><span class="tiny-star">✧</span><span>잠든 사람들의 꿈이 섬이 되는 곳,<br><b>잠의 바다에서 만나요.</b></span><button id="openingReplay" class="text-button">인트로 다시 보기 ↻</button><button id="titleHelp" class="text-button">조작 방법 &nbsp; ↗</button></div>
 </section>
 <section id="hud" class="layer hidden" aria-label="게임 상태">
@@ -49,9 +50,9 @@
 <script src="tide-content.js?v=4.14"></script>
 <script src="region-art.js?v=4.15"></script><script src="region-content.js?v=4.15"></script><script src="region-layout.js?v=4.15"></script><script src="region-combat.js?v=4.15"></script><script src="region-ui.js?v=4.15"></script>
 <script src="equipment-art.js?v=4.16.0"></script><script src="equipment-content.js?v=4.16.0"></script><script src="pet-art.js?v=4.17.0"></script><script src="pet-system.js?v=4.17.0"></script><script src="pet-ui.js?v=4.17.0"></script><script src="gear-system.js?v=4.17.0"></script><script src="gear-ui.js?v=4.17.0"></script><script src="equipment-ui.js?v=4.17.0"></script>
-<script src="voice-manifest.js"></script><script src="voice-overrides.js?v=4.9"></script><script src="remaster-system.js?v=4.14"></script><script src="rpg-system.js?v=4.17.0"></script><script src="atlas.js?v=4.8"></script><script src="world-system.js?v=4.16.0"></script><script src="renderer.js"></script><script src="rpg-renderer.js"></script><script src="world-renderer.js"></script><script src="remaster-renderer.js?v=4.17.0"></script><script src="illustrated-renderer.js?v=4.16.0"></script><script src="exploration-renderer.js?v=4.15.1"></script>
+<script src="voice-manifest.js"></script><script src="voice-overrides.js?v=4.9"></script><script src="remaster-system.js?v=4.14"></script><script src="rpg-system.js?v=4.17.0"></script><script src="atlas.js?v=4.8"></script><script src="world-system.js?v=4.18.0"></script><script src="renderer.js"></script><script src="rpg-renderer.js"></script><script src="world-renderer.js"></script><script src="remaster-renderer.js?v=4.17.0"></script><script src="illustrated-renderer.js?v=4.16.0"></script><script src="exploration-renderer.js?v=4.15.1"></script>
 <script src="tide-renderer.js?v=4.14"></script>
 <script src="region-renderer.js?v=4.15"></script>
 <script src="equipment-renderer.js?v=4.16.0"></script><script src="pet-renderer.js?v=4.17.0"></script>
-<script src="journey-system.js?v=4.15"></script><script src="touch-controls.js?v=4.11.1"></script><script src="expression-frames.js?v=4.10"></script><script src="dialogue-expressions.js?v=4.10"></script><script src="conversation.js?v=4.10"></script><script src="opening-player.js?v=4.11"></script><script src="game.js?v=4.17.0"></script>
+<script src="journey-system.js?v=4.15"></script><script src="touch-controls.js?v=4.11.1"></script><script src="expression-frames.js?v=4.10"></script><script src="dialogue-expressions.js?v=4.10"></script><script src="conversation.js?v=4.10"></script><script src="lobby-art.js?v=4.18.0"></script><script src="lobby-motion.js?v=4.18.0"></script><script src="opening-player.js?v=4.18.0"></script><script src="game.js?v=4.18.0"></script>
 </body></html>

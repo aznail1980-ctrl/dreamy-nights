@@ -1,4 +1,4 @@
-# 우리의 드리미 나이츠 v4.17 공개 테스트 배포본
+# 우리의 드리미 나이츠 v4.18 공개 테스트 배포본
 
 이 폴더는 다른 사람이 웹에서 플레이해볼 수 있도록 정리한 공개 테스트용 정적 웹 게임입니다.
 
@@ -15,6 +15,8 @@
 - 구성 파일: 루트의 `.js`, `.css`, `icon.svg`
 
 ## 현재 배포
+
+v4.18: 눈을 깜빡이고 인사하는 아리·포포와 새 인트로/시작 버튼. 캐릭터를 누르면 인사하고, 상단 모션 버튼에서 움직임을 멈출 수 있습니다. [로비 개선·그림·검사 기록](LOBBY-v4.18.md).
 
 v4.17: 가방의 기억 수선대에서 개별 장비 강화·잠금·분해를 지원합니다. 캐릭터 화면 또는 P키에서 꿈의 알과 펫 3종을 돌볼 수 있습니다. 기존 저장은 자동으로 이전합니다. 자세한 수치와 범위는 [성장 기능 안내](GROWTH-v4.17.md)를 참고하세요.
 
@@ -36,3 +38,5 @@ v4.17: 가방의 기억 수선대에서 개별 장비 강화·잠금·분해를 
 ## 저장·거래 회귀 검사
 
 Node.js에서 `node tests/gear-regression.cjs`, `node tests/growth-regression.cjs`, `node tests/pet-motion-regression.cjs`를 실행합니다. 외부 패키지 없이 장비/펫 거래·저장·메뉴 이벤트·동행 이동을 검사합니다.
+
+브라우저 검사는 Playwright 설치 환경에서 `node tests/lobby-flow.cjs`, `node tests/lobby-accessibility.cjs`, `node tests/lobby-video.cjs`로 실행합니다. 기본 Chromium 또는 `CHROME_BIN`에 지정한 실행 파일을 사용하며 결과는 `test-results/`에 저장합니다.
