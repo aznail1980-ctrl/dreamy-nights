@@ -63,7 +63,7 @@
         const swing = r.settings.reducedMotion ? 0 : Math.sin(p.walkTime || 0) * (p.walkBlend || 0) * .035;
         if (layer === 'back') {
             if (look.back === 'nightCape')
-                this.wear('nightCape', pose.kind === 'attack' ? 0 : view, nx - 1, ny + 3, pose.who === 'ari' ? .88 : 1, swing + (pose.kind === 'attack' ? 1.1 : 0));
+                this.wear('nightCape', view, nx - 1, ny + 3, pose.who === 'ari' ? .88 : 1, swing + (['attack', 'dash'].includes(pose.kind) ? 1.0 : 0));
             return;
         }
         if (look.back && look.back !== 'nightCape') {
@@ -135,7 +135,7 @@
             c.save();
             if (kind === 'attack') {
                 const a = this.images[who === 'ari' ? 'ariAttack' : 'popoAttack'], aw = h * a.width / a.height;
-                c.drawImage(a, -aw * .42, -h, aw, h);
+                c.drawImage(a, -aw * .42 + (who === 'ari' ? 28 : 0), -h, aw, h);
             }
             else if (kind === 'walk' || kind === 'climb') {
                 const key = who + (kind === 'climb' ? 'ClimbV41' : 'WalkV41'), sheet = window.DREAM_ART_V41.motion[key];
@@ -176,15 +176,17 @@
             c.restore();
         }
     };
-    R.previewHero = function (canvas, state) {
+    R.previewHero = function (canvas, state, options = {}) {
         const preview = new window.DreamRenderer(canvas, this.images, this.C);
         preview.r = { state, clock: 1, settings: { reducedMotion: true }, player: { grounded: true, groundY: 210, y: 210, walkBlend: 0, walkTime: 0, motionSpeed: 0, attackT: 0, dodgeT: 0, chargeT: 0, chargeHeld: false, invincible: 0 }, companion: {} };
+        const poses = {walk:{motionSpeed:200,walkTime:options.phase??2,walkBlend:1},jump:{grounded:false,vy:-350},climb:{climbing:{},climbPhase:options.phase??2},dash:{dodgeT:.13,dodgeFacing:options.face||1},attack:{attackT:.19,attackLength:.38},charge:{chargeHeld:true,chargeT:.6}};
+        Object.assign(preview.r.player,poses[options.pose]||{});
         const c = preview.ctx;
-        c.clearRect(0, 0, 360, 390);
+        c.clearRect(0, 0, canvas.width, canvas.height);
         c.save();
         c.scale(1.9, 1.9);
         preview.r.player.groundY = 186;
-        preview.actor(state.active, 94, 186, 1, true);
+        preview.actor(state.active, 94, 186, options.face||1, true);
         c.restore();
     };
     R.drawNPC = function (id) {

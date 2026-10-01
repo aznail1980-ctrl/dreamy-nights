@@ -101,12 +101,14 @@ window.createDreamWorld = function (api) {
         };
     }
     function wardrobe(id = selectedLook) {
-        if (api.mode !== 'play' && !(api.mode === 'modal' && ['wardrobe', 'bag', 'npc'].includes(api.modalKind)))
+        if (api.mode !== 'play' && !(api.mode === 'modal' && ['wardrobe', 'bag', 'npc', 'characterDetail'].includes(api.modalKind)))
             return;
         selectedLook = id;
         const ids = Object.keys(C.items).filter(k => C.items[k].type === 'costume'), item = C.items[id] || C.items.softScarf, owned = api.own(id) > 0, recipe = C.costumeRecipes[id], equipped = s().world.look[item.cosmeticSlot] === id, canCraft = recipe && Object.entries(recipe).every(([key, n]) => api.own(key) >= n);
         api.openModal('wardrobe', '나만의 꿈 지킴이', `<div class="wardrobe-layout"><aside class="wardrobe-preview"><span class="small-label">${s().active === 'ari' ? '아리' : '포포'}의 순찰 옷장</span><canvas id="lookPreview" width="360" height="390" aria-label="현재 착용한 캐릭터 모습"></canvas><div class="look-slots">${Object.entries(lookSlots).map(([key, label]) => `<button data-look-slot="${s().world.look[key] || ''}" ${!s().world.look[key] ? 'disabled' : ''}><small>${label}</small><b>${C.items[s().world.look[key]]?.name || '장식 없음'}</b></button>`).join('')}</div></aside><div class="wardrobe-items"><p class="wardrobe-note">탐험의 기억을 입어요. 꾸미기는 장비 능력과 별도로 적용돼요.</p><div class="costume-grid">${ids.map(key => `<button data-look="${key}" data-grade="${C.items[key].grade}" class="costume-item ${key === id ? 'selected' : ''} ${api.own(key) ? '' : 'locked'}">${api.icon(C.items[key].icon, 38)}<b>${C.items[key].name}</b><small>${Object.values(s().world.look).includes(key) ? '착용 중' : api.own(key) ? '보유' : C.costumeRecipes[key] ? '제작 가능 아이템' : '탐험으로 발견'}</small></button>`).join('')}</div><div class="costume-detail"><span>${lookSlots[item.cosmeticSlot]} · ${C.grades[item.grade].name}</span><h3>${item.name}</h3><p>${item.lore}</p>${owned ? `<button id="wearLook" class="primary">${equipped ? '벗기' : '착용하기'}</button>` : recipe ? `<p class="recipe-list">${Object.entries(recipe).map(([key, n]) => `${C.items[key].name} <b>${api.own(key)}/${n}</b>`).join(' · ')}</p><button id="craftLook" class="primary" ${canCraft ? '' : 'disabled'}>재료로 만들기</button>` : `<div class="item-effect">${item.effect}</div>`}</div></div></div>`, 'COLLECT MOMENTS · WEAR YOUR STORY');
         api.preview($('lookPreview'));
+        $('lookPreview').insertAdjacentHTML('afterend','<button id="wardrobeDetails" class="drop-guide">전체 장비 · 동작별 착용 보기 ↗</button>');
+        $('wardrobeDetails').onclick=()=>{api.closeModal();document.getElementById('tagPortrait').click();};
         document.querySelectorAll('[data-look]').forEach(b => b.onclick = () => wardrobe(b.dataset.look));
         document.querySelectorAll('[data-look-slot]').forEach(b => b.onclick = () => wardrobe(b.dataset.lookSlot));
         if ($('wearLook'))

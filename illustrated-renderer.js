@@ -62,7 +62,7 @@
   if(!active||(!charging&&!released))return oldActor.call(this,who,x,y,face,active);
   const c=this.ctx,r=this.r,sheet=ART.sheets[who+'ChargeV44'],elapsed=(p.attackLength||.74)-p.attackT;
   const frame=charging?(p.chargeT<.35?0:p.chargeT<.8?1:2):elapsed<.1?2:elapsed<.28?3:elapsed<.53?4:5;
-  const b=sheet.frames[frame],pivot=sheet.pivots[frame],sc=sheet.scale,flip=sheet.flips[frame],pose={who,kind:'attack',frame,pins:sheet.pins[frame]};
+  const b=sheet.frames[frame],pivot=sheet.pivots[frame],sc=sheet.scale,flip=sheet.flips[frame],pose={who,kind:'attack',source:'charge',frame,pins:sheet.pins[frame]};
   this.ellipse(x,p.groundY??y,25,4,'#48455630');c.save();c.translate(x,y);c.scale(released?p.attackFacing||face:face,1);
   const drawBody=()=>{c.save();c.scale(flip,1);c.drawImage(this.images[who+'ChargeV44'],...b,(b[0]-pivot[0])*sc,(b[1]-pivot[1])*sc,b[2]*sc,b[3]*sc);c.restore();};
   this.costume(r.state.world.look,pose,'back',drawBody);drawBody();this.costume(r.state.world.look,pose,'front',drawBody);c.restore();

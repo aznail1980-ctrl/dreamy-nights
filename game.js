@@ -2,7 +2,7 @@
 (() => {
     const C = window.DREAM_CONTENT, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
     const $ = id => document.getElementById(id), clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-    const imageKeys = [...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'];
+    const imageKeys = [...new Set([...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'])];
     let sessionStarted = false, rpg, world, remaster, controls, journey, opening;
     let cameraY = 0, dialogueKey = '', autoClimb = 0;
     let images = {}, renderer, mode = 'loading', modalKind = '', beforeModal = 'play', state, player, enemies = [], particles = [], texts = [], waves = [], rings = [], camera = 0, clock = 0, lastTime = 0, uiTime = 0, saveTime = 0, hitstop = 0, shake = 0, transition = 0, autoWalk = false, interaction = null, dialogue = null, dialogueIndex = 0, dialogueDone = null, lastQuest = -1, dialogueBefore = 'play';
@@ -938,7 +938,7 @@
             say(state.active === 'popo' ? '반짝반짝 온다온다—!' : '걱정은 바람에, 기억은 마음에!', 2, state.active === 'ari' ? '아리' : '포포');
         }
         if (name === 'wardrobe')
-            world.wardrobe();
+            rpg.details();
     }
     function interact() {
         if (mode !== 'play' || !interaction)
@@ -1571,13 +1571,13 @@
     }
     const keyMap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyJ: 'attack', Space: 'jump' };
     addEventListener('keydown', e => {
-        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName) && e.code !== 'Escape')
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) && !['Escape', 'Tab'].includes(e.code))
             return;
         const dialogueControl = mode === 'dialogue' && e.target.closest('button') && e.target.id !== 'dialogueNext';
         if ((mode === 'play' || mode === 'dialogue') && ['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code) && !(e.code === 'Space' && dialogueControl))
             e.preventDefault();
         if (e.code === 'Tab' && (mode === 'modal' || mode === 'dialogue')) {
-            const root = mode === 'modal' ? $('modal') : $('dialogue'), items = [...root.querySelectorAll('button:not(:disabled),input')].filter(x => x.offsetParent !== null), first = items[0], last = items[items.length - 1];
+            const root = mode === 'modal' ? $('modal') : $('dialogue'), items = [...root.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled)')].filter(x => x.offsetParent !== null), first = items[0], last = items[items.length - 1];
             if (e.shiftKey && document.activeElement === first) {
                 e.preventDefault();
                 last?.focus();
@@ -1604,7 +1604,7 @@
                     retry();
                 return;
             }
-            if (e.code === 'Escape' || (e.code === 'KeyM' && modalKind === 'map') || (e.code === 'KeyN' && modalKind === 'journal') || (e.code === 'KeyI' && modalKind === 'bag') || (['KeyC', 'KeyQ'].includes(e.code) && modalKind === 'wardrobe'))
+            if (e.code === 'Escape' || (e.code === 'KeyM' && modalKind === 'map') || (e.code === 'KeyN' && modalKind === 'journal') || (e.code === 'KeyI' && modalKind === 'bag') || (['KeyC', 'KeyQ'].includes(e.code) && ['wardrobe', 'characterDetail'].includes(modalKind)))
                 closeModal();
             return;
         }
@@ -1705,7 +1705,7 @@
     $('journeyLocal').onclick = () => journey.localMap();
     $('journeyOverview').onclick = () => world.map();
     $('pauseButton').onclick = pause;
-    $('tagPortrait').onclick = () => world.wardrobe();
+    $('tagPortrait').onclick = () => rpg.details();
     $('snackButton').onclick = heal;
     $('interactButton').onclick = interact;
     $('voiceReplay').onclick = () => remaster.replay();
@@ -1765,6 +1765,13 @@
             const img = new Image();
             images[key] = img;
             img.onload = () => {
+                const size = window.DREAM_EQUIPMENT.bodySizes[key];
+                if (size && (img.width !== size[0] || img.height !== size[1])) {
+                    const body = document.createElement('canvas');
+                    [body.width, body.height] = size;
+                    body.getContext('2d').drawImage(img, 0, 0, ...size);
+                    images[key] = body;
+                }
                 loaded++;
                 $('loadBar').style.width = loaded / imageKeys.length * 100 + '%';
                 resolve();
@@ -1798,7 +1805,7 @@
             return mode;
         }, get modalKind() {
             return modalKind;
-        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), preview: canvas => renderer.previewHero(canvas, state) });
+        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     world = window.createDreamWorld({ get state() {
             return state;
         }, get player() {
@@ -1809,7 +1816,7 @@
             return modalKind;
         }, get enemies() {
             return enemies;
-        }, own: rpg.own, add: rpg.add, take: rpg.take, icon: rpg.icon, save, toast, enterMap, openModal, closeModal, dialogue: startDialogue, memory, sound: kind => audio.sfx(kind), refresh: updateHUD, activeQuest, questComplete, questCount, preview: canvas => renderer.previewHero(canvas, state) });
+        }, own: rpg.own, add: rpg.add, take: rpg.take, icon: rpg.icon, save, toast, enterMap, openModal, closeModal, dialogue: startDialogue, memory, sound: kind => audio.sfx(kind), refresh: updateHUD, activeQuest, questComplete, questCount, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     remaster = window.createDreamRemaster({ get state() {
             return state;
         }, get player() {
