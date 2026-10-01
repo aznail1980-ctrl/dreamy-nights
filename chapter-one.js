@@ -2,6 +2,8 @@
 /* Authored first-world routes and the optional, post-ending departure preparation. */
 (() => {
  const C=window.DREAM_CONTENT;
+ // New entry requirements must never trap a save already inside the boss chamber.
+ for(const exit of C.exits[4]){exit.gate='';exit.hint='';}
  const layouts={
   0:{sections:['별조개가 밀려오는 해안','끊어진 조개 절벽','밀물 전망대'],description:'해안에서 첫 걱정을 정화하고, 떨어진 절벽을 지상으로 돌아 올라가요. 동쪽 전망대와 젖은 답장은 선택 탐험이에요.',platforms:[[560,341,1080],[2170,341,1420],[2590,31,780]],lower:[720,1400,2400,3320],upper:[2780,3160],devices:{camp:[330,651],cache:[3200,31]}},
   1:{sections:['별잎이 자라는 숲길','세 갈래 연의 언덕','바람이 머무는 나뭇가지'],description:'세 개의 언덕을 오가며 정화하고 별잎을 모아요. 중앙 상승 바람과 나무 위 기억을 찾거나, 지상의 갈림길로 정원에 갈 수 있어요.',platforms:[[430,341,900],[1660,341,950],[2930,341,920],[1840,31,540]],lower:[620,1120,1850,2380,3140,3620],upper:[2000,2200],devices:{camp:[330,651],cache:[2140,31],vent:[1800,651]}},

@@ -31,6 +31,7 @@ function go(dest){for(let i=0;s.map!==dest&&i<12;i++){const ex=world.route(dest)
 function obj(id){return C.objects.find(o=>o.id===id);}
 function action(npc,id){api.mode='play';rpg.npc(npc);const b=elements.find(e=>e.dataset.npcAction===id);assert(b&&!b.disabled,npc+' '+id);b.onclick();}
 function click(key,value){const b=elements.find(e=>e.dataset[key]===String(value));assert(b,key+value);b.onclick();}
+test('A previous-version save inside the boss room can always return to the alley',()=>{const old=s.map;s.map=4;assert(!world.gateOpen('bossReady'));const exit=world.route(3);assert(exit);world.travel(exit);assert.equal(s.map,3);s.map=old;});
 test('First patrol food is recoverable; cooking is required before reading the star chart',()=>{
  assert(!world.gateOpen('bossReady'));assert.equal(C.chapterBridge.next(s),null);clear();go(1);clear();go(2);rpg.npc('lumen');assert(s.flags.metLumen);
  s.flags.tideAttuned=s.flags.windAttuned=true;world.interact(obj('starChart'));assert.equal(api.mode,'play');assert(lastToast.includes('도시락'));s.flags.tideAttuned=s.flags.windAttuned=false;
