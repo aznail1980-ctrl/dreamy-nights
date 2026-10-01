@@ -1,0 +1,165 @@
+{
+  "tool": "image_gen.imagegen",
+  "transparent_background": true,
+  "assets": [
+    {
+      "id": "tideOtter",
+      "source": "assets/tideOtterPetV417.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent game pet growth/animation sprite atlas. Create ONE clean atlas with exactly 6 separate illustrations in an evenly spaced 3-column x 2-row grid. Pet: a tiny mint-blue sea otter with a cream face, a little pearl-shell on its forehead and a navy star scarf. Rounded short body, gentle smile, adorable small paws. Match a cozy Korean anime RPG with coral-haired chibi heroes, warm brown clean outlines, navy capes, mint and cream clothes, golden stars. Soft polished cel shading, no pixel art, no text, no borders, no platform or ground shadow, no glow haze outside silhouettes. Readable at 42 pixels. All cells fully inside their own equally sized cell with ample transparent padding. Cell order left to right then next row: 1) one magical egg incorporating pearl shell, closed and intact, no animal outside; 2) baby pet sitting and facing viewer, big head, short body; 3) same baby in full side profile facing RIGHT, stepping forward; 4) grown pet sitting in full side profile facing RIGHT, slightly more mature proportions and larger tail, same identity; 5) grown pet in walking stride facing RIGHT; 6) grown pet happy celebratory pose with raised paws and closed smiling eyes, facing RIGHT. No humans, no other objects, no accessories held in paws. Species and palette strictly consistent across all five pet cells. Egg and individual pets isolated with genuine transparent background.",
+      "generated_file": "exec-460c6bf8-b334-43ed-ae43-b47daf689d8b.png"
+    },
+    {
+      "id": "leafFox",
+      "source": "assets/leafFoxPetV417.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent game pet growth/animation sprite atlas. Create ONE clean atlas with exactly 6 separate illustrations in an evenly spaced 3-column x 2-row grid. Pet: a tiny cream fox with coral ear tips, mint leaf-shaped tail tuft, a navy star scarf and a golden seed on its forehead. Rounded short body, gentle smile, adorable small paws. Match a cozy Korean anime RPG with coral-haired chibi heroes, warm brown clean outlines, navy capes, mint and cream clothes, golden stars. Soft polished cel shading, no pixel art, no text, no borders, no platform or ground shadow, no glow haze outside silhouettes. Readable at 42 pixels. All cells fully inside their own equally sized cell with ample transparent padding. Cell order left to right then next row: 1) one magical egg incorporating leaf seed, closed and intact, no animal outside; 2) baby pet sitting and facing viewer, big head, short body; 3) same baby in full side profile facing RIGHT, stepping forward; 4) grown pet sitting in full side profile facing RIGHT, slightly more mature proportions and larger tail, same identity; 5) grown pet in walking stride facing RIGHT; 6) grown pet happy celebratory pose with raised paws and closed smiling eyes, facing RIGHT. No humans, no other objects, no accessories held in paws. Species and palette strictly consistent across all five pet cells. Egg and individual pets isolated with genuine transparent background.",
+      "generated_file": "exec-be175a7f-d930-481e-a911-f8dd1b83228e.png"
+    },
+    {
+      "id": "glowNewt",
+      "source": "assets/glowNewtPetV417.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent game pet growth/animation sprite atlas. Create ONE clean atlas with exactly 6 separate illustrations in an evenly spaced 3-column x 2-row grid. Pet: a tiny lavender water salamander with soft mint external gills, a cream belly, a navy star scarf and a golden lantern-star on its forehead. Rounded short body, gentle smile, adorable small paws. Match a cozy Korean anime RPG with coral-haired chibi heroes, warm brown clean outlines, navy capes, mint and cream clothes, golden stars. Soft polished cel shading, no pixel art, no text, no borders, no platform or ground shadow, no glow haze outside silhouettes. Readable at 42 pixels. All cells fully inside their own equally sized cell with ample transparent padding. Cell order left to right then next row: 1) one magical egg incorporating water lantern, closed and intact, no animal outside; 2) baby pet sitting and facing viewer, big head, short body; 3) same baby in full side profile facing RIGHT, stepping forward; 4) grown pet sitting in full side profile facing RIGHT, slightly more mature proportions and larger tail, same identity; 5) grown pet in walking stride facing RIGHT; 6) grown pet happy celebratory pose with raised paws and closed smiling eyes, facing RIGHT. No humans, no other objects, no accessories held in paws. Species and palette strictly consistent across all five pet cells. Egg and individual pets isolated with genuine transparent background.",
+      "generated_file": "exec-971b8477-3627-424b-a4de-0f9cec6f54b9.png"
+    }
+  ],
+  "frames": {
+    "tideOtter": {
+      "key": "tideOtterPetV417",
+      "file": "assets/tideOtterPetV417.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": [
+        [
+          118,
+          110,
+          296,
+          371
+        ],
+        [
+          598,
+          126,
+          332,
+          356
+        ],
+        [
+          1044,
+          108,
+          436,
+          376
+        ],
+        [
+          46,
+          556,
+          413,
+          390
+        ],
+        [
+          522,
+          577,
+          501,
+          367
+        ],
+        [
+          1084,
+          553,
+          407,
+          396
+        ]
+      ]
+    },
+    "leafFox": {
+      "key": "leafFoxPetV417",
+      "file": "assets/leafFoxPetV417.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": [
+        [
+          118,
+          103,
+          293,
+          349
+        ],
+        [
+          619,
+          41,
+          317,
+          416
+        ],
+        [
+          1041,
+          52,
+          454,
+          404
+        ],
+        [
+          17,
+          475,
+          492,
+          477
+        ],
+        [
+          543,
+          516,
+          515,
+          429
+        ],
+        [
+          1096,
+          493,
+          434,
+          468
+        ]
+      ]
+    },
+    "glowNewt": {
+      "key": "glowNewtPetV417",
+      "file": "assets/glowNewtPetV417.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": [
+        [
+          83,
+          90,
+          354,
+          405
+        ],
+        [
+          563,
+          82,
+          412,
+          393
+        ],
+        [
+          1013,
+          97,
+          481,
+          376
+        ],
+        [
+          20,
+          534,
+          483,
+          401
+        ],
+        [
+          528,
+          577,
+          496,
+          356
+        ],
+        [
+          1055,
+          540,
+          470,
+          415
+        ]
+      ]
+    }
+  },
+  "note": "프레임은 균등 셀 대신 실제 캐릭터 연결 영역을 기준으로 지정. 원본 픽셀 수정 없음."
+}

@@ -233,7 +233,11 @@
         if (!s.visited.includes(s.map))
             s.visited.push(s.map);
         s.y = raw.version === 4 && Number.isFinite(raw.y) ? clamp(raw.y, 31, GROUND) : GROUND;
-        return remaster.initialize(world.migrate(rpg.migrate(s, raw), raw), raw);
+        const migrated=remaster.initialize(world.migrate(rpg.migrate(s, raw), raw), raw);
+        const gearHP=['weapon','charm','keepsake'].reduce((n,slot)=>n+(DREAM_GEAR.stats(DREAM_GEAR.equipped(s.rpg,slot)).hp||0),0);
+        const limit=Math.min(8,6+Math.floor(Math.floor(s.xp/75)/3))+gearHP;
+        s.hp=clamp(Number(raw.hp)||6,.5,limit);
+        return migrated;
     }
     function loadSave() {
         try {
@@ -371,10 +375,6 @@
         remaster?.stopVoice();
         state.map = index;
         C.syncHeroItems(state.active);
-        const popo = state.active === 'popo';
-        C.items.baton.name = popo ? '신입의 꿈도장 해머' : '신입의 꿈배턴';
-        C.items.stellarBaton.name = popo ? '다시 빛나는 꿈해머' : '다시 빛나는 꿈배턴';
-        C.items.baton.icon = C.items.stellarBaton.icon = popo ? 'hammer' : 'wand';
         state.x = x ?? (fromRight ? C.maps[index].width - 180 : 180);
         player = makePlayer(state.x);
         player.y = y;
@@ -383,7 +383,7 @@
         cameraY = clamp(y - 570, -650, 0);
         camera = clamp(player.x - W * .4, 0, C.maps[index].width - W);
         companion = { x: player.x - 100, y: GROUND, vx: 0, vy: 0, facing: 1, grounded: true, groundY: GROUND, walkTime: 0, walkBlend: 0, lean: 0, jumpDelay: 0 };
-        pet = { x: player.x - 160, y: GROUND - 90 };
+        pet = { x: Math.max(65,player.x - 90), y, vx:0, vy:0, grounded:true, facing:player.facing, walkTime:0, recall:0 };
         enemies = makeEnemies();
         particles = [];
         waves = [];
@@ -395,6 +395,7 @@
             state.visited.push(index);
         if (index === 2)
             state.hp = maxHP();
+        rpg.petProgress('map',index);
         transition = .45;
         splashTimer = 2.1;
         $('zoneSplash').querySelector('b').textContent = C.maps[index].name;
@@ -538,7 +539,7 @@
         lastFocus?.focus?.({ preventScroll: true });
     }
     function help() {
-        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['점프', 'Space'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['캐릭터 · 장비', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
+        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['점프', 'Space'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['캐릭터 · 장비', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['작은 꿈 친구들', 'P'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
     }
     function pause() {
         if (mode === 'modal') {
@@ -937,6 +938,7 @@
             }
             say(state.active === 'popo' ? '반짝반짝 온다온다—!' : '걱정은 바람에, 기억은 마음에!', 2, state.active === 'ari' ? '아리' : '포포');
         }
+        if (name === 'pets')return rpg.pets();
         if (name === 'wardrobe')
             rpg.details();
     }
@@ -1081,6 +1083,21 @@
         stepBody(companion, dt);
         companion.landSquash = Math.max(0, (companion.landSquash || 0) - dt);
     }
+    function updateGrowthPet(dt) {
+        if(!DREAM_PETS.active(state))return;
+        const dx=player.x-player.facing*90-pet.x;
+        pet.recall=Math.max(0,(pet.recall||0)-dt);
+        pet.happy=Math.max(0,(pet.happy||0)-dt);
+        if(Math.abs(dx)>520||Math.abs(player.y-pet.y)>185){
+            // A short dream-light return replaces floating across ladders or through platforms.
+            pet.x=clamp(player.x-player.facing*65,65,currentMap().width-65);pet.y=player.y;pet.vx=0;pet.vy=0;pet.recall=.28;
+        }
+        pet.vx=approach(pet.vx||0,Math.abs(dx)>18?clamp(dx*3.8,-385,385):0,dt*1450);
+        if(Math.abs(pet.vx)>25)pet.facing=Math.sign(pet.vx);
+        if(pet.grounded&&player.y<pet.y-55&&Math.abs(dx)>28)pet.vy=-660;
+        stepBody(pet,dt);pet.walkTime=(pet.walkTime||0)+Math.abs(pet.vx)*dt*.025;
+        pet.landSquash=Math.max(0,(pet.landSquash||0)-dt);
+    }
     function updatePlayer(dt) {
         Object.keys(cooldowns).forEach(k => cooldowns[k] = Math.max(0, cooldowns[k] - dt));
         for (const k of ['invincible', 'attackT', 'dodgeT', 'comboT', 'jumpBuffer', 'landSquash', 'attackBuffer', 'hitT', 'climbDetachT'])
@@ -1151,8 +1168,7 @@
         const item = currentMap().memory;
         if (item && !state.memories.includes(item.id) && Math.hypot(player.x - item.x, player.y - 65 - item.y) < 76)
             memory(item.id);
-        pet.x += (player.x - player.facing * 163 - pet.x) * Math.min(1, dt * 3);
-        pet.y += (player.y - 92 - pet.y) * Math.min(1, dt * 4);
+        updateGrowthPet(dt);
         cameraY += (clamp(player.y - 570, -650, 0) - cameraY) * Math.min(1, dt * 5);
         camera += (clamp(player.x - W * .42 + player.vx * .055, 0, currentMap().width - W) - camera) * Math.min(1, dt * 5.5);
     }
@@ -1604,7 +1620,7 @@
                     retry();
                 return;
             }
-            if (e.code === 'Escape' || (e.code === 'KeyM' && modalKind === 'map') || (e.code === 'KeyN' && modalKind === 'journal') || (e.code === 'KeyI' && modalKind === 'bag') || (['KeyC', 'KeyQ'].includes(e.code) && ['wardrobe', 'characterDetail'].includes(modalKind)))
+            if (e.code === 'Escape' || (e.code === 'KeyM' && modalKind === 'map') || (e.code === 'KeyN' && modalKind === 'journal') || (e.code === 'KeyI' && modalKind === 'bag') || (e.code === 'KeyP' && ['pets','petChoice','petHatch'].includes(modalKind)) || (['KeyC', 'KeyQ'].includes(e.code) && ['wardrobe', 'characterDetail'].includes(modalKind)))
                 closeModal();
             return;
         }
@@ -1616,7 +1632,7 @@
             if (keyMap[e.code] !== 'attack')
                 autoWalk = false;
         }
-        const acts = { KeyJ: 'attackPress', Space: 'jump', ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyK: 'skill', KeyQ: 'wardrobe', KeyC: 'wardrobe' };
+        const acts = { KeyJ: 'attackPress', Space: 'jump', ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyK: 'skill', KeyQ: 'wardrobe', KeyC: 'wardrobe', KeyP:'pets' };
         if (acts[e.code])
             action(acts[e.code]);
         if (e.code === 'KeyE')
@@ -1750,7 +1766,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.15.1' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.17.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1805,7 +1821,7 @@
             return mode;
         }, get modalKind() {
             return modalKind;
-        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
+        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), pets:()=>rpg.pets(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     world = window.createDreamWorld({ get state() {
             return state;
         }, get player() {

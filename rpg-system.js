@@ -1,16 +1,22 @@
 'use strict';
 window.createDreamRPG = function (api) {
+    const G = window.DREAM_GEAR;
     const C = window.DREAM_CONTENT, $ = id => document.getElementById(id), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
     const labels = { equipment: '장비', supply: '소모품', material: '재료', story: '이야기', costume: '꾸미기' }, slots = { weapon: '정화 도구', charm: '가슴 장식', keepsake: '기억 부적' };
     const extraFlags = ['cookedFirst', 'letterRead', 'readyForBoss', 'journalReturned', 'herbsDelivered', 'replyDelivered', 'beaconsRewarded', 'metBaker', 'metPost', 'bakerGift', 'bossRecovered'];
+    let selectedGearUid = '';
     let selection = 'baton', bagTab = 'all', bagGrade = 'all', mini = null, loot = [], comboTime = 0, combo = 0;
     const state = () => api.state, own = id => state()?.rpg.inventory[id] || 0;
     const regionUI=window.createDreamRegionUI({C,api,state,own,add,take,icon,bag});
     const equipmentUI=window.createDreamEquipmentUI({C,api,state,stats,icon,bag});
+    const gearUI=window.createDreamGearUI({C,G,api,state,icon,bag,details:equipmentUI.details});
+    const petUI=window.createDreamPetUI({api,state,own,take,details:equipmentUI.details});
     function initialize(s) {
         extraFlags.forEach(f => s.flags[f] = false);
         s.version = 2;
         s.rpg = { inventory: { baton: 1, rookieBadge: 1, cookie: 3 }, equipment: { weapon: 'baton', charm: 'rookieBadge', keepsake: null }, accepted: [], gathered: [], opened: [], beacons: [], resonance: 0, protection: 0, stats: { hits: 0, bestCombo: 0, perfectDodges: 0, cooked: 0 } };
+        G.initialize(s.rpg);
+        DREAM_PETS.initialize(s);
         return s;
     }
     function migrate(s, raw) {
@@ -67,6 +73,8 @@ window.createDreamRPG = function (api) {
             for (const f of extraFlags)
                 s.flags[f] = raw.flags?.[f] === true;
         }
+        G.initialize(r,source);
+        DREAM_PETS.initialize(s,raw);
         s.snacks = r.inventory.cookie || 0;
         return s;
     }
@@ -77,7 +85,7 @@ window.createDreamRPG = function (api) {
             for (const id of Object.values(r.equipment)) {
                 if (!id || !r.inventory[id])
                     continue;
-                for (const [k, v] of Object.entries(C.items[id].stats || {}))
+                for (const [k, v] of Object.entries(G.stats(G.equipped(r,C.items[id].slot)||{itemId:id,level:0})))
                     result[k] += v;
             }
         return result;
@@ -86,14 +94,15 @@ window.createDreamRPG = function (api) {
         if (!C.items[id] || qty <= 0)
             return;
         const r = state().rpg;
-        r.inventory[id] = clamp(own(id) + qty, 0, 999);
+        if(G.isGear(id))G.add(r,id,qty);
+        else r.inventory[id] = clamp(own(id) + qty, 0, 999);
         if (id === 'cookie')
             state().snacks = r.inventory[id];
         if (notify)
             api.toast(C.items[id].name + ' ×' + qty + ' · 가방에 담았어요');
     }
     function take(id, qty) {
-        if (own(id) < qty)
+        if (G.isGear(id) || !Number.isInteger(qty) || qty <= 0 || own(id) < qty)
             return false;
         state().rpg.inventory[id] -= qty;
         if (state().rpg.inventory[id] === 0)
@@ -124,7 +133,7 @@ window.createDreamRPG = function (api) {
             api.closeModal();
             return;
         }
-        if (api.mode !== 'play' && !(api.mode === 'modal' && ['bag','characterDetail','regionGuide','regionWorkshop','wardrobe'].includes(api.modalKind)))
+        if (api.mode !== 'play' && !(api.mode === 'modal' && ['bag','characterDetail','regionGuide','regionWorkshop','wardrobe','gearWorkshop','gearConfirm'].includes(api.modalKind)))
             return;
         if (tab === 'toggle')
             tab = 'all';
@@ -135,14 +144,20 @@ window.createDreamRPG = function (api) {
         if (!ids.includes(id))
             id = ids[0] || null;
         selection = id;
-        const it = C.items[id], equipped = id && Object.values(state().rpg.equipment).includes(id), st = stats();
+        const copies=state().rpg.gear.filter(g=>g.itemId===id);
+        const chosen=copies.find(g=>g.uid===selectedGearUid)||copies.find(g=>Object.values(state().rpg.equippedUids).includes(g.uid))||copies[0];
+        selectedGearUid=chosen?.uid||'';
+        const it = C.items[id], equipped = chosen && Object.values(state().rpg.equippedUids).includes(chosen.uid), st = stats();
         const html = `<div class="bag-layout"><aside class="bag-character"><span class="small-label">나의 꿈 지킴이</span><div class="paper-doll"><div></div><canvas id="bagHeroPreview" width="360" height="390"></canvas></div><h3>${state().active === 'ari' ? '아리' : '포포'} <small>Lv. ${api.level()}</small></h3><dl class="character-stats"><div><dt>마음</dt><dd>${state().hp} / ${api.maxHP()}</dd></div><div><dt>정화 위력</dt><dd>${2 + st.attack}</dd></div><div><dt>꿈빛 파동</dt><dd>${7 + st.skill}</dd></div><div><dt>이동 속도</dt><dd>${Math.round(100 + st.speed * 100)}%</dd></div></dl><div class="equipment-slots">${Object.entries(slots).map(([slot, label]) => {
             const item = state().rpg.equipment[slot];
-            return `<button class="equipment-slot" data-slot-item="${item || ''}" ${!item ? 'disabled' : ''}>${icon(C.items[item]?.icon || 'dust', 25)}<span><small>${label}</small><b>${C.items[item]?.name || '아직 비어 있어요'}</b></span></button>`;
-        }).join('')}</div></aside><div class="bag-center"><label class="bag-grade-filter">아이템 등급 <select id="bagGrade" aria-label="아이템 등급 필터">${[['all','모든 등급'],...Object.entries(C.grades).reverse().map(([k,g])=>[k,g.symbol+' '+g.name])].map(([k,n])=>`<option value="${k}" ${grade===k?'selected':''}>${n}</option>`).join('')}</select></label><div class="bag-tabs">${[['all', '전체'], ...Object.entries(labels)].map(([key, label]) => `<button data-bag-tab="${key}" class="${key === tab ? 'active' : ''}">${label}</button>`).join('')}</div><div class="item-grid">${ids.map(key => `<button data-item="${key}" data-grade="${C.items[key].grade}" class="item-slot ${key === id ? 'selected' : ''} ${Object.values(state().rpg.equipment).includes(key) ? 'equipped' : ''}" aria-label="${C.grades[C.items[key].grade].name} ${C.items[key].name} ${own(key)}개">${icon(C.items[key].icon, 43)}<em class="grade-badge">${C.grades[C.items[key].grade].symbol} ${C.grades[C.items[key].grade].name}</em><b>${C.items[key].name}</b><small>${Object.values(state().rpg.equipment).includes(key) ? '장착 중' : '× ' + own(key)}</small></button>`).join('')}${ids.length === 0 ? '<p class="empty-bag">아직 담긴 물건이 없어요.<br>꿈길에서 새로운 기억을 찾아보세요.</p>' : ''}</div><button id="dropGuide" class="drop-guide">등급 · 드롭 안내 ↗</button><div class="bag-money">${icon('dust', 25)} 꿈빛 <b>${state().light}</b><span>보유 물건 ${Object.keys(state().rpg.inventory).filter(k => own(k) > 0).length}종</span></div></div><aside class="item-detail">${it ? `<div class="item-preview">${icon(it.icon, 88)}</div><span class="item-rarity" data-grade="${it.grade}">${C.grades[it.grade].symbol} ${C.grades[it.grade].name} · ${labels[it.type]}</span><h3>${it.name}</h3><p>${it.lore}</p><div class="item-effect">${it.effect}</div>${it.slot ? `<p class="equip-compare">현재 ${slots[it.slot]}<br><b>${C.items[state().rpg.equipment[it.slot]]?.name || '비어 있음'}</b></p>` : ''}${equipmentUI.comparison(it)}<div class="item-actions">${it.type === 'equipment' ? `<button id="equipItem" class="primary">${equipped ? '장착 중' : '장착하기'}</button>${equipped && it.slot !== 'weapon' ? '<button id="unequipItem" class="secondary">장착 해제</button>' : ''}` : it.type === 'supply' ? '<button id="useItem" class="primary">사용하기</button>' : it.type === 'costume' ? '<button id="openWardrobe" class="primary">옷장에서 착용하기</button>' : `<div class="item-context">${it.type === 'story' ? '이야기 속에서 사용할 물건이에요.' : '마을에서 재료를 사용해보세요.'}</div>`}</div>` : '<p>물건을 선택하면 이야기를 읽을 수 있어요.</p>'}</aside></div>`;
+            return `<button class="equipment-slot" data-slot-item="${item || ''}" ${!item ? 'disabled' : ''}>${icon(C.items[item]?.icon || 'dust', 25)}<span><small>${label}</small><b>${item?G.name(G.equipped(state().rpg,slot)):'아직 비어 있어요'}</b></span></button>`;
+        }).join('')}</div></aside><div class="bag-center"><label class="bag-grade-filter">아이템 등급 <select id="bagGrade" aria-label="아이템 등급 필터">${[['all','모든 등급'],...Object.entries(C.grades).reverse().map(([k,g])=>[k,g.symbol+' '+g.name])].map(([k,n])=>`<option value="${k}" ${grade===k?'selected':''}>${n}</option>`).join('')}</select></label><div class="bag-tabs">${[['all', '전체'], ...Object.entries(labels)].map(([key, label]) => `<button data-bag-tab="${key}" class="${key === tab ? 'active' : ''}">${label}</button>`).join('')}</div><div class="item-grid">${ids.map(key => `<button data-item="${key}" data-grade="${C.items[key].grade}" class="item-slot ${key === id ? 'selected' : ''} ${Object.values(state().rpg.equipment).includes(key) ? 'equipped' : ''}" aria-label="${C.grades[C.items[key].grade].name} ${C.items[key].name} ${own(key)}개">${icon(C.items[key].icon, 43)}<em class="grade-badge">${C.grades[C.items[key].grade].symbol} ${C.grades[C.items[key].grade].name}</em><b>${C.items[key].name}</b><small>${Object.values(state().rpg.equipment).includes(key) ? '장착 중' : '× ' + own(key)}</small></button>`).join('')}${ids.length === 0 ? '<p class="empty-bag">아직 담긴 물건이 없어요.<br>꿈길에서 새로운 기억을 찾아보세요.</p>' : ''}</div><button id="dropGuide" class="drop-guide">등급 · 드롭 안내 ↗</button><div class="bag-money">${icon('dust', 25)} 꿈빛 <b>${state().light}</b><span>보유 물건 ${Object.keys(state().rpg.inventory).filter(k => own(k) > 0).length}종</span></div></div><aside class="item-detail">${it ? `<div class="item-preview">${icon(it.icon, 88)}</div><span class="item-rarity" data-grade="${it.grade}">${C.grades[it.grade].symbol} ${C.grades[it.grade].name} · ${labels[it.type]}</span><h3>${chosen?G.name(chosen):it.name}</h3>${chosen?`<label class="bag-grade-filter">개별 장비 <select id="gearCopy">${copies.map(g=>`<option value="${g.uid}" ${g.uid===chosen.uid?'selected':''}>${G.name(g)} · ${g.uid.slice(1)}번${Object.values(state().rpg.equippedUids).includes(g.uid)?' · 장착 중':''}${g.locked?' · 잠금':''}</option>`).join('')}</select></label>`:''}<p>${it.lore}</p><div class="item-effect">${chosen?equipmentUI.summary(chosen):it.effect}</div>${it.slot ? `<p class="equip-compare">현재 ${slots[it.slot]}<br><b>${G.equipped(state().rpg,it.slot)?G.name(G.equipped(state().rpg,it.slot)):'비어 있음'}</b></p>` : ''}${equipmentUI.comparison(it,chosen)}<div class="item-actions">${it.type === 'equipment' ? `<button id="equipItem" class="primary">${equipped ? '장착 중' : '장착하기'}</button>${equipped && it.slot !== 'weapon' ? '<button id="unequipItem" class="secondary">장착 해제</button>' : ''}` : it.type === 'supply' ? '<button id="useItem" class="primary">사용하기</button>' : it.type === 'costume' ? '<button id="openWardrobe" class="primary">옷장에서 착용하기</button>' : `<div class="item-context">${it.type === 'story' ? '이야기 속에서 사용할 물건이에요.' : '마을에서 재료를 사용해보세요.'}</div>`}</div>` : '<p>물건을 선택하면 이야기를 읽을 수 있어요.</p>'}</aside></div>`;
         api.openModal('bag', '순찰 가방', html, 'LITTLE THINGS, MEANINGFUL JOURNEYS');
         $('dropGuide').insertAdjacentHTML('beforebegin','<button id="bagDetails" class="drop-guide">캐릭터 · 장착 모습 ↗</button>');
         $('bagDetails').onclick=equipmentUI.details;
+        $('bagDetails').insertAdjacentHTML('afterend','<button id="gearWorkshop" class="drop-guide">기억 수선대 · 강화 · 분해 ↗</button>');
+        $('gearWorkshop').onclick=()=>gearUI.open(chosen?.uid);
+        if($('gearCopy'))$('gearCopy').onchange=e=>{selectedGearUid=e.target.value;bag(tab,id);};
         $('bagGrade').onchange=e=>bag(bagTab,null,e.target.value);
         $('dropGuide').onclick = dropGuide;
         $('dropGuide').insertAdjacentHTML('afterend','<button id="regionGuide" class="drop-guide">지역 생태 · 재료 · 제작법 ↗</button>');
@@ -156,7 +171,7 @@ window.createDreamRPG = function (api) {
         if ($('equipItem')) {
             $('equipItem').disabled = equipped;
             $('equipItem').onclick = () => {
-                state().rpg.equipment[it.slot] = id;
+                if(!chosen||!G.equip(state().rpg,chosen.uid))return;
                 state().hp = Math.min(state().hp, api.maxHP());
                 api.sound('tag');
                 api.save();
@@ -166,7 +181,7 @@ window.createDreamRPG = function (api) {
         }
         if ($('unequipItem'))
             $('unequipItem').onclick = () => {
-                state().rpg.equipment[it.slot] = null;
+                G.unequip(state().rpg,it.slot);
                 state().hp = Math.min(state().hp, api.maxHP());
                 api.save();
                 api.refresh();
@@ -179,7 +194,7 @@ window.createDreamRPG = function (api) {
             };
     }
     function dropGuide() {
-        api.openModal('dropGuide', '어둑이의 레벨과 발견할 보물', `<p>어둑이를 정화할 때 재료와 장비를 각각 추첨해요. 높은 레벨일수록 장비 발견 확률과 좋은 등급의 확률이 올라갑니다.</p><div class="grade-legend">${Object.values(C.grades).reverse().map(g => `<span style="--grade:${g.color}">${g.symbol} ${g.name}</span>`).join('')}</div><table class="drop-table"><thead><tr><th>몬스터 레벨</th><th>장비 획득</th><th>저급</th><th>일반</th><th>레어</th><th>유니크</th></tr></thead><tbody>${C.lootBands.map(b => `<tr><td>Lv. ${b.min}–${b.max === 99 ? '9' : b.max}</td><td>${(C.dropProfile({ level: b.min }).gearChance * 100).toFixed(1)}–${(C.dropProfile({ level: Math.min(b.max, 9) }).gearChance * 100).toFixed(1)}%</td>${Object.values(b.weights).map(v => `<td>${v}%</td>`).join('')}</tr>`).join('')}<tr><td>먼지대장</td><td>100%</td><td>0%</td><td>0%</td><td>70%</td><td>30%</td></tr></tbody></table><p class="drop-note">등급 확률은 <b>장비를 획득했을 때</b>의 비율입니다. 예: Lv. 7의 유니크 장비 확률은 27.5% × 10% = 2.75%예요. 재료는 별도로 추첨하며 아무 아이템도 나오지 않을 수 있습니다.</p><p>편지 조각처럼 이야기에 꼭 필요한 단서는 정해진 어둑이에게서 반드시 나와요. 같은 이름의 아이템은 같은 등급과 능력을 가집니다.</p><button id="backToBag" class="primary">가방으로 돌아가기</button>`, 'FIND SOMETHING WORTH KEEPING');
+        api.openModal('dropGuide', '어둑이의 레벨과 발견할 보물', `<p>어둑이를 정화할 때 재료와 장비를 각각 추첨해요. 높은 레벨일수록 장비 발견 확률과 좋은 등급의 확률이 올라갑니다.</p><div class="grade-legend">${Object.values(C.grades).reverse().map(g => `<span style="--grade:${g.color}">${g.symbol} ${g.name}</span>`).join('')}</div><table class="drop-table"><thead><tr><th>몬스터 레벨</th><th>장비 획득</th><th>저급</th><th>일반</th><th>레어</th><th>유니크</th></tr></thead><tbody>${C.lootBands.map(b => `<tr><td>Lv. ${b.min}–${b.max === 99 ? '9' : b.max}</td><td>${(C.dropProfile({ level: b.min }).gearChance * 100).toFixed(1)}–${(C.dropProfile({ level: Math.min(b.max, 9) }).gearChance * 100).toFixed(1)}%</td>${Object.values(b.weights).map(v => `<td>${v}%</td>`).join('')}</tr>`).join('')}<tr><td>먼지대장</td><td>100%</td><td>0%</td><td>0%</td><td>70%</td><td>30%</td></tr></tbody></table><p class="drop-note">등급 확률은 <b>장비를 획득했을 때</b>의 비율입니다. 예: Lv. 7의 유니크 장비 확률은 27.5% × 10% = 2.75%예요. 재료는 별도로 추첨하며 아무 아이템도 나오지 않을 수 있습니다.</p><p>편지 조각처럼 이야기에 꼭 필요한 단서는 정해진 어둑이에게서 반드시 나와요. 같은 이름의 장비도 강화 단계는 각각 다를 수 있어요. 가방에서 개별 장비를 선택해 비교해주세요.</p><button id="backToBag" class="primary">가방으로 돌아가기</button>`, 'FIND SOMETHING WORTH KEEPING');
         $('backToBag').onclick = () => {
             api.closeModal();
             bag();
@@ -216,7 +231,18 @@ window.createDreamRPG = function (api) {
     function drops(type) {
         return { sand: [['dreamDust', 2], ['moonFlour', 1]], crab: [['dreamDust', 3], ['honey', 1]], box: [['dreamDust', 3], ['thread', 1], ['page', 1]], boss: [['dreamDust', 10]] }[type] || [];
     }
+    function petProgress(kind,id) {
+        const s=state(),wasReady=s.pets.egg?.warmth>=8,pet=DREAM_PETS.active(s),wasGrown=pet&&DREAM_PETS.grown(pet);
+        const help=DREAM_PETS.progress(s,kind,id);
+        if(help)api.petReaction?.();
+        if(help==='tideOtter'&&s.hp<api.maxHP()){s.hp=Math.min(api.maxHP(),s.hp+1);api.floatText('작은 친구의 응원 · 마음 +1',api.player.x,api.player.y-175,'#c5f5de');}
+        if(help==='leafFox'){gainResonance(6);api.floatText('새잎의 응원 · 공명 +6',api.player.x,api.player.y-175,'#d8efae');}
+        if(help==='glowNewt'&&s.rpg.fragments<100000000){s.rpg.fragments++;api.floatText('반짝! 잔해물 +1',api.player.x,api.player.y-175,'#eddbff');}
+        if(s.pets.egg?.warmth>=8&&!wasReady)api.toast('알이 움직여요! 캐릭터 수첩 → 작은 꿈 친구들에서 만나봐요. · P',4);
+        else if(pet&&!wasGrown&&DREAM_PETS.grown(pet))api.toast(pet.name+'이 어른 모습으로 자랐어요! · P',4);
+    }
     function rewardKill(enemy) {
+        petProgress('enemy',enemy.id);
         const rewards = C.rollDrops(enemy, state().map);
         for (const [id, n] of rewards) {
             add(id, n, false);
@@ -349,7 +375,7 @@ window.createDreamRPG = function (api) {
     }
     function npcMenu(id) {
         const s = state(), n = C.npcs[id];
-        let choices = choice('regionWorkshop','지역 재료로 만들고 싶어요.','순찰 간식 3종 · 항구 기념 장비 3종'), message = n.greeting;
+        let choices = choice('petNursery','작은 꿈 친구들을 만나고 싶어요.','꿈의 알 선택 · 부화 · 펫 성장') + choice('gearWorkshop','기억 수선대를 이용할게요.','남는 장비 분해 · 꿈빛 잔해물로 장비 강화') + choice('regionWorkshop','지역 재료로 만들고 싶어요.','순찰 간식 3종 · 항구 기념 장비 3종'), message = n.greeting;
         if (id === 'lumen') {
             if (s.flags.letterRead && !s.flags.readyForBoss)
                 choices += choice('truth', '반장님, 이 편지를 봐주세요.', '뒤뚱이 이어 붙인 편지의 주인을 만나요.');
@@ -383,6 +409,8 @@ window.createDreamRPG = function (api) {
     }
     function npcAction(id, action) {
         const s = state();
+        if(action==='petNursery')return petUI.open();
+        if(action==='gearWorkshop')return gearUI.open();
         if(action==='regionWorkshop')return regionUI.workshop();
         if (action === 'truth' && !s.flags.readyForBoss && own('oldLetter')) {
             api.closeModal();
@@ -698,5 +726,5 @@ window.createDreamRPG = function (api) {
     function view() {
         return { loot, combo: comboTime > 0 ? combo : 0, npcMarks: Object.fromEntries(Object.keys(C.npcs).map(id => [id, npcMark(id)])) };
     }
-    return { details: equipmentUI.details, initialize, migrate, stats, add, take, own, bag, use, quickHeal, icon, rewardKill, gainResonance, hit, perfectDodge, absorb, teamBurst, objective, nearest, handleInteraction, recoverJournal, sideHTML, update, key, view, npc, ritual };
+    return { pets:petUI.open, petProgress, gearWorkshop: gearUI.open, details: equipmentUI.details, initialize, migrate, stats, add, take, own, bag, use, quickHeal, icon, rewardKill, gainResonance, hit, perfectDodge, absorb, teamBurst, objective, nearest, handleInteraction, recoverJournal, sideHTML, update, key, view, npc, ritual };
 };

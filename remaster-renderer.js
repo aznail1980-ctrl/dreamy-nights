@@ -433,6 +433,7 @@
         for (const e of r.enemies)
             if (Math.abs(e.x - r.player.x) < 1700)
                 this.enemy(e);
+        this.drawGrowthPet?.(r);
         this.actor(r.state.active, r.player.x, r.player.y, r.player.facing, true);
         this.drawHitEffects(r);
         for (const w of r.waves) {

@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const text=fs.readFileSync(require('path').resolve(__dirname,'../game.js'),'utf8'),cut=(start,end)=>text.slice(text.indexOf(start),text.indexOf(end));
+const c=vm.createContext({Math,DREAM_PETS:{active:s=>s.active},state:{active:true},GROUND:651,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),currentMap:()=>({width:2500,platforms:[{x:400,y:451,w:400}]}),spark(){},pet:{},player:{}});
+vm.runInContext(cut('    function approach(','    function updateCompanion(')+cut('    function updateGrowthPet(','    function updatePlayer('),c);
+let n=0;const test=(s,f)=>{f();n++;console.log('PASS',s);};
+const pet=()=>c.pet={x:100,y:651,vx:0,vy:0,grounded:true,facing:1,walkTime:0,recall:0};
+test('Following accelerates, brakes and stays on the ground without overlapping the player',()=>{pet();c.player={x:700,y:651,facing:1};for(let i=0;i<180;i++)c.updateGrowthPet(1/60);assert(Math.abs(c.pet.x-610)<20);assert.equal(c.pet.y,651);assert(Math.abs(c.pet.x-c.player.x)>65);assert(Math.abs(c.pet.vx)<25);});
+test('Facing follows travel and is stable when the player turns while standing',()=>{pet();c.player={x:200,y:651,facing:-1};for(let i=0;i<100;i++)c.updateGrowthPet(1/60);assert.equal(c.pet.facing,1);assert(c.pet.x>260);c.player={x:120,y:651,facing:-1};for(let i=0;i<100;i++)c.updateGrowthPet(1/60);assert.equal(c.pet.facing,-1);});
+test('Large ladder height gaps return softly to a supported platform instead of hovering in space',()=>{pet();c.player={x:620,y:451,facing:1};c.updateGrowthPet(1/60);assert(c.pet.recall>0);assert.equal(c.pet.y,451);for(let i=0;i<90;i++)c.updateGrowthPet(1/60);assert.equal(c.pet.y,451);assert.equal(c.pet.recall,0);});
+test('Sleeping pets have no position updates and travel bounds remain valid',()=>{pet();c.state.active=false;const before=JSON.stringify(c.pet);c.updateGrowthPet(.1);assert.equal(JSON.stringify(c.pet),before);c.state.active=true;c.player={x:2490,y:651,facing:-1};for(let i=0;i<60;i++)c.updateGrowthPet(1/60);assert(c.pet.x<=2435&&c.pet.x>=65);});
+console.log(n+' companion movement checks passed');
