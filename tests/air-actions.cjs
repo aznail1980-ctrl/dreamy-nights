@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
+const c={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../air-actions.js'),'utf8'),c);const A=c.window.DREAM_AIR;
+const hero=()=>({x:100,y:400,vx:100,vy:0,grounded:true,coyote:.1,jumpBuffer:.16,airJumpUsed:false,plungeUsed:false});let p=hero();
+assert.equal(A.jump(p),'ground');assert.equal(p.vy,-820);assert.equal(A.jump(p),'air');assert.equal(p.vy,-700);assert.equal(A.jump(p),null);A.reset(p);p.grounded=true;assert.equal(A.jump(p),'ground');
+p=hero();p.grounded=false;p.coyote=-1;assert.equal(A.jump(p),'air');assert.equal(A.jump(p),null);
+p=hero();p.climbing={};assert.equal(A.jump(p),null);assert.equal(A.begin(p),false);p.climbing=null;p.grounded=false;p.coyote=0;assert(A.begin(p));assert.equal(A.jump(p),null);assert.equal(A.begin(p),false);A.fall(p,.13);assert(p.vy>=920);
+const enemy={id:'target',x:102,y:651,floorY:651};p.y=610;
+assert(A.canHit(p,enemy,500,100,30,[]));p.plunge.hits.push('target');assert(!A.canHit(p,enemy,500,100,30,[]));p.plunge.hits=[];
+assert(!A.canHit(p,enemy,300,100,30,[{x:0,y:341,w:500}]));assert(!A.canHit(p,enemy,300,100,30,[],true));p.y=651;assert(A.canHit(p,enemy,600,100,30,[],true));assert(!A.canHit(p,{...enemy,y:341,floorY:341},600,100,30,[],true));
+p.plunge=null;assert(!A.begin(p),'cancelling must not grant another plunge before landing');A.reset(p);assert(A.begin(p));
+console.log('PASS: two jumps only, ledge recovery, ladder exclusion, plunge windup, swept collision, one hit per enemy, platform blocking, same-floor landing, cancellation stock');

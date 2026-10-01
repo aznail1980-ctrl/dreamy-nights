@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-    const C = window.DREAM_CONTENT, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
+    const C = window.DREAM_CONTENT, AIR = window.DREAM_AIR, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
     const $ = id => document.getElementById(id), clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const imageKeys = [...new Set([...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'])];
     let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby;
@@ -367,7 +367,7 @@
         show('hud', next === 'play' || next === 'dialogue' || next === 'modal' || next === 'fail');
     }
     function makePlayer(x) {
-        return { x, y: GROUND, vx: 0, vy: 0, facing: 1, grounded: true, coyote: .12, jumpBuffer: 0, invincible: 1, attackT: 0, attackLength: .38, dodgeT: 0, combo: 0, comboT: 0, walkTime: 0, walkBlend: 0, lean: 0, landSquash: 0, groundY: GROUND, pendingStrike: null, stepDistance: 0, attackBuffer: 0, hitT: 0, recoilV: 0, climbDetachT: 0, moveAxis: 0, motionSpeed: 0, chargeHeld: false, chargeT: 0, chargeLevel: 0, chargeReady: false };
+        return { x, y: GROUND, vx: 0, vy: 0, facing: 1, grounded: true, coyote: .12, jumpBuffer: 0, invincible: 1, attackT: 0, attackLength: .38, dodgeT: 0, combo: 0, comboT: 0, walkTime: 0, walkBlend: 0, lean: 0, landSquash: 0, groundY: GROUND, pendingStrike: null, stepDistance: 0, attackBuffer: 0, hitT: 0, recoilV: 0, climbDetachT: 0, moveAxis: 0, motionSpeed: 0, chargeHeld: false, chargeT: 0, chargeLevel: 0, chargeReady: false, airJumpUsed: false, airJumpT: 0, plungeUsed: false, plunge: null, plungeLandT: 0 };
     }
     function makeEnemies() {
         return currentMap().enemies.map(e => ({ ...e, home: e.x, y: e.y ?? GROUND, floorY: e.y ?? GROUND, hp: Math.round(C.creatures[e.type].hp * (e.hpScale || 1)), max: Math.round(C.creatures[e.type].hp * (e.hpScale || 1)), dead: !e.wild && state.killed.includes(e.id), fade: 0, hurt: 0, stun: 0, timer: e.type === 'boss' ? 2.2 : 1 + Math.random(), windup: 0, phase: 'rest', phaseT: 2.4, pattern: 0, face: -1, zone: null, elapsed: Math.random() * 4 }));
@@ -541,7 +541,7 @@
         lastFocus?.focus?.({ preventScroll: true });
     }
     function help() {
-        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['점프', 'Space'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['캐릭터 · 장비', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['작은 꿈 친구들', 'P'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
+        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['이단 점프', 'Space → Space'], ['내려찍기', '공중에서 J'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['캐릭터 · 장비', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['작은 꿈 친구들', 'P'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">공중에서 점프를 다시 누르면 한 번 더 뛰어요. 공중에서 정화 버튼이나 J를 누르면 아래로 내려찍어요. 대시로 내려찍기를 취소할 수도 있어요.<br>지상에서 정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
     }
     function pause() {
         if (mode === 'modal') {
@@ -677,6 +677,7 @@
         player.invincible = 1.4;
         const away = Math.sign(player.x - sourceX) || -player.facing;
         cancelCharge();
+        player.plunge = null;
         player.hitT = .16;
         player.recoilV = player.climbing ? 0 : away * 240;
         player.pendingStrike = null;
@@ -783,6 +784,7 @@
         })[0];
     }
     function attack() {
+        if (!player.grounded && !player.climbing && !player.lift) { startPlunge(); return; }
         if (mode !== 'play' || cooldowns.attack > 0 || player.dodgeT > 0 || player.hitT > 0 || player.climbing || player.lift)
             return;
         autoWalk = false;
@@ -802,6 +804,40 @@
         player.pendingStrike = { delay: player.combo === 3 ? .12 : .085, active: .12, combo: player.combo, facing: player.facing, hits: [], started: false };
         audio.sfx('attack');
     }
+    function startPlunge() {
+        if (mode !== 'play' || cooldowns.attack > 0 || !AIR.begin(player)) return;
+        cancelCharge();
+        autoWalk = false;
+        audio.sfx('attack');
+        spark(player.x, player.y - 55, 9, '#fff0c2', 100);
+    }
+    function resolvePlunge(oldY) {
+        const plunge = player.plunge;
+        if (!plunge) return;
+        const landed = player.grounded;
+        for (const e of enemies) {
+            if (mode !== 'play') break;
+            if (AIR.canHit(player, e, oldY, C.creatures[e.type].size, enemyRadius(e), currentMap().platforms, landed)) {
+                plunge.hits.push(e.id);
+                player.invincible = Math.max(player.invincible, .2);
+                hit(e, 4 + rpg.stats().attack, 'finisher');
+            }
+        }
+        if (landed) {
+            player.plunge = null;
+            player.plungeLandT = .28;
+            player.landSquash = .18;
+            cooldowns.attack = Math.max(cooldowns.attack, .28);
+            AIR.reset(player);
+            ring(player.x, player.y - 4, 150, '#ffe7a3');
+            spark(player.x, player.y - 5, 24, '#fff2c6', 260);
+            audio.thump(115, .7, .22);
+            audio.sfx('stamp');
+            shake = settings.reducedMotion ? 0 : Math.max(shake, 4);
+        } else if (plunge.age > 2) {
+            player.plunge = null;
+        }
+    }
     function cancelCharge() {
         if (!player) return;
         player.chargeHeld = false;
@@ -809,6 +845,7 @@
         player.chargeReady = false;
     }
     function beginCharge() {
+        if (!player.grounded && !player.climbing && !player.lift) { startPlunge(); return; }
         if (mode !== 'play' || player.chargeHeld || player.climbing || player.lift || player.dodgeT > 0 || player.hitT > 0) return;
         autoWalk = false;
         player.chargeHeld = true;
@@ -821,6 +858,7 @@
         const held = player.chargeT;
         cancelCharge();
         if (cancelled || mode !== 'play' || player.climbing || player.dodgeT > 0 || player.hitT > 0) return;
+        if (!player.grounded && !player.lift) { startPlunge(); return; }
         if (held < .35) {
             player.attackBuffer = Math.max(.22, cooldowns.attack + .08);
             attack();
@@ -886,10 +924,12 @@
             return attack();
         }
         if (name === 'burst') {
+            player.plunge = null;
             cancelCharge();
             return rpg.teamBurst();
         }
         if (name === 'jump') {
+            if (player.plunge) return;
             cancelCharge();
             player.jumpReleased = false;
             player.jumpBuffer = .16;
@@ -897,6 +937,7 @@
             return;
         }
         if (name === 'dodge' && cooldowns.dodge <= 0) {
+            player.plunge = null;
             cancelCharge();
             dodgeCooldownDuration = Math.max(.35, 1.35 - rpg.stats().dodge);
             cooldowns.dodge = dodgeCooldownDuration;
@@ -921,6 +962,7 @@
             updateDashHUD();
         }
         if (name === 'skill' && cooldowns.skill <= 0 && !player.climbing && !player.lift) {
+            player.plunge = null;
             cancelCharge();
             cooldowns.skill = 5;
             player.pendingStrike = null;
@@ -1102,7 +1144,7 @@
     }
     function updatePlayer(dt) {
         Object.keys(cooldowns).forEach(k => cooldowns[k] = Math.max(0, cooldowns[k] - dt));
-        for (const k of ['invincible', 'attackT', 'dodgeT', 'comboT', 'jumpBuffer', 'landSquash', 'attackBuffer', 'hitT', 'climbDetachT'])
+        for (const k of ['invincible', 'attackT', 'dodgeT', 'comboT', 'jumpBuffer', 'landSquash', 'attackBuffer', 'hitT', 'climbDetachT', 'airJumpT', 'plungeLandT'])
             player[k] = Math.max(0, player[k] - dt);
         autoClimb = 0;
         let dir = moveAxis();
@@ -1123,6 +1165,7 @@
             }
         }
         let target = dir * speed;
+        if (player.plunge) target *= .45;
         if (player.chargeHeld && player.chargeT > .25 && player.grounded) target = 0;
         if (player.attackT > 0 && player.grounded)
             target *= .68;
@@ -1131,23 +1174,30 @@
         player.recoilV = approach(player.recoilV, 0, dt * 1250);
         player.vx = player.dodgeT > 0 ? dashVelocity(player.dodgeT, player.dodgeFacing)
             : approach(player.vx, target, dt * (dir ? (player.grounded ? 2400 : 1450) : 3200));
-        if (player.grounded)
+        if (player.grounded) {
             player.coyote = .11;
+            AIR.reset(player);
+        }
         else
             player.coyote -= dt;
-        if (player.jumpBuffer > 0 && player.coyote > 0 && !player.climbing && !player.lift) {
-            player.vy = player.jumpReleased ? -600 : -820;
-            player.grounded = false;
-            player.coyote = 0;
-            player.jumpBuffer = 0;
-            companion.jumpDelay = .14;
-            audio.sfx('jump');
-            spark(player.x, player.y, 8, '#fff1d3', 80);
-            state.flags.jumped = true;
+        if (player.jumpBuffer > 0) {
+            const jump = AIR.jump(player);
+            if (jump) {
+                companion.jumpDelay = .14;
+                audio.sfx('jump');
+                spark(player.x, player.y, jump === 'air' ? 16 : 8, '#fff1d3', jump === 'air' ? 140 : 80);
+                if (jump === 'air') ring(player.x, player.y + 4, 57, '#cceeea');
+                state.flags.jumped = true;
+            }
         }
         const climbDir = (keys.has('down') ? 1 : 0) - (keys.has('up') ? 1 : 0) || controls?.climbAxis() || autoClimb;
-        if (!remaster.climb(dt, climbDir))
+        const oldY = player.y;
+        AIR.fall(player, dt);
+        if (player.plunge || !remaster.climb(dt, climbDir))
             stepBody(player, dt);
+        resolvePlunge(oldY);
+        if (mode !== 'play') return;
+        if (player.grounded || player.climbing || player.lift) AIR.reset(player);
         if (autoWalk && player.grounded && Math.abs(player.vx) > 30 && player.y < GROUND - 100 && !currentMap().platforms.some(v => v.y === player.y && player.x + player.facing * 65 > v.x && player.x + player.facing * 65 < v.x + v.w))
             player.jumpBuffer = .16;
         strike(dt);
@@ -1156,7 +1206,7 @@
         if (player.attackBuffer > 0 && !player.chargeHeld) attack();
         if (state.map === 0 && player.x > 430 && !state.flags.walkHint) {
             state.flags.walkHint = true;
-            say(controls?.touch ? '왼쪽 스틱으로 이동하고, 오른쪽 점프 버튼으로 폴짝! 반짝이는 안내를 누르면 상자도 열 수 있어.' : 'Space로 점프! E로 별잎과 상자를 살펴볼 수도 있어.');
+            say(controls?.touch ? '점프를 공중에서 한 번 더 누르면 이단 점프! 공중에서 정화 버튼을 누르면 아래 적을 내려찍어.' : 'Space로 점프, 공중에서 한 번 더 누르면 이단 점프! 공중에서 J로 아래 적을 내려찍어.');
         }
         if (state.map === 1 && player.x > 460 && !state.flags.skillHint) {
             state.flags.skillHint = true;
@@ -1387,7 +1437,7 @@
                     }
                 }
             }
-            if (player.dodgeT > 0 || player.climbing || player.lift)
+            if (player.dodgeT > 0 || player.plunge || player.climbing || player.lift)
                 continue;
             for (const e of living) {
                 if (Math.abs(player.y - e.y) > 64)
@@ -1477,7 +1527,11 @@
         updateDashHUD();
         $('attackControl').style.setProperty('--charge', Math.min(1, player.chargeT / 1.05));
         $('attackControl').classList.toggle('charged', player.chargeReady);
-        $('attackControl').querySelector('b').textContent = player.chargeReady ? '놓기!' : player.chargeHeld && player.chargeT > .25 ? '모으기' : '정화';
+        const air = !player.grounded && !player.climbing && !player.lift;
+        $('attackControl').querySelector('b').textContent = player.plunge ? '찍는 중' : air ? '내려찍기' : player.chargeReady ? '놓기!' : player.chargeHeld && player.chargeT > .25 ? '모으기' : '정화';
+        $('attackControl').setAttribute('aria-label', air ? '공중 내려찍기 · 아래쪽 적 공격' : '정화 · 짧게 기본 공격, 길게 모아 강한 공격');
+        $('jumpControl').querySelector('b').textContent = air && !player.airJumpUsed && !player.plunge ? '2단 점프' : '점프';
+        $('jumpControl').setAttribute('aria-label', player.plunge ? '내려찍는 중 · 착지 후 점프' : air ? (player.airJumpUsed ? '공중 점프 사용 완료 · 착지하면 회복' : '이단 점프 가능') : '점프 · 공중에서 한 번 더 누르면 이단 점프');
         const boss = enemies.find(e => e.type === 'boss' && !e.dead);
         show('bossHud', state.map === 4 && !!boss && state.flags.bossIntroduced);
         if (boss) {
@@ -1676,7 +1730,8 @@
     function releaseJump() {
         if (!player || keys.has('jump') || controls?.held('jump')) return;
         player.jumpReleased = true;
-        if (player.vy < -320 && !player.climbing) player.vy *= .64;
+        if (player.jumpCutAvailable && player.vy < -320 && !player.climbing) player.vy *= .64;
+        player.jumpCutAvailable = false;
     }
     function clearControls() {
         keys.clear();
@@ -1685,6 +1740,7 @@
         if (player) {
             player.attackBuffer = 0;
             player.jumpBuffer = 0;
+            player.plunge = null;
             player.moveAxis = 0;
             player.climbLatch = false;
         }
@@ -1777,7 +1833,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.20.2' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.21.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
