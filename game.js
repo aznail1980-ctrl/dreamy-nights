@@ -1165,18 +1165,22 @@
         companion.landSquash = Math.max(0, (companion.landSquash || 0) - dt);
     }
     function updateGrowthPet(dt) {
-        if(!DREAM_PETS.active(state))return;
-        const dx=player.x-player.facing*90-pet.x;
+        const activePet=DREAM_PETS.active(state);if(!activePet)return;
+        const followGap=()=>{const gap=player.x-pet.x;return Math.abs(gap)>108?gap-Math.sign(gap)*90:0;};
+        let dx=followGap();
         pet.recall=Math.max(0,(pet.recall||0)-dt);
         pet.happy=Math.max(0,(pet.happy||0)-dt);
         if(Math.abs(dx)>520||Math.abs(player.y-pet.y)>185){
             // A short dream-light return replaces floating across ladders or through platforms.
             pet.x=clamp(player.x-player.facing*65,65,currentMap().width-65);pet.y=player.y;pet.vx=0;pet.vy=0;pet.recall=.28;
+            dx=followGap();
         }
         pet.vx=approach(pet.vx||0,Math.abs(dx)>18?clamp(dx*3.8,-385,385):0,dt*1450);
         if(Math.abs(pet.vx)>25)pet.facing=Math.sign(pet.vx);
         if(pet.grounded&&player.y<pet.y-55&&Math.abs(dx)>28)pet.vy=-660;
-        stepBody(pet,dt);pet.walkTime=(pet.walkTime||0)+Math.abs(pet.vx)*dt*.025;
+        const previousX=pet.x,wasGrounded=pet.grounded;
+        stepBody(pet,dt);
+        DREAM_PET_MOTION.tick(pet,activePet,dt,Math.abs(pet.x-previousX),wasGrounded);
         pet.landSquash=Math.max(0,(pet.landSquash||0)-dt);
     }
     function updatePlayer(dt) {
