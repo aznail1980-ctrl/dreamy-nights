@@ -62,6 +62,7 @@
         const [nx, ny] = pins.neck;
         const swing = r.settings.reducedMotion ? 0 : Math.sin(p.walkTime || 0) * (p.walkBlend || 0) * .035;
         if (layer === 'back') {
+            if (look.neck && this.scarf) this.scarf(look.neck, pose, 'back');
             if (look.back === 'nightCape')
                 this.wear('nightCape', view, nx - 1, ny + 3, pose.who === 'ari' ? .88 : 1, swing + (['attack', 'dash'].includes(pose.kind) ? 1.0 : 0));
             return;
@@ -77,8 +78,10 @@
             c.stroke();
             this.wear(look.back, rear && look.back === 'mailBag' ? 1 : view, bx, by, rear ? .95 : 1, swing);
         }
-        if (look.neck)
-            this.wear(look.neck, view, nx, ny + 2, pose.who === 'ari' ? .92 : 1, pins.angle);
+        if (look.neck) {
+            if (this.scarf) this.scarf(look.neck, pose, 'front');
+            else this.wear(look.neck, view, nx, ny + 2, pose.who === 'ari' ? .92 : 1, pins.angle);
+        }
         if (rear && pose.who === 'ari' && (look.neck || look.back)) {
             // The ponytail overlaps the collar and backpack, as it does in the base illustration.
             c.save();
