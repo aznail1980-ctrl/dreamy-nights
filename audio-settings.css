@@ -9,6 +9,11 @@
 #modal[data-kind="pause"] .pause-actions{margin-top:12px}
 @media(pointer:coarse){
  #modal[data-kind="pause"] .modal-card{padding:calc(var(--u)*.5)}
+ #modal[data-kind="pause"] #modalContent>p{font-size:calc(var(--u)*.32);line-height:1.55;margin-bottom:calc(var(--u)*.2)}
+ #modal[data-kind="pause"] .settings-row{font-size:calc(var(--u)*.34);min-height:calc(var(--u)*1.15);padding:calc(var(--u)*.2) 0;gap:calc(var(--u)*.2)}
+ #modal[data-kind="pause"] .settings-row small{font-size:calc(var(--u)*.26);line-height:1.5;margin-top:calc(var(--u)*.1)}
+ #modal[data-kind="pause"] input[type="checkbox"]{width:calc(var(--u)*.48);height:calc(var(--u)*.48);flex-shrink:0}
+ #modal[data-kind="pause"] .pause-actions button{font-size:calc(var(--u)*.32);min-height:var(--u);padding:calc(var(--u)*.2)}
  #modal[data-kind="pause"] .audio-levels{grid-template-columns:1fr}
  #modal[data-kind="pause"] .audio-levels .settings-row{padding:calc(var(--u)*.15) 0;min-height:var(--u)}
  #modal[data-kind="pause"] .audio-levels input{width:calc(var(--u)*2.4);min-height:var(--u)}
