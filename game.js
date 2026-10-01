@@ -104,9 +104,12 @@
     }
     function fit() {
         const padding = getComputedStyle(document.body);
+        const coarse = matchMedia('(pointer:coarse)').matches;
+        const safe = window.DREAM_MOBILE_SURFACE.insets();
         const view = window.visualViewport;
+        if (coarse && view && Math.abs(view.scale - 1) > .02) return;
         const layout = window.dreamViewport({ width: view?.width || innerWidth, height: view?.height || innerHeight,
-            coarse: matchMedia('(pointer:coarse)').matches,
+            coarse,
             left: parseFloat(padding.paddingLeft) || 0, right: parseFloat(padding.paddingRight) || 0,
             top: parseFloat(padding.paddingTop) || 0, bottom: parseFloat(padding.paddingBottom) || 0 });
         document.documentElement.style.setProperty('--viewport-height', (view?.height || innerHeight) + 'px');
@@ -119,6 +122,7 @@
         $('stage').style.setProperty('--stage-height', layout.stageHeight + 'px');
         $('stage').style.setProperty('--stage-width', layout.stageWidth + 'px');
         $('stage').dataset.layout = layout.portrait ? 'portrait' : layout.coarse ? 'landscape' : 'desktop';
+        for (const side of ['left','right','top','bottom']) $('stage').style.setProperty('--safe-'+side,(coarse ? safe[side]/layout.scale : 0)+'px');
     }
     function show(id, on = true) {
         $(id).classList.toggle('hidden', !on);
@@ -1716,7 +1720,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.27.1' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.28.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
