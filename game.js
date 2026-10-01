@@ -737,14 +737,22 @@
         e.hurt = .28;
         e.stun = e.type === 'boss' ? (charged ? .24 : .08) : charged ? .65 : .24;
         e.knockV = dir * (e.type === 'boss' ? (charged ? 145 : heavy ? 75 : 28) : charged ? 510 : heavy ? 290 : 95);
+        // Interrupted leaps fall under gravity instead of freezing or snapping to the floor.
+        if (e.type !== 'boss' && e.y < (e.floorY ?? GROUND) - 4) {
+            e.airFall = true;
+            e.fallVy = 0;
+            e.action = 'recover';
+            e.actionT = .65;
+            e.windup = 0;
+        }
         e.poise = (e.poise || 0) + power;
         const threshold = e.type === 'boss' ? 28 : 10;
         if (e.poise >= threshold && !finish) {
             e.poise = 0;
             e.stun = e.type === 'boss' ? .7 : .85;
             e.windup = 0;
-            e.action = null;
-            e.y = e.floorY ?? GROUND;
+            e.action = e.airFall ? 'recover' : null;
+            if (!e.airFall) e.y = e.floorY ?? GROUND;
             if (e.type === 'boss') {
                 e.phase = 'rest';
                 e.phaseT = .9;
@@ -1288,10 +1296,13 @@
                     e.action = null;
                     e.windup = 0;
                     e.respawn = 28;
+                    e.airFall = false;
+                    e.fallVy = 0;
                 }
             }
             return;
         }
+        if (window.DREAM_MOTION.falling(e, dt)) return;
         if (e.stun > 0)
             return;
         const c = C.creatures[e.type], dx = player.x - e.x;
@@ -1585,8 +1596,10 @@
             updatePlayer(dt);
             if (mode === 'play') {
                 for (const e of enemies) {
+                    const oldEnemyX = e.x;
                     updateEnemy(e, dt);
                     boundEnemy(e);
+                    window.DREAM_MOTION.track(e, dt, oldEnemyX);
                     if (mode !== 'play')
                         break;
                 }
@@ -1833,7 +1846,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.21.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.22.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
