@@ -1,5 +1,17 @@
 # 진행 기록과 다음 작업
 
+## 2026-10-01 · v4.26 맵별 음악·녹음 효과음·음성 재생 정비
+
+기존 DreamAudio의 반복 오실레이터 선율/저음 thump/noise 효과음을 제거하고 audio-engine.js로 분리했다. 작곡가 Scott Buckley가 CC BY 4.0으로 공개한 완성 음악 10곡을 각 맵에 다르게 배치했다. 해변 Childhood, 산책로 Wanderlust, 항구 Echoes Of Home, 창고 골목 The Long Way Home, 보스 Jade, 조수 동굴 Undertow, 정원 A Kind Of Hope, 관측소 Celestial, 기록실 Reverie, 수로 Moonlight. 곡당 약2~5분40초이며 원본 파일을 사용한다. 다음 곡 재생이 시작된 후 1.6초에 걸쳐 전환하고 최대 두 곡만 유지한다. 전체 음악을 시작 때 한꺼번에 내려받지 않는다. 대사/메뉴 중 음악을 낮추고 음소거·백그라운드 이동 시 재생을 정지한다. 실패한 곡은 간격을 두고 재시도한다.
+
+Kenney Impact Sounds/RPG Audio 및 pauliuw의 CC0 생물 발성 원본을 잘라 음량·음높이·겹침을 편집한 효과음 41개를 추가했다. 휘두름, 몸체/껍데기/나무/강공격, 보상/소품, 지면 재질별 발소리와 실제 몬스터 11종의 공격 발성을 구분했다. 명중에는 같은 재질의 3개 샘플을 순환하며 과한 저음 합성은 사용하지 않는다. 보스의 재채기/내려찍기에도 실제 발동 시 소리를 연결한다. 음악·효과음·인물 대사의 개별 음량을 저장한다. audio-room.html 감상실 및 assets/audio-v426/CREDITS.txt에 곡별 제작자·원문 링크·라이선스·수정 내용을 표기했다.
+
+음성은 **연기 품질 교체 완료가 아니다**. 현재 대사 97개를 대조하여 기존 전용 녹음 83개와 누락 14개를 확인했다. 누락된 최신 후일담 대사를 같은 브라우저 기본 목소리로 읽던 자동 대체를 제거했다. 해당 장면은 자막으로 진행한다. 배역과 실제 녹음 대본이 일치할 때만 전용 파일을 재생하며 녹음 실패 시 다른 배역이나 옛 OS 음성으로 돌아가지 않는다. 기존 전용 녹음은 유지한다. 무료 로컬 모델로 루멘/마들렌/뒤뚱의 새 후보를 제작했으나 발음 검사에서 오류가 있어 배포하지 않았다. 전문 제작 수단 사용 여부를 사용자에게 질의했으며 아직 결정 전이다. 음성_제작/음성_재제작_v426.json에 6배역·97대사·연기/발음 요구사항을 준비했다. 사람의 청취 평가와 재제작은 남아 있다.
+
+검증: 실제 브라우저에서 10곡 스트리밍/전환, 오디오 신호 출력, 효과음 41개 디코딩, 몬스터 11종 발성, 명중 3변주, 대사 중 음악 낮춤, 음소거/복귀, 음량 저장, 배역/대본 검증·재생 취소·기본 TTS 차단, 감상실/출처 링크와 작은 화면 가로 넘침을 확인했다. 기존 성장/메뉴/저장 13개 및 펫 보행 7개 검사 통과. 검사는 청취 평가나 실기기 음질 검수를 대신하지 않는다.
+
+설계 참고: [Ori 개발팀의 오디오 개선 설명](https://news.xbox.com/en-us/2020/11/10/ori-and-the-will-of-the-wisps-embraces-the-power-of-xbox-series-xs/)의 원본 음원 품질·믹싱·공간 구분 방향을 참고했다. 다른 게임의 음악/효과음을 추출해 사용하지 않았다. 라이선스: [Scott Buckley 이용 안내](https://www.scottbuckley.com.au/library/using-this-music/), [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds), [Kenney RPG Audio](https://kenney.nl/assets/rpg-audio), [pauliuw 생물 발성](https://opengameart.org/content/some-kind-of-beings-sounds7).
+
 ## 2026-10-01 · v4.25 펫 전용 동작 일러스트와 보행
 
 물결수달·새잎여우·별아가미 각각 어린 모습/성장한 모습의 걷기 4컷, 대기, 눈 깜빡임, 점프, 인사 그림을 제작했다. 내장 image_gen을 사용한 투명 원화 3장·48컷이며 assets/{leafFox,tideOtter,glowNewt}MotionV425.webp에 저장했다. 원본 펫의 색·별 망토·장식을 참고했다. 최종 제작 프롬프트는 tests/pet-motion-prompts.json, 실제 투명 영역과 발 기준 측정값은 tests/pet-motion-measurements.json에 기록한다. 원본 알/성장 화면 자산은 유지한다.

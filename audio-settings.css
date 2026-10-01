@@ -1,0 +1,16 @@
+#modal[data-kind="pause"] .modal-card{display:flex;flex-direction:column;padding:28px 36px}
+#modal[data-kind="pause"] #modalContent{min-height:0;overflow:auto;padding-right:6px}
+#modal[data-kind="pause"] #modalTitle{margin:8px 0 14px}
+#modal[data-kind="pause"] #modalContent>p{margin:0 0 12px}
+#modal[data-kind="pause"] .audio-levels{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
+#modal[data-kind="pause"] .audio-levels .settings-row{gap:12px;min-width:0;padding:12px 0;flex-wrap:wrap}
+#modal[data-kind="pause"] .audio-levels input{width:150px;max-width:100%}
+#modal[data-kind="pause"] .audio-room-link{display:inline-flex;align-items:center;min-height:42px;color:#496c72;text-decoration:none;font-weight:600}
+#modal[data-kind="pause"] .pause-actions{margin-top:12px}
+@media(pointer:coarse){
+ #modal[data-kind="pause"] .modal-card{padding:calc(var(--u)*.5)}
+ #modal[data-kind="pause"] .audio-levels{grid-template-columns:1fr}
+ #modal[data-kind="pause"] .audio-levels .settings-row{padding:calc(var(--u)*.15) 0;min-height:var(--u)}
+ #modal[data-kind="pause"] .audio-levels input{width:calc(var(--u)*2.4);min-height:var(--u)}
+ #modal[data-kind="pause"] .audio-room-link{min-height:var(--u);font-size:calc(var(--u)*.32)}
+}

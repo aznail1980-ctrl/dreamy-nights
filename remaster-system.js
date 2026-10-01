@@ -146,6 +146,7 @@ window.createDreamRemaster = function (api) {
         }
     }
     function update(dt) {
+        if(voiceAudio)voiceAudio.volume=api.settings.sound?Math.min(1,api.settings.volume*2.8*(api.settings.voiceVolume??1)*(currentVoice?.gain||1)):0;
         if (api.mode !== 'play')
             return;
         const p = api.player;
@@ -226,62 +227,26 @@ window.createDreamRemaster = function (api) {
             window.speechSynthesis.cancel();
         api.duck(false);
     }
-    function readVoice(key, index, who, text) {
-        stopVoice();
-        currentVoice = { key, index, who, text };
-        if (!api.settings.voice || !api.settings.sound)
-            return;
-        const token = voiceToken;
-        api.duck(true);
-        const original = 'assets/voice/' + key + '-' + index + '.m4a';
-        const overrides = window.DREAM_VOICE_OVERRIDES || {};
-        const entry = overrides[key + '-' + index + '-' + who] || overrides[key + '-' + index];
-        const valid = (!entry?.speaker || entry.speaker === who) && typeof entry?.file === 'string' && /^assets\/voice(?:-performed)?\/[a-zA-Z0-9_-]+\.(mp3|m4a|wav|ogg)$/.test(entry.file);
-        const gain = valid && Number.isFinite(entry.gain) ? Math.max(.25, Math.min(2, entry.gain)) : 1;
-        const playFile = (url, performed) => {
-            if (token !== voiceToken)
-                return;
-            currentVoice.source = performed ? (entry.source || 'performance') : 'original';
-            const audio = new Audio(url);
-            voiceAudio = audio;
-            audio.volume = Math.min(1, api.settings.volume * 2.8 * (performed ? gain : 1));
-            const fail = () => {
-                if (token !== voiceToken || audio !== voiceAudio)
-                    return;
-                voiceAudio = null;
-                if (performed && window.DREAM_VOICE?.[key])
-                    playFile(original, false);
-                else
-                    fallback(text, token);
-            };
-            audio.onended = () => {
-                if (token === voiceToken)
-                    api.duck(false);
-            };
-            audio.onerror = fail;
-            audio.play().catch(fail);
-        };
-        if (valid)
-            playFile(entry.file, true);
-        else if (window.DREAM_VOICE?.[key])
-            playFile(original, false);
-        else
-            fallback(text, token);
-    }
-    function fallback(text, token) {
-        if (!window.speechSynthesis) {
-            api.duck(false);
-            return;
-        }
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ko-KR';
-        u.rate = 1;
-        u.volume = Math.min(1, api.settings.volume * 2.8);
-        u.onend = u.onerror = () => {
-            if (token === voiceToken)
-                api.duck(false);
-        };
-        speechSynthesis.speak(u);
+    function readVoice(key,index,who,text){
+        stopVoice();currentVoice={key,index,who,text,source:'muted'};
+        const button=document.getElementById('voiceReplay');
+        const id=key+'-'+index+'-'+who,entry=(window.DREAM_VOICE_OVERRIDES||{})[id];
+        const normalize=v=>String(v||'').normalize('NFC').replace(/\s+/g,'');
+        const script=window.DREAM_VOICE_SCRIPTS?.[id];
+        const valid=entry?.speaker===who&&normalize(script)===normalize(text)&&typeof entry.file==='string'&&/^assets\/voice-performed\/[a-zA-Z0-9_-]+\.(mp3|m4a|wav|ogg)$/.test(entry.file);
+        if(button){button.disabled=!valid;button.title=valid?'현재 대사 다시 듣기':'이 장면은 자막으로 진행해요';button.setAttribute('aria-label',button.title);}
+        if(!api.settings.voice||!api.settings.sound)return;
+        if(!valid){currentVoice.source='captions';return;}
+        const token=voiceToken,audio=new Audio(entry.file);voiceAudio=audio;
+        currentVoice.source=entry.source||'performance';
+        const gain=Number.isFinite(entry.gain)?Math.max(.25,Math.min(2,entry.gain)):1;
+        currentVoice.gain=gain;
+        audio.volume=Math.min(1,api.settings.volume*2.8*(api.settings.voiceVolume??1)*gain);
+        audio.onplaying=()=>{if(token===voiceToken)api.duck(true);};
+        const finish=()=>{if(token===voiceToken){api.duck(false);voiceAudio=null;}};
+        audio.onended=finish;
+        const fail=()=>{if(token!==voiceToken)return;finish();currentVoice.source='captions';};
+        audio.onerror=fail;audio.play().catch(fail);
     }
     function replay() {
         if (currentVoice)

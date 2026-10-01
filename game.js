@@ -10,205 +10,21 @@
     let toastTimer = 0, speechTimer = 0, splashTimer = 0, saveUnavailable = false, lastFocus = null, companion = { x: 100, y: GROUND }, pet = { x: 40, y: GROUND - 60 };
     const keys = new Set(), cooldowns = { attack: 0, skill: 0, tag: 0, dodge: 0 };
     let dodgeCooldownDuration = 1.35;
-    const settings = { voice: true, sound: true, volume: .24, reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches, largeText: false };
+    const settings = { voice: true, sound: true, volume: .24, musicVolume:.55, effectsVolume:.85, voiceVolume:1, reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches, largeText: false };
     try {
         const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
         if (raw && typeof raw === 'object') {
             for (const k of ['sound', 'voice', 'reducedMotion', 'largeText'])
                 if (typeof raw[k] === 'boolean')
                     settings[k] = raw[k];
+            for(const k of ['musicVolume','effectsVolume','voiceVolume'])if(Number.isFinite(raw[k]))settings[k]=clamp(raw[k],0,1);
             if (Number.isFinite(raw.volume))
                 settings.volume = clamp(raw.volume, 0, 1);
         }
     }
     catch {
     }
-    class DreamAudio {
-        constructor() {
-            this.ctx = null;
-            this.master = null;
-            this.timer = 0;
-            this.note = 0;
-            this.next = 0;
-        }
-        unlock() {
-            try {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    this.master = this.ctx.createGain();
-                    this.compressor = this.ctx.createDynamicsCompressor();
-                    this.compressor.threshold.value = -15;
-                    this.compressor.ratio.value = 5;
-                    this.compressor.attack.value = .003;
-                    this.compressor.release.value = .15;
-                    this.master.connect(this.compressor);
-                    this.compressor.connect(this.ctx.destination);
-                }
-                this.ctx.resume().catch(() => {
-                });
-                this.volume();
-            }
-            catch {
-                settings.sound = false;
-            }
-        }
-        volume() {
-            if (this.master && this.ctx)
-                this.master.gain.setTargetAtTime(settings.sound ? settings.volume : 0, this.ctx.currentTime, .08);
-        }
-        tone(freq, duration = .3, gain = .2, type = 'sine', delay = 0) {
-            if (!this.ctx || !this.master || !settings.sound)
-                return;
-            const at = this.ctx.currentTime + delay, o = this.ctx.createOscillator(), g = this.ctx.createGain();
-            o.type = type;
-            o.frequency.setValueAtTime(freq, at);
-            g.gain.setValueAtTime(.001, at);
-            g.gain.exponentialRampToValueAtTime(Math.max(.002, gain), at + .02);
-            g.gain.exponentialRampToValueAtTime(.001, at + duration);
-            o.connect(g);
-            g.connect(this.master);
-            o.start(at);
-            o.stop(at + duration + .03);
-        }
-        noise(duration = .1, volume = .25, frequency = 1800) {
-            if (!this.ctx || !settings.sound)
-                return;
-            const n = Math.ceil(this.ctx.sampleRate * duration), buffer = this.ctx.createBuffer(1, n, this.ctx.sampleRate), data = buffer.getChannelData(0);
-            for (let i = 0; i < n; i++)
-                data[i] = (Math.random() * 2 - 1) * (1 - i / n);
-            const source = this.ctx.createBufferSource(), filter = this.ctx.createBiquadFilter(), gain = this.ctx.createGain();
-            source.buffer = buffer;
-            filter.type = 'bandpass';
-            filter.frequency.value = frequency;
-            filter.Q.value = .7;
-            gain.gain.setValueAtTime(volume, this.ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(.001, this.ctx.currentTime + duration);
-            source.connect(filter);
-            filter.connect(gain);
-            gain.connect(this.master);
-            source.start();
-        }
-        thump(frequency = 180, volume = .6, duration = .18) {
-            if (!this.ctx || !settings.sound)
-                return;
-            const o = this.ctx.createOscillator(), gain = this.ctx.createGain(), t = this.ctx.currentTime;
-            o.type = 'triangle';
-            o.frequency.setValueAtTime(frequency, t);
-            o.frequency.exponentialRampToValueAtTime(42, t + duration);
-            gain.gain.setValueAtTime(volume, t);
-            gain.gain.exponentialRampToValueAtTime(.001, t + duration);
-            o.connect(gain);
-            gain.connect(this.master);
-            o.start(t);
-            o.stop(t + duration + .02);
-        }
-        impact(type, heavy, finish) {
-            if (!this.ctx || !settings.sound)
-                return;
-            this.events = (this.events || []).concat({ type, heavy, finish, time: clock }).slice(-12);
-            const base = { sand: 135, crab: 240, box: 170, boss: 95 }[type] || 160;
-            this.thump(base * (.96 + Math.random() * .08), heavy ? .95 : .64, heavy ? .24 : .14);
-            this.noise(heavy ? .15 : .09, heavy ? .85 : .48, type === 'box' ? 1200 : type === 'crab' ? 3300 : 2100);
-            this.tone(type === 'crab' ? 1140 : 780, .085, .21, 'triangle');
-            if (heavy) {
-                this.noise(.2, .28, 650);
-                this.tone(392, .27, .22, 'sine', .04);
-            }
-            if (finish) {
-                this.thump(100, .72, .25);
-                [784, 1047, 1318].forEach((f, i) => this.tone(f, .32, .18, 'sine', .035 + i * .035));
-            }
-        }
-        sfx(kind) {
-            this.events = (this.events || []).concat({ event: kind, time: clock }).slice(-24);
-            const region={regionRush:[150,210,550],regionFan:[660,990,1900],regionHop:[190,285,950],regionSeed:[440,880,2600],regionInk:[120,240,650],regionWake:[330,660,1200]};
-            if(region[kind]){
-                const [low,high,noise]=region[kind];
-                this.tone(low,.16,.16,'triangle');this.tone(high,.2,.12,'sine',.045);
-                this.noise(kind==='regionFan'?.35:.14,.14,noise);return;
-            }
-            const special = { loot: [880, 1175, 1568, 2093], chest: [392, 587, 784, 1175, 1568], camp: [262, 330, 392, 523], arrive: [659, 880, 1047], mechanism: [147, 220, 294, 440], wind: [740, 988, 1318], rattle: [196, 247, 294], claw: [110, 220], sandRush: [146, 196], step: [90], gather: [784, 988, 1175] };
-            if (special[kind]) {
-                special[kind].forEach((f, i) => this.tone(f, kind === 'camp' ? .7 : .24, kind === 'step' ? .025 : .18, kind === 'mechanism' ? 'triangle' : 'sine', i * .06));
-                if (['mechanism', 'claw', 'rattle'].includes(kind)) {
-                    this.noise(.16, .25, kind === 'claw' ? 3100 : 950);
-                    this.thump(160, .4, .16);
-                }
-                if (kind === 'wind')
-                    this.noise(.6, .08, 1500);
-                if (kind === 'sandRush')
-                    this.noise(.28, .22, 550);
-                return;
-            }
-            if (kind === 'chargeReady') {
-                [523, 784, 1047].forEach((f, i) => this.tone(f, .18, .17, 'sine', i * .035));
-                return;
-            }
-            if (kind === 'chargeRelease') {
-                this.noise(.28, .45, 1600);
-                this.thump(190, .85, .30);
-                return;
-            }
-            if (kind === 'attack') {
-                this.noise(.11, .35, 2600);
-                this.thump(330, .09, .075);
-                return;
-            }
-            if (kind === 'skill') {
-                this.noise(.32, .3, 1100);
-                this.thump(250, .7, .32);
-                [392, 587, 880].forEach((f, i) => this.tone(f, .4, .22, 'triangle', i * .03));
-                return;
-            }
-            const table = { hit: [330, 440], purify: [523, 784, 1047], jump: [392, 523], dodge: [740, 880], tag: [659, 880], memory: [659, 784, 1047], clear: [523, 659, 784, 1047, 1318], hurt: [233, 196], stamp: [523, 1047] };
-            (table[kind] || [523]).forEach((f, i) => this.tone(f, kind === 'clear' ? .7 : .19, kind === 'purify' ? .15 : .24, 'sine', i * .055));
-        }
-        update(dt) {
-            if (!this.ctx || !settings.sound || ['modal', 'pause', 'ending', 'opening'].includes(mode))
-                return;
-            this.timer -= dt;
-            this.ambientTimer = (this.ambientTimer || 0) - dt;
-            const map = C.maps[state?.map || 0], theme = map.theme;
-            const score = { beach: [.44, 0, 'sine'], trail: [.37, 2, 'triangle'], town: [.49, -2, 'sine'], alley: [.48, -5, 'triangle'], boss: [.25, -7, 'triangle'], tide: [.60, -5, 'sine'], garden: [.36, 5, 'sine'], observatory: [.64, 7, 'sine'], archive: [.57, -2, 'triangle'], waterway: [.42, -5, 'sine'] }[theme] || [.5, 0, 'sine'];
-            if (this.scoreTheme !== theme) {
-                this.scoreTheme = theme;
-                this.note = 0;
-                this.timer = 0;
-                this.musicChanges = (this.musicChanges || []).concat(theme).slice(-15);
-            }
-            if (this.ambientTimer <= 0) {
-                this.ambientTimer = 4 + Math.random() * 3;
-                if (['beach', 'tide', 'waterway'].includes(theme)) {
-                    this.noise(1.4, .026, theme === 'waterway' ? 600 : 350);
-                    this.tone(1100 + Math.random() * 500, .35, .018, 'sine', .3);
-                }
-                else if (['trail', 'garden'].includes(theme)) {
-                    this.noise(1.1, .014, 1800);
-                    this.tone(1480, .15, .019, 'sine');
-                    this.tone(1760, .16, .013, 'sine', .2);
-                }
-                else if (theme === 'archive')
-                    this.noise(.18, .017, 900);
-            }
-            if (this.timer > 0)
-                return;
-            this.timer = score[0];
-            const n = this.note++, bars = [[0, 4, 7, 11], [9, 12, 16, 19], [5, 9, 12, 16], [7, 11, 14, 17]], chord = bars[Math.floor(n / 16) % 4], motifs = [[0, 2, 1, 3, 2, 1, 0, 1], [2, 1, 0, 2, 3, 2, 1, 0], [0, 1, 2, 1, 3, 2, 0, 1]], motif = motifs[Math.floor(n / 32) % 3], semi = chord[motif[n % 8]], root = 130.81 * Math.pow(2, score[1] / 12), duck = this.ducked ? .26 : 1;
-            if (n % 8 !== 7)
-                this.tone(root * 4 * Math.pow(2, semi / 12), score[0] * 2.8, .039 * duck, score[2]);
-            if (n % 2 === 0)
-                this.tone(root * 2 * Math.pow(2, chord[(n / 2) % 4] / 12), score[0] * 1.8, .021 * duck, 'triangle', .06);
-            if (n % 8 === 0) {
-                this.tone(root * Math.pow(2, chord[0] / 12), score[0] * 7.6, .043 * duck, 'sine');
-                this.tone(root * 1.5 * Math.pow(2, chord[0] / 12), score[0] * 7, .014 * duck, 'sine');
-            }
-            if (['town', 'trail', 'garden', 'boss', 'waterway'].includes(theme) && n % 4 === 2)
-                this.noise(.05, (theme === 'boss' ? .07 : .016) * duck, 1800);
-            if (theme === 'boss' && n % 4 === 0)
-                this.thump(84, .15 * duck, .16);
-        }
-    }
-    const audio = new DreamAudio();
+    const audio = new window.DreamAudioEngine({settings,getScene:()=>({mode,theme:C.maps[state?.map||0].theme,hero:state?.active||'ari',clock,playerX:player?.x||0})});
     function defaultState() {
         const s = remaster.initialize(world.initialize(rpg.initialize({ version: 3, map: 0, x: 185, hp: 6, active: 'ari', xp: 0, light: 0, snacks: 3, killed: [], memories: [], claimed: [], visited: [0], flags: { introSeen: false, firstMemory: false, metLumen: false, bossIntroduced: false, completed: false, walkHint: false, skillHint: false, jumped: false, pomiRescue: false }, time: 0 })));
         return window.DREAM_PROGRESS.initialize(s);
@@ -568,9 +384,10 @@
         if (mode !== 'play')
             return;
         save();
-        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>소리<small>직접 만든 별빛 선율과 정화 효과음</small></span><input type="checkbox" id="soundSetting"></label><label class="settings-row"><span>소리 크기</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
+        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>소리<small>맵별 배경음악 · 전투 효과음 · 인물 대사</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
         $('soundSetting').checked = settings.sound;
         $('volumeSetting').value = settings.volume * 100;
+        for(const k of ['musicVolume','effectsVolume','voiceVolume']){$(k+'Setting').value=settings[k]*100;$(k+'Setting').oninput=e=>{settings[k]=Number(e.target.value)/100;saveSettings();};}
         $('motionSetting').checked = settings.reducedMotion;
         $('textSetting').checked = settings.largeText;
         $('soundSetting').onchange = e => {
@@ -786,7 +603,7 @@
         shake = settings.reducedMotion ? 0 : charged ? 10 : heavy ? 6.5 : 3.3;
         impacts.push({ x: e.x, y: e.y - C.creatures[e.type].size * .5, life: charged ? .46 : heavy ? .32 : .24, max: charged ? .46 : heavy ? .32 : .24, charged, heavy, dir, seed: Math.random() * 6 });
         spark(e.x, e.y - C.creatures[e.type].size * .5, heavy ? 20 : 11, heavy ? '#fff1ca' : '#ffe4ac', heavy ? 320 : 220);
-        audio.impact(e.type, heavy, finish);
+        audio.impact(e.variant||e.type, heavy, finish, e.x);
         if (e.hp <= 0)
             defeat(e);
         else
@@ -1299,7 +1116,7 @@
             if (e.windup <= 0) {
                 e.action = 'strike'; e.actionT = .38;
                 waves.push({x:e.x+e.attackFace*60,y:floor-53,vx:e.attackFace*205,life:1.65,r:19,damage:1,kind:'tideBubble',hit:false});
-                audio.sfx('claw');
+                audio.sfx('claw',e);
             }
             return;
         }
@@ -1347,7 +1164,7 @@
             e.face = e.zone?.face || e.face;
         else if (Math.abs(dx) > 12)
             e.face = Math.sign(dx);
-        if (C.regionCreatures?.[e.variant]) return window.updateDreamRegionEnemy(e,dt,{player,waves,advance:advanceEnemyAttack,damage,sound:name=>audio.sfx(name)});
+        if (C.regionCreatures?.[e.variant]) return window.updateDreamRegionEnemy(e,dt,{player,waves,advance:advanceEnemyAttack,damage,sound:name=>audio.sfx(name,e)});
         if (e.variant === 'tideBell') return updateTideBell(e, dt);
         if (e.type === 'boss') {
             if (!state.flags.bossIntroduced)
@@ -1366,6 +1183,7 @@
             }
             else if (e.phase === 'warn' && e.phaseT <= 0) {
                 e.phase = 'release';
+                audio.sfx(e.zone.kind==='sneeze'?'bossSneeze':'bossStomp',e);
                 e.phaseT = .55;
                 if (e.zone.kind === 'sneeze') {
                     waves.push({ x: e.x + e.zone.face * 100, y: GROUND - 35, vx: e.zone.face * 460, life: 2.5, r: 36, hit: false });
@@ -1432,10 +1250,10 @@
                 if (e.type === 'box') {
                     for (const vy of [-95, 15, 115])
                         waves.push({ x: e.x + e.attackFace * 40, y: floor - 68, vx: e.attackFace * 330, vy, life: 1.65, r: 13, hit: false, kind: 'button' });
-                    audio.sfx('rattle');
+                    audio.sfx('rattle',e);
                 }
                 else
-                    audio.sfx(e.type === 'sand' ? 'sandRush' : 'claw');
+                    audio.sfx(e.type === 'sand' ? 'sandRush' : 'claw',e);
             }
             return;
         }
@@ -1888,7 +1706,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.23.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.26.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
