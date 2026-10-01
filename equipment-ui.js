@@ -2,7 +2,7 @@
 window.createDreamEquipmentUI = ({C,api,state,stats,icon,bag}) => {
     const $=id=>document.getElementById(id);
     let pose='idle',face=1;
-    const poses={idle:'서 있기',walk:'걷기',jump:'점프',climb:'등반',dash:'대시',attack:'공격',charge:'모으기'};
+    const poses={idle:'서 있기',walk:'걷기',run:'달리기',jump:'점프',climb:'등반',dash:'대시',attack:'공격',charge:'모으기'};
     const gearSlots={weapon:'정화 도구',charm:'가슴 장식',keepsake:'기억 부적'};
     const lookSlots={head:'머리',neck:'목',back:'등',aura:'발자국'};
     const slot=(category,key,label,id)=>{

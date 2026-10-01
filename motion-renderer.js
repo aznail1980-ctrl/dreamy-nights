@@ -6,7 +6,7 @@
         const r = this.r, p = r.player, frame = active ? motion.heroFrame(p) : -1;
         if (frame < 0 || !art.hero[who]) return oldActor.call(this, who, x, y, face, active);
         const spec = art.hero[who], box = spec.frames[frame], pivot = spec.pivots[frame], sc = spec.scale, c = this.ctx;
-        const pose = { who, kind: frame < 4 ? 'run' : 'jump', frame, pins: spec.pins[frame] };
+        const pose = { who, source: 'motion', kind: frame < 4 ? 'run' : 'jump', frame, pins: spec.pins[frame] };
         const floor = p.groundY ?? y;
         this.ellipse(x, floor + 3, Math.max(12, 24 - Math.max(0, floor - y) * .028), 4, '#48455630');
         c.save(); c.translate(x, y); c.scale(face, 1);

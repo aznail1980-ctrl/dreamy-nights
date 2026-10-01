@@ -60,15 +60,17 @@
         const c = this.ctx, r = this.r, p = r.player, pins = pose.pins;
         const rear = pose.kind === 'climb', view = rear ? 2 : ['attack', 'dash'].includes(pose.kind) ? 1 : 0;
         const [nx, ny] = pins.neck;
+        const fit = window.DREAM_ATTACHMENTS.fit(pose);
         const swing = r.settings.reducedMotion ? 0 : Math.sin(p.walkTime || 0) * (p.walkBlend || 0) * .035;
         if (layer === 'back') {
             if (look.neck && this.scarf) this.scarf(look.neck, pose, 'back');
             if (look.back === 'nightCape')
-                this.wear('nightCape', view, nx - 1, ny + 3, pose.who === 'ari' ? .88 : 1, swing + (['attack', 'dash'].includes(pose.kind) ? 1.0 : 0));
+                this.wear('nightCape', view, nx - 1, ny + 3, pose.who === 'ari' ? .88 : 1, swing + fit.lean);
             return;
         }
         if (look.back && look.back !== 'nightCape') {
-            const bx = rear ? nx : nx - (look.back === 'lampPack' ? 28 : 24), by = ny + (rear ? 12 : 9);
+            const bx = fit.back ? fit.back[0] - (look.back === 'lampPack' ? 3 : 0) : rear ? nx : nx - (look.back === 'lampPack' ? 28 : 24);
+            const by = fit.back ? fit.back[1] : ny + (rear ? 12 : 9);
             // A visible shoulder attachment keeps the bag/lantern connected to the torso.
             c.strokeStyle = look.back === 'lampPack' ? '#bd9561' : '#66546a';
             c.lineWidth = 1;
@@ -76,7 +78,7 @@
             c.moveTo(nx - 3, ny + 5);
             c.quadraticCurveTo(bx - 3, ny + 3, bx, by + 5);
             c.stroke();
-            this.wear(look.back, rear && look.back === 'mailBag' ? 1 : view, bx, by, rear ? .95 : 1, swing);
+            this.wear(look.back, rear && look.back === 'mailBag' ? 1 : view, bx, by, rear ? .95 : 1, swing + fit.lean * .25);
         }
         if (look.neck) {
             if (this.scarf) this.scarf(look.neck, pose, 'front');
@@ -99,9 +101,10 @@
             c.restore();
         }
         if (look.head) {
-            const point = look.head === 'roseBow' ? pins.bow : pins.head;
-            const size = look.head === 'roseBow' ? 1 : pose.who === 'ari' ? .90 : pose.kind === 'idle' ? .88 : 1;
-            this.wear(look.head, view, point[0], point[1], size, pins.angle);
+            const ribbon = look.head === 'roseBow', point = ribbon ? fit.bow : fit.head;
+            const size = ribbon ? 1 : fit.scale;
+            const lift = look.head === 'starCrown' && pose.source === 'motion' ? 5 * size : 0;
+            this.wear(look.head, fit.view, point[0], point[1] - lift, size, fit.angle);
         }
         if (look.aura)
             for (let i = 0; i < 4; i++)
@@ -182,7 +185,7 @@
     R.previewHero = function (canvas, state, options = {}) {
         const preview = new window.DreamRenderer(canvas, this.images, this.C);
         preview.r = { state, clock: 1, settings: { reducedMotion: true }, player: { grounded: true, groundY: 210, y: 210, walkBlend: 0, walkTime: 0, motionSpeed: 0, attackT: 0, dodgeT: 0, chargeT: 0, chargeHeld: false, invincible: 0 }, companion: {} };
-        const poses = {walk:{motionSpeed:200,walkTime:options.phase??2,walkBlend:1},jump:{grounded:false,vy:-350},climb:{climbing:{},climbPhase:options.phase??2},dash:{dodgeT:.13,dodgeFacing:options.face||1},attack:{attackT:.19,attackLength:.38},charge:{chargeHeld:true,chargeT:.6}};
+        const poses = {run:{motionSpeed:240,walkTime:options.phase??2,walkBlend:1},walk:{motionSpeed:100,walkTime:options.phase??2,walkBlend:1},jump:{grounded:false,vy:-350},climb:{climbing:{},climbPhase:options.phase??2},dash:{dodgeT:.13,dodgeFacing:options.face||1},attack:{attackT:.19,attackLength:.38},charge:{chargeHeld:true,chargeT:.6}};
         Object.assign(preview.r.player,poses[options.pose]||{});
         const c = preview.ctx;
         c.clearRect(0, 0, canvas.width, canvas.height);
