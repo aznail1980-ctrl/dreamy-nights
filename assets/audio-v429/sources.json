@@ -1,0 +1,296 @@
+{
+  "strike-basic-ari-0": {
+    "file": "assets/audio-v429/strike-basic-ari-0.wav",
+    "seconds": 0.23,
+    "design": "star pop",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 8.614227833692352e-08
+  },
+  "strike-plunge-ari-0": {
+    "file": "assets/audio-v429/strike-plunge-ari-0.wav",
+    "seconds": 0.37,
+    "design": "bop with one light rebound",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.2202825383344997e-07
+  },
+  "strike-charged-ari-0": {
+    "file": "assets/audio-v429/strike-charged-ari-0.wav",
+    "seconds": 0.46,
+    "design": "bright three-bounce impact, no heavy bass",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.717965527273456e-08
+  },
+  "strike-basic-ari-1": {
+    "file": "assets/audio-v429/strike-basic-ari-1.wav",
+    "seconds": 0.23,
+    "design": "star pop",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.7393677920202523e-07
+  },
+  "strike-plunge-ari-1": {
+    "file": "assets/audio-v429/strike-plunge-ari-1.wav",
+    "seconds": 0.37,
+    "design": "bop with one light rebound",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 7.549533292475589e-08
+  },
+  "strike-charged-ari-1": {
+    "file": "assets/audio-v429/strike-charged-ari-1.wav",
+    "seconds": 0.46,
+    "design": "bright three-bounce impact, no heavy bass",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 3.179814699525518e-07
+  },
+  "swing-basic-ari": {
+    "file": "assets/audio-v429/swing-basic-ari.wav",
+    "seconds": 0.14,
+    "design": "short elastic preparation chirp, no knife whoosh",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 3.3932415535646303e-06
+  },
+  "swing-plunge-ari": {
+    "file": "assets/audio-v429/swing-plunge-ari.wav",
+    "seconds": 0.18,
+    "design": "short elastic preparation chirp, no knife whoosh",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.1937575481300001e-06
+  },
+  "swing-charged-ari": {
+    "file": "assets/audio-v429/swing-charged-ari.wav",
+    "seconds": 0.23,
+    "design": "short elastic preparation chirp, no knife whoosh",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.1774537865884387e-06
+  },
+  "action-jump-ari": {
+    "file": "assets/audio-v429/action-jump-ari.wav",
+    "seconds": 0.24,
+    "design": "character jump toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 7.577890584574606e-06
+  },
+  "action-dodge-ari": {
+    "file": "assets/audio-v429/action-dodge-ari.wav",
+    "seconds": 0.295,
+    "design": "character dodge toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 5.132059815610782e-07
+  },
+  "action-ready-ari": {
+    "file": "assets/audio-v429/action-ready-ari.wav",
+    "seconds": 0.325,
+    "design": "character ready toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.3478948982045776e-08
+  },
+  "action-skill-ari": {
+    "file": "assets/audio-v429/action-skill-ari.wav",
+    "seconds": 0.39,
+    "design": "character skill toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.7607009363837364e-08
+  },
+  "action-guard-ari": {
+    "file": "assets/audio-v429/action-guard-ari.wav",
+    "seconds": 0.35,
+    "design": "character guard toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 2.0055455411112488e-07
+  },
+  "action-control-ari": {
+    "file": "assets/audio-v429/action-control-ari.wav",
+    "seconds": 0.39,
+    "design": "character control toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 5.1578634622796146e-08
+  },
+  "action-burst-ari": {
+    "file": "assets/audio-v429/action-burst-ari.wav",
+    "seconds": 0.51,
+    "design": "character burst toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.395295701891999e-08
+  },
+  "action-hurt-ari": {
+    "file": "assets/audio-v429/action-hurt-ari.wav",
+    "seconds": 0.24,
+    "design": "character hurt toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 8.521085798738523e-07
+  },
+  "action-purify-ari": {
+    "file": "assets/audio-v429/action-purify-ari.wav",
+    "seconds": 0.325,
+    "design": "character purify toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 2.7940378772269623e-08
+  },
+  "strike-basic-popo-0": {
+    "file": "assets/audio-v429/strike-basic-popo-0.wav",
+    "seconds": 0.23,
+    "design": "rubber toy mallet bop",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.4476590995022373e-06
+  },
+  "strike-plunge-popo-0": {
+    "file": "assets/audio-v429/strike-plunge-popo-0.wav",
+    "seconds": 0.37,
+    "design": "bop with one light rebound",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 5.546648950463766e-07
+  },
+  "strike-charged-popo-0": {
+    "file": "assets/audio-v429/strike-charged-popo-0.wav",
+    "seconds": 0.46,
+    "design": "bright three-bounce impact, no heavy bass",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.1887074622677153e-06
+  },
+  "strike-basic-popo-1": {
+    "file": "assets/audio-v429/strike-basic-popo-1.wav",
+    "seconds": 0.23,
+    "design": "rubber toy mallet bop",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 2.0624650594780986e-06
+  },
+  "strike-plunge-popo-1": {
+    "file": "assets/audio-v429/strike-plunge-popo-1.wav",
+    "seconds": 0.37,
+    "design": "bop with one light rebound",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.4306419725252402e-06
+  },
+  "strike-charged-popo-1": {
+    "file": "assets/audio-v429/strike-charged-popo-1.wav",
+    "seconds": 0.46,
+    "design": "bright three-bounce impact, no heavy bass",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.671515486020676e-06
+  },
+  "swing-basic-popo": {
+    "file": "assets/audio-v429/swing-basic-popo.wav",
+    "seconds": 0.14,
+    "design": "short elastic preparation chirp, no knife whoosh",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 6.915870102351619e-05
+  },
+  "swing-plunge-popo": {
+    "file": "assets/audio-v429/swing-plunge-popo.wav",
+    "seconds": 0.18,
+    "design": "short elastic preparation chirp, no knife whoosh",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 5.813126463102504e-05
+  },
+  "swing-charged-popo": {
+    "file": "assets/audio-v429/swing-charged-popo.wav",
+    "seconds": 0.23,
+    "design": "short elastic preparation chirp, no knife whoosh",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.657906867363134e-05
+  },
+  "action-jump-popo": {
+    "file": "assets/audio-v429/action-jump-popo.wav",
+    "seconds": 0.24,
+    "design": "character jump toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 7.799033645575204e-05
+  },
+  "action-dodge-popo": {
+    "file": "assets/audio-v429/action-dodge-popo.wav",
+    "seconds": 0.295,
+    "design": "character dodge toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.0014720158893084e-05
+  },
+  "action-ready-popo": {
+    "file": "assets/audio-v429/action-ready-popo.wav",
+    "seconds": 0.325,
+    "design": "character ready toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.0243253856510197e-06
+  },
+  "action-skill-popo": {
+    "file": "assets/audio-v429/action-skill-popo.wav",
+    "seconds": 0.39,
+    "design": "character skill toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 5.119766784893356e-07
+  },
+  "action-guard-popo": {
+    "file": "assets/audio-v429/action-guard-popo.wav",
+    "seconds": 0.35,
+    "design": "character guard toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 6.995560789216935e-07
+  },
+  "action-control-popo": {
+    "file": "assets/audio-v429/action-control-popo.wav",
+    "seconds": 0.39,
+    "design": "character control toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 7.29365720672022e-08
+  },
+  "action-burst-popo": {
+    "file": "assets/audio-v429/action-burst-popo.wav",
+    "seconds": 0.51,
+    "design": "character burst toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 7.218367236307949e-07
+  },
+  "action-hurt-popo": {
+    "file": "assets/audio-v429/action-hurt-popo.wav",
+    "seconds": 0.24,
+    "design": "character hurt toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 9.88975027766723e-07
+  },
+  "action-purify-popo": {
+    "file": "assets/audio-v429/action-purify-popo.wav",
+    "seconds": 0.325,
+    "design": "character purify toy-pop motif",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.1070102349304795e-06
+  },
+  "grade-rare": {
+    "file": "assets/audio-v429/grade-rare.wav",
+    "seconds": 0.305,
+    "design": "light star-bubble upgrade accent",
+    "peak": 0.6799999999999999,
+    "bassEnergyUnder180Hz": 6.286280423595429e-08
+  },
+  "grade-unique": {
+    "file": "assets/audio-v429/grade-unique.wav",
+    "seconds": 0.37,
+    "design": "light star-bubble upgrade accent",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 4.7218749012448046e-08
+  },
+  "forge-spark": {
+    "file": "assets/audio-v429/forge-spark.wav",
+    "seconds": 0.24,
+    "design": "light star-bubble upgrade accent",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.925656112248815e-08
+  },
+  "forge-resonance": {
+    "file": "assets/audio-v429/forge-resonance.wav",
+    "seconds": 0.325,
+    "design": "light star-bubble upgrade accent",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 1.0225223766758356e-07
+  },
+  "swish-0": {
+    "file": "assets/audio-v429/swish-0.wav",
+    "seconds": 0.15,
+    "design": "soft creature motion puff, replacing a shared blade swish",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 5.27351043932737e-05
+  },
+  "swish-1": {
+    "file": "assets/audio-v429/swish-1.wav",
+    "seconds": 0.15,
+    "design": "soft creature motion puff, replacing a shared blade swish",
+    "peak": 0.68,
+    "bassEnergyUnder180Hz": 3.139808644755767e-05
+  }
+}

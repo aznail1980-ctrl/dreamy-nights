@@ -1,0 +1,3 @@
+Original game sound design for Our Dreamy Nights, v4.29.0.
+Offline mathematical synthesis of short rubber-membrane pitch rebounds, star pops and soft filtered air transients. No third-party audio samples, knife/metal recordings, voice actor recordings, or MIDI music.
+Generated with tools/build-playful-audio.py (deterministic seed 429). PCM 16-bit mono, 32 kHz.

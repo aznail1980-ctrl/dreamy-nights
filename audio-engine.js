@@ -60,7 +60,7 @@ window.DreamAudioEngine=class DreamAudioEngine{
     }
     combatSwing(profile){
         this.record({combatSwing:profile.kind,hero:profile.hero,grade:profile.grade,level:profile.level});
-        this.play('swing-'+profile.kind+'-'+profile.hero,{gain:.65});
+        this.play('swing-'+profile.kind+'-'+profile.hero,{gain:.30});
     }
     combatLanding(profile){
         this.play(this.variant('strike-plunge-'+profile.hero,2),{gain:.5});
@@ -74,8 +74,6 @@ window.DreamAudioEngine=class DreamAudioEngine{
             this.lastCombatHit=now;
             const pan=(x-this.getScene().playerX)/800;
             this.play(this.variant('strike-'+profile.kind+'-'+profile.hero,2),{gain:profile.kind==='basic'?.86:1,rate:(profile.rank===0?.96:1)+profile.level*.012,pan});
-            const material={crab:'shell',tideBell:'shell',shoreSnail:'shell',box:'wood',parcelBat:'wood',inkMimic:'shell'}[type];
-            if(material)this.play(this.variant('hit-'+material),{gain:.16,rate:1.25,pan});
             if(profile.rank===1)this.play('forge-spark',{gain:.075,pan});
             if(profile.rank>=2)this.play('grade-'+profile.grade,{gain:profile.rank===3?.23:.17,pan});
             if(profile.level>=2)this.play(profile.level>=4?'forge-resonance':'forge-spark',{gain:.09+profile.level*.015,pan});
@@ -94,7 +92,9 @@ window.DreamAudioEngine=class DreamAudioEngine{
         const scene=this.getScene();
         if(subject)this.enemy(subject);
         if(kind==='step'){const floor=['town','alley','boss','archive'].includes(scene.theme)?'wood':['trail','garden'].includes(scene.theme)?'grass':'concrete';this.play(this.variant('step-'+floor,2),{gain:.12});return;}
-        if(kind==='attack'){this.play(this.variant('swish',2),{gain:scene.hero==='popo'?.75:.57,rate:scene.hero==='popo'?.88:1.15});return;}
+        if(kind==='attack'){this.combatSwing({kind:'basic',hero:scene.hero==='popo'?'popo':'ari'});return;}
+        const actions={jump:['jump',.35],dodge:['dodge',.36],hurt:['hurt',.48],chargeReady:['ready',.38],chargeRelease:['skill',.65],skill:['skill',.65],playerGuard:['guard',.48],playerControl:['control',.48],playerBurst:['burst',.7],purify:['purify',.34]};
+        if(actions[kind]){const [clip,gain]=actions[kind];this.play('action-'+clip+'-'+(scene.hero==='popo'?'popo':'ari'),{gain});return;}
         const map={
             jump:['cloth',.33,1.15],dodge:['swish-1',.57,1.3],hurt:['hit-soft-1',.6,.97],hit:['hit-soft-0',.7,1],
             chargeReady:['chime-1',.32,1.25],chargeRelease:['charge',1,1],skill:['charge',.72,1.24],

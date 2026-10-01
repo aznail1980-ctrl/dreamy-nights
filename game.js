@@ -829,7 +829,7 @@
             cooldowns.skill = state.growth.skillCD;
             player.pendingStrike = null; player.attackLength = .55; player.attackT = .55;
             player.attackFacing = player.facing; player.invincible = .3; autoWalk = false;
-            audio.sfx(spec.id === 'guard' ? 'camp' : spec.id === 'control' ? 'wind' : 'skill');
+            audio.sfx(spec.id === 'guard' ? 'playerGuard' : spec.id === 'control' ? 'playerControl' : 'skill');
 
             ring(player.x,player.y-45,spec.range,spec.color);spark(player.x,player.y-75,28,spec.color,260);
             if(spec.damage)for(const e of enemies){
@@ -1720,7 +1720,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.28.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.29.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

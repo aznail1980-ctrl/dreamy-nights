@@ -299,7 +299,7 @@ window.createDreamRPG = function (api) {
         state().hp = Math.min(api.maxHP(), state().hp + 1);
         api.ring(api.player.x, api.player.y - 80, 520, '#ffdf94');
         api.spark(api.player.x, api.player.y - 80, 80, '#f8dcff', 550);
-        api.sound('clear');
+        api.sound('playerBurst');
         for (const e of api.enemies) {
             if (api.mode !== 'play')
                 break;
