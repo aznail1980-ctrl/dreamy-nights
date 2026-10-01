@@ -538,7 +538,7 @@
         lastFocus?.focus?.({ preventScroll: true });
     }
     function help() {
-        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['점프', 'Space'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['순찰 옷장', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 옷장은 왼쪽 위 캐릭터 얼굴에서 열어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
+        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['점프', 'Space'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['캐릭터 · 장비', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
     }
     function pause() {
         if (mode === 'modal') {
@@ -1816,7 +1816,7 @@
             return modalKind;
         }, get enemies() {
             return enemies;
-        }, own: rpg.own, add: rpg.add, take: rpg.take, icon: rpg.icon, save, toast, enterMap, openModal, closeModal, dialogue: startDialogue, memory, sound: kind => audio.sfx(kind), refresh: updateHUD, activeQuest, questComplete, questCount, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
+        }, details: () => rpg.details(), own: rpg.own, add: rpg.add, take: rpg.take, icon: rpg.icon, save, toast, enterMap, openModal, closeModal, dialogue: startDialogue, memory, sound: kind => audio.sfx(kind), refresh: updateHUD, activeQuest, questComplete, questCount, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     remaster = window.createDreamRemaster({ get state() {
             return state;
         }, get player() {
