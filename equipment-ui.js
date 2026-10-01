@@ -8,7 +8,7 @@ window.createDreamEquipmentUI = ({C,api,state,stats,icon,bag}) => {
     const slot=(category,key,label,id)=>{
         const owned=category==='keeper-gear'?DREAM_GEAR.equipped(state().rpg,key):null;
         const it=C.items[id],grade=C.grades[it?.grade];
-        return `<button class="keeper-slot" data-${category}="${id||''}" aria-label="${label}: ${it?.name||'비어 있음'} 변경"><span class="keeper-slot-art">${it?icon(it.icon,42):'<span aria-hidden="true">＋</span>'}</span><span><small>${label}</small><b>${owned?DREAM_GEAR.name(owned):it?.name||'장착하지 않았어요'}</b>${grade?`<em style="color:${grade.color}">${grade.symbol} ${grade.name}</em>`:'<em>선택하기</em>'}</span><span aria-hidden="true">›</span></button>`;
+        return `<button class="keeper-slot" data-keeper-slot="${key}" data-${category}="${id||''}" aria-label="${label}: ${it?.name||'비어 있음'} 변경"><span class="keeper-slot-art">${it?icon(it.icon,42):'<span aria-hidden="true">＋</span>'}</span><span><small>${label}</small><b>${owned?DREAM_GEAR.name(owned):it?.name||'장착하지 않았어요'}</b>${grade?`<em style="color:${grade.color}">${grade.symbol} ${grade.name}</em>`:'<em>선택하기</em>'}</span><span aria-hidden="true">›</span></button>`;
     };
     function details(){
         if(api.mode!=='play'&&!(api.mode==='modal'&&['characterDetail','bag','wardrobe','gearWorkshop','pets','growth'].includes(api.modalKind)))return;
@@ -19,8 +19,8 @@ window.createDreamEquipmentUI = ({C,api,state,stats,icon,bag}) => {
         render();
         document.querySelectorAll('[data-keeper-pose]').forEach(b=>b.onclick=()=>{pose=b.dataset.keeperPose;render();});
         $('keeperTurn').onclick=()=>{face=-face;render();};
-        document.querySelectorAll('[data-keeper-gear]').forEach(b=>b.onclick=()=>bag('equipment',b.dataset.keeperGear));
-        document.querySelectorAll('[data-keeper-look]').forEach(b=>b.onclick=()=>api.wardrobe(b.dataset.keeperLook||undefined));
+        document.querySelectorAll('[data-keeper-gear]').forEach(b=>b.onclick=()=>bag('equipment',b.dataset.keeperGear,'all',b.dataset.keeperSlot));
+        document.querySelectorAll('[data-keeper-look]').forEach(b=>b.onclick=()=>api.wardrobe(b.dataset.keeperLook||undefined,b.dataset.keeperSlot,'all'));
         $('keeperGrowth').onclick=()=>api.growth?.();
         $('keeperBag').onclick=()=>bag('equipment');$('keeperWardrobe').onclick=()=>api.wardrobe();$('keeperPets').onclick=()=>api.pets();
     }

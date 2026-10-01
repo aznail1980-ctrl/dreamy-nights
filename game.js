@@ -539,6 +539,11 @@
         $('modalTitle').textContent = title;
         $('modalEyebrow').textContent = eyebrow;
         $('modalContent').innerHTML = html;
+        window.DreamKit?.mount(kind, page => {
+            // Return to the paused mode before routing; individual menus retain their own state.
+            closeModal();
+            ({bag:()=>rpg.bag(),characterDetail:()=>rpg.details(),wardrobe:()=>world.wardrobe(),growth:()=>growthUI.open()})[page]?.();
+        });
         show('modal');
         $('modal').querySelector('.modal-card').scrollTop = 0;
         $('modalClose').focus({ preventScroll: true });
@@ -1939,7 +1944,7 @@
             return mode;
         }, get modalKind() {
             return modalKind;
-        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: id => world.wardrobe(id), pets:()=>rpg.pets(), growth:()=>growthUI.open(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
+        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: (...args) => world.wardrobe(...args), pets:()=>rpg.pets(), growth:()=>growthUI.open(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     world = window.createDreamWorld({ get state() {
             return state;
         }, get player() {
