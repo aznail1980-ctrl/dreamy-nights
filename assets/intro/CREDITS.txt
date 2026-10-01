@@ -1,0 +1,8 @@
+Intro music: Echoes Of Home — Scott Buckley
+https://www.scottbuckley.com.au/library/echoes-of-home/
+https://www.scottbuckley.com.au
+License: Creative Commons Attribution 4.0 (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+Edited for the 5.367-second intro: excerpt 35.000–40.367 seconds, +4 dB gain, 0.3-second fade-in and 1.217-second fade-out. AAC stereo 48 kHz.
+The previous synthesized dreamlight-cue audio was removed, not mixed with the new music.
+Existing Higgsfield video stream retained without re-encoding.

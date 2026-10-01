@@ -85,7 +85,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
         caption.textContent = '';
         play.disabled = false; pause.hidden = true;
         video.muted = !settings.sound;
-        video.volume = Math.min(1, Math.max(0, settings.volume * 2));
+        video.volume = Math.min(1, Math.max(0, settings.volume * 2 * (settings.musicVolume ?? .55)));
         if (video.readyState) video.currentTime = 0;
         updateSound();
         onOpen();
