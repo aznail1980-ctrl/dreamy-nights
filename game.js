@@ -337,6 +337,7 @@
         return questCount(i) >= C.quests[i].goal;
     }
     function activeQuest() {
+        if(state.flags.completed)return -1;
         return C.quests.findIndex((_, i) => !questComplete(i));
     }
     function bossUnlocked() {
@@ -508,6 +509,7 @@
         show('toast', false);
         audio.sfx('clear');
         $('endingStats').innerHTML = `<span>✦ 첫 밤의 지킴이</span><span>정화 ${state.killed.length} / ${C.maps.reduce((n, m) => n + m.enemies.filter(e => !e.wild).length, 0)}</span><span>반짝 기억 ${state.memories.length} / ${C.memories.length}</span><span>전한 마음 ${['herbsDelivered', 'replyDelivered', 'beaconsRewarded'].filter(f => state.flags[f]).length} / 3</span><span>최고 ${state.rpg.stats.bestCombo} 콤보</span>`;
+        $('exploreButton').textContent=C.chapterBridge?.next(state)?'항구로 · 다음 밤 준비하기':'항구에서 더 탐험하기';
         $('exploreButton').focus({ preventScroll: true });
     }
     function openModal(kind, title, html, eyebrow = 'DREAM KEEPER') {
@@ -601,7 +603,7 @@
             tab = 'missions';
         let content = '';
         if (tab === 'missions') {
-            content = world.missionsHTML();
+            content = (C.chapterBridge?C.chapterBridge.journal(state):'')+world.missionsHTML();
         }
         else if (tab === 'memories') {
             content = '<div class="memory-grid">' + C.memories.map(m => {
@@ -1452,12 +1454,20 @@
         $('snackCount').textContent = rpg.own('cookie') + rpg.own('lunch') + rpg.own('tea');
         $('locationName').textContent = currentMap().name;
         $('petLabel').textContent = '↑ ↓ 사다리 · L 탐험 지도';
+        const bridge=qi<0?C.chapterBridge?.next(state):null;
         $('questCard').querySelector('.eyebrow').firstChild.textContent = C.acts[q.act] + ' ';
         $('questTitle').textContent = qi < 0 ? '순찰 완료—!' : q.name;
         $('questDetail').textContent = qi < 0 ? '항구에 남은 반짝 기억을 찾아보세요.' : q.description;
         $('questStep').textContent = String((qi < 0 ? C.quests.length - 1 : qi) + 1).padStart(2, '0') + ' / ' + String(C.quests.length);
         $('questFill').style.width = (qi < 0 ? 100 : questCount(qi) / q.goal * 100) + '%';
         $('questCount').textContent = qi < 0 ? '반짝 기억 ' + state.memories.length + ' / ' + C.memories.length : `${q.flag ? '진행' : '정화'} ${questCount(qi)} / ${q.goal}`;
+        if(qi<0&&state.flags.completed){
+            const prepared=(C.chapterBridge?.steps||[]).filter(step=>state.flags[step.flag]).length;
+            $('questCard').querySelector('.eyebrow').firstChild.textContent='후일담 · 다음 밤의 약속 ';
+            $('questTitle').textContent=bridge?'다음 밤을 준비하는 마음':state.flags.ovenRouteReady?'몽글 항로 · 출항 준비 완료':'순찰 완료—!';
+            $('questDetail').textContent=bridge?.label||'다음 세계는 아직 개방 전이에요. 남은 기억을 찾아보세요.';
+            $('questStep').textContent=prepared+' / 3';$('questCount').textContent='출항 준비 '+prepared+' / 3';$('questFill').style.width=(prepared/3*100)+'%';
+        }
         journey?.update();
         show('rewardDot', C.quests.some((_, i) => questComplete(i) && !state.claimed.includes(i)));
         for (const [id, key, duration] of [['skillControl', 'skill', 5]]) {
@@ -1745,7 +1755,7 @@
         show('ending', false);
         setMode('play');
         enterMap(2);
-        say('항구에 남은 반짝 기억도 찾아보자!');
+        say(C.chapterBridge?.next(state)?.label||'항구에 남은 반짝 기억도 찾아보자!');
     };
     $('endingTitle').onclick = toTitle;
     document.querySelectorAll('.sound-toggle').forEach(b => b.onclick = () => {
@@ -1767,7 +1777,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.19.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.20.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

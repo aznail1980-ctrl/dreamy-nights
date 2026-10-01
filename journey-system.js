@@ -8,7 +8,7 @@ window.createDreamJourney=function(api){
   }}));return options.sort((a,b)=>(a.map===s().map?0:1)-(b.map===s().map?0:1)||Math.abs(a.x-api.player.x)-Math.abs(b.x-api.player.x))[0];
  }
  function target(){
-  const q=C.quests[api.activeQuest()];if(!q)return null;
+  const q=C.quests[api.activeQuest()];if(!q)return C.chapterBridge?.target(s())||null;
   if(q.ids)return enemyTarget(q.ids);
   if(q.npc){const n=C.npcs[q.npc];return{map:q.map,x:n.x,y:n.y,label:{cookedFirst:'마들렌과 도시락 만들기',letterRead:'뒤뚱에게 편지 조각 맡기기',readyForBoss:'루멘에게 임명장 보여주기',journalReturned:'루멘에게 순찰 일지 돌려주기'}[q.flag]||n.name+' 만나기',kind:'npc'};}
   if(['archiveRead','bridgeOpened'].includes(q.flag)){const foe=enemyTarget(null,q.map);if(foe)return foe;}
@@ -24,7 +24,11 @@ window.createDreamJourney=function(api){
  }
  function instruction(t=target()){
   if(!t)return'자유 탐험 · 남은 기억과 부탁을 찾아보세요';
-  const p=api.player;if(t.map!==s().map){const ex=api.route(t.map);return ex?(ex.x<p.x?'← ':'→ ')+C.maps[ex.to].name+' 방면 출구로':C.maps[t.map].name+' · 수첩에서 길의 단서 확인';}
+  const p=api.player;
+  if(t.map!==s().map){const ex=api.route(t.map);if(!ex)return C.maps[t.map].name+' · 수첩에서 길의 단서 확인';t={map:s().map,x:ex.x,y:ex.y??651,label:C.maps[ex.to].name+' 방면 출구로',kind:'exit'};}
+  const route=C.nextRouteLadder?.(C.maps[s().map],p,t);
+  if(route)return(route.ladder.x<p.x?'← ':'→ ')+'사다리로 '+(route.up?'위층':'아래층')+' · '+t.label;
+
   if(Math.abs(p.y-t.y)>85){const up=t.y<p.y,ls=C.maps[s().map].ladders.filter(l=>Math.abs((up?l.bottom:l.top)-p.y)<70).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x)),l=ls[0];return(l?(l.x<p.x?'← ':'→ '):'')+'사다리로 '+(up?'위층':'아래층')+' · '+t.label;}
   return(Math.abs(t.x-p.x)<(t.kind==='enemy'?165:100)?t.kind==='enemy'?'정화 · ':'상호작용 · ':t.x<p.x?'← ':'→ ')+t.label;
  }
@@ -46,7 +50,7 @@ window.createDreamJourney=function(api){
  function seaMap(){
   api.openModal('seaMap','잠의 바다 · 일곱 꿈의 땅',window.DreamAtlas.world(s()),'THE SEA OF DREAMS');
   function detail(i){
-   $('seaDetail').innerHTML=window.DreamAtlas.worldDetail(i); $('worldSelect').value=i;
+   $('seaDetail').innerHTML=window.DreamAtlas.worldDetail(i,s()); $('worldSelect').value=i;
    document.querySelectorAll('[data-world]').forEach(b=>{const active=Number(b.dataset.world)===i;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});
   }
   detail(0); document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>detail(Number(b.dataset.world)));

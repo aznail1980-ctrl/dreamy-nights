@@ -1,0 +1,103 @@
+/* v4.20 · One visual language for the lobby and the patrol bag. */
+#title .title-popo{top:65px;width:315px;height:420px}
+#title .title-ari{top:20px;width:330px;height:440px}
+#title .character-note{top:520px;bottom:auto;left:16px;right:12px;min-height:46px;transform:none;line-height:1.5;margin:0}
+#stage[data-layout="portrait"] #title .lobby-keeper{width:51%;height:100%;top:0}
+#stage[data-layout="portrait"] #title .title-popo{top:calc(var(--u)*.16)}
+#modal[data-kind="bag"] .modal-card{width:1360px;max-height:770px;padding:25px 30px 27px;background:linear-gradient(135deg,#1a3a4d,#12243a);border:1px solid #8cd4c365;border-top:3px solid #a6dfcd;border-radius:20px;color:#e6eeed}
+#modal[data-kind="bag"] #modalEyebrow{color:#9bd9cd}#modal[data-kind="bag"] h2{color:#fff0cb;margin:10px 0 24px}
+#modal[data-kind="bag"] .modal-close{color:#eaf6ee;background:#173447;border:1px solid #95c8c260;border-radius:10px}
+#modal[data-kind="bag"] .bag-layout{display:grid;grid-template-columns:218px minmax(0,1fr) 326px;gap:22px;height:auto;min-height:510px;align-items:start}
+#modal[data-kind="bag"] .bag-character{padding:15px 14px;border:1px solid #91bcae42;border-radius:16px;background:radial-gradient(ellipse at 50% 25%,#47687966,#10263a8c);min-width:0}
+#modal[data-kind="bag"] .bag-character .small-label{color:#b6d4cc}
+#modal[data-kind="bag"] .paper-doll{height:205px;margin:6px 0}
+#modal[data-kind="bag"] .paper-doll canvas{max-width:100%;height:205px;object-fit:contain}
+#modal[data-kind="bag"] .bag-character h3{color:#fff0cb;font-size:25px;margin:6px 0 13px}
+#modal[data-kind="bag"] .bag-character h3 small{font-size:13px;color:#a7cdbf}
+#modal[data-kind="bag"] .character-stats{gap:7px;margin-bottom:14px}
+#modal[data-kind="bag"] .character-stats>div{background:#26485a;border:1px solid #8cb6b22b;border-radius:9px;padding:9px 4px}
+#modal[data-kind="bag"] .character-stats dt{color:#b6d4d2;font-size:11px}#modal[data-kind="bag"] .character-stats dd{color:#fff0c4;font-size:18px}
+#modal[data-kind="bag"] .equipment-slots{gap:7px}
+#modal[data-kind="bag"] .equipment-slot{min-width:0;min-height:48px;background:#234456;color:#f0eedc;border:1px solid #91bcae45;border-radius:9px;padding:8px}
+#modal[data-kind="bag"] .equipment-slot>span{min-width:0}#modal[data-kind="bag"] .equipment-slot small{color:#b1cecb}#modal[data-kind="bag"] .equipment-slot b{font-size:12px;white-space:normal;overflow-wrap:anywhere}
+#modal[data-kind="bag"] .bag-center{display:flex;flex-direction:column;min-width:0;gap:12px;height:auto}
+#modal[data-kind="bag"] .bag-grade-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0;margin:0;color:#d1e2de;font-size:13px}
+#modal[data-kind="bag"] select{min-width:0;max-width:100%;background:#143247;color:#f4ecd7;border:1px solid #8bbeb65e;border-radius:10px;min-height:42px;padding:9px 10px;box-sizing:border-box}
+#modal[data-kind="bag"] .bag-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none;margin:0}
+#modal[data-kind="bag"] .bag-tabs button{min-height:40px;min-width:0;margin:0;padding:8px 6px;border-radius:8px;color:#c8e1dc;background:#25465a;border:1px solid #95c7bd25;font-size:13px}
+#modal[data-kind="bag"] .bag-tabs button.active{background:#b2e1cc;color:#173849;border-color:#d8f6d9;font-weight:800}
+#modal[data-kind="bag"] .item-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(130px,auto);gap:10px;align-content:start;flex:none;min-height:285px;max-height:370px;overflow:auto;padding:3px;margin:0;scrollbar-width:thin;scrollbar-color:#709b97 #183347}
+#modal[data-kind="bag"] .item-slot{min-width:0;width:auto;min-height:130px;padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:linear-gradient(#315166,#203a50);border:1px solid #90b8b245;border-radius:13px;color:#ebf0e7}
+#modal[data-kind="bag"] .item-slot.selected{border:2px solid #ffe0a1;background:linear-gradient(#465f69,#2b4557);box-shadow:0 0 0 2px #ffdea21a}
+#modal[data-kind="bag"] .item-slot .item-art{width:52px;height:52px}
+#modal[data-kind="bag"] .item-slot b{font-size:13px;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+#modal[data-kind="bag"] .item-slot small{font-size:11px;color:#b9dcd1}
+#modal[data-kind="bag"] .grade-badge{font-size:11px;color:#e7d1ee;font-style:normal}
+#modal[data-kind="bag"] [data-grade="unique"] .grade-badge{color:#ffe1a1}#modal[data-kind="bag"] [data-grade="rare"] .grade-badge{color:#c9c3ff}
+#modal[data-kind="bag"] .bag-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#modal[data-kind="bag"] .bag-tools .drop-guide{margin:0;min-width:0;min-height:43px;padding:8px;background:#27495b;color:#d8ebe0;border:1px solid #a1cfbd40;border-radius:9px;font-size:12px;text-align:center;white-space:normal}
+#modal[data-kind="bag"] .bag-money{display:flex;align-items:center;gap:7px;margin:0;padding:12px 0 0;color:#dfecd8;border-top:1px solid #90bfb246;font-size:13px}
+#modal[data-kind="bag"] .bag-money b{color:#ffe2a8}#modal[data-kind="bag"] .bag-money span{margin-left:auto;font-size:11px;color:#b1c9cc}
+#modal[data-kind="bag"] .item-detail{width:auto;min-width:0;max-width:100%;max-height:565px;overflow-y:auto;overflow-x:hidden;padding:21px 19px;background:linear-gradient(140deg,#2c4c60,#1a334c);border:1px solid #a8c8bc4d;border-radius:16px;scrollbar-width:thin;scrollbar-color:#709b97 #183347;box-sizing:border-box}
+#modal[data-kind="bag"] .item-preview{height:112px;margin:0 0 18px;background:radial-gradient(ellipse,#d9efbf20,transparent 70%)}
+#modal[data-kind="bag"] .item-preview .item-art{width:105px;height:105px}
+#modal[data-kind="bag"] .item-rarity{color:#d8c4e1;font-size:12px}#modal[data-kind="bag"] .item-detail h3{color:#fff0cb;font-size:25px;line-height:1.35;overflow-wrap:anywhere;margin:10px 0 15px}
+#modal[data-kind="bag"] .item-detail .bag-grade-filter{display:grid;grid-template-columns:1fr;gap:7px;margin:0 0 14px}
+#modal[data-kind="bag"] #gearCopy{width:100%;font-size:13px}
+#modal[data-kind="bag"] .item-detail p{color:#cedee2;font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+#modal[data-kind="bag"] .item-effect{border-color:#aac9bd42;color:#dcf2d8;font-size:14px;line-height:1.7;padding:13px 0}
+#modal[data-kind="bag"] .equip-compare,#modal[data-kind="bag"] .item-context{color:#bbd2d0;font-size:13px;line-height:1.7}
+#modal[data-kind="bag"] .item-comparison{color:#dbe8e1}
+#modal[data-kind="bag"] .item-actions{display:flex;flex-direction:column;gap:8px;min-width:0}
+#modal[data-kind="bag"] .item-actions button{width:100%;min-width:0;min-height:48px;font-size:15px;padding:12px;white-space:normal}
+#modal[data-kind="bag"] .empty-bag{grid-column:1/-1;color:#c4dcd4;text-align:center;line-height:1.8;padding:36px 10px}
+#modal[data-kind="bag"] button:focus-visible,#modal[data-kind="bag"] select:focus-visible{outline:3px solid #ffe2a8;outline-offset:2px}
+.departure-journal{padding:22px;border:1px solid #c9b397;border-radius:16px;background:linear-gradient(130deg,#fff3d7,#f0e1d3);color:#544960;margin-bottom:24px}
+.departure-journal>span{font-size:12px;color:#907146}.departure-journal h3{font-size:23px;margin:8px 0}.departure-journal p,.departure-journal li{font-size:15px;line-height:1.8}.departure-journal ol{list-style:none;padding:0}.departure-journal .done{color:#537e72}.departure-journal small{display:block;font-size:13px;line-height:1.7;color:#786778}
+@media(pointer:coarse){
+ #modal[data-kind="bag"] .bag-tabs button,#modal[data-kind="bag"] .bag-tools .drop-guide,#modal[data-kind="bag"] .item-actions button,#modal[data-kind="bag"] select{min-height:var(--u);font-size:calc(var(--u)*.3)}
+ #modal[data-kind="bag"] .item-detail p,#modal[data-kind="bag"] .item-effect{font-size:calc(var(--u)*.32)}
+}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-layout{grid-template-columns:1fr;gap:calc(var(--u)*.35);min-height:0}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-character{display:none}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-center{gap:calc(var(--u)*.23)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-grade-filter{font-size:calc(var(--u)*.28)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--u)*.12)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-grid{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(calc(var(--u)*2.65),auto);gap:calc(var(--u)*.17);min-height:calc(var(--u)*2.8);max-height:calc(var(--u)*5.7)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-slot{min-height:calc(var(--u)*2.65);padding:calc(var(--u)*.18) calc(var(--u)*.07);gap:calc(var(--u)*.1)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-slot .item-art{width:calc(var(--u)*1.05);height:calc(var(--u)*1.05)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-slot b{font-size:calc(var(--u)*.27)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-slot small,#stage[data-layout="portrait"] #modal[data-kind="bag"] .grade-badge{font-size:calc(var(--u)*.23)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-tools{gap:calc(var(--u)*.15)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-money{font-size:calc(var(--u)*.29);padding-top:calc(var(--u)*.25)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-money span{font-size:calc(var(--u)*.23)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-detail{max-height:none;overflow:visible;padding:calc(var(--u)*.35)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-detail h3{font-size:calc(var(--u)*.49)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-preview{height:calc(var(--u)*2.5)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-preview .item-art{width:calc(var(--u)*2.3);height:calc(var(--u)*2.3)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] #gearCopy{font-size:calc(var(--u)*.3)}
+#stage[data-layout="portrait"] .departure-journal{padding:calc(var(--u)*.35)}
+#stage[data-layout="portrait"] .departure-journal h3{font-size:calc(var(--u)*.45)}
+#stage[data-layout="portrait"] .departure-journal p,#stage[data-layout="portrait"] .departure-journal li{font-size:calc(var(--u)*.32)}
+#stage[data-layout="portrait"] .departure-journal small{font-size:calc(var(--u)*.28)}
+#modal[data-kind="bag"] .item-slot b{color:#f0eedc}
+#modal[data-kind="bag"] .gear-comparison{color:#deede5}
+#modal[data-kind="bag"] .gear-comparison dd{color:#dbe7e4}
+#modal[data-kind="bag"] .gear-comparison .increase{color:#9de2b6}
+#modal[data-kind="bag"] .gear-comparison .decrease{color:#ffbfb5}
+#modal[data-kind="bag"] .item-grid{min-height:274px;max-height:280px}
+#modal[data-kind="bag"] .item-actions{position:sticky;bottom:-21px;padding:12px 0;background:#203d52;margin-bottom:-21px}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-grid{min-height:calc(var(--u)*2.8);max-height:calc(var(--u)*5.7)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-actions{position:static;margin-bottom:0;background:none}
+#modal[data-kind="bag"] .item-grid{max-height:300px}
+#modal[data-kind="bag"] #bagGrade{min-width:120px}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] #bagGrade{min-width:calc(var(--u)*2.9);width:calc(var(--u)*2.9)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-grid{max-height:calc(var(--u)*5.7)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-slot,#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-tabs button,#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-tools button{border-radius:calc(var(--u)*.2)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-rarity{font-size:calc(var(--u)*.26)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .item-context,#stage[data-layout="portrait"] #modal[data-kind="bag"] .gear-comparison{font-size:calc(var(--u)*.3)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .gear-comparison small{font-size:calc(var(--u)*.25)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-money .item-art{width:calc(var(--u)*.5);height:calc(var(--u)*.5)}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-money b{font-size:calc(var(--u)*.39)}
+#modal[data-kind="bag"] .bag-list-back{display:none}
+#stage[data-layout="portrait"] #modal[data-kind="bag"] .bag-list-back{display:block;min-height:var(--u);font-size:calc(var(--u)*.31);width:100%;margin-bottom:calc(var(--u)*.25);border:1px solid #b1d2c853;border-radius:calc(var(--u)*.2);background:#2c5263;color:#e9f4e7}

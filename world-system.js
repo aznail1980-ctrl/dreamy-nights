@@ -142,7 +142,7 @@ window.createDreamWorld = function (api) {
         if (!gate)
             return true;
         if (gate === 'bossReady')
-            return s().flags.readyForBoss && s().flags.bridgeOpened;
+            return s().flags.completed || ['readyForBoss','bridgeOpened','archiveRead','starChartRead'].every(f=>s().flags[f]);
         return !!s().flags[gate];
     }
     function exits(map = s().map) {
@@ -176,7 +176,7 @@ window.createDreamWorld = function (api) {
     function map(selected = s().map) {
         if (api.mode !== 'play' && !(api.mode === 'modal' && api.modalKind === 'map'))
             return;
-        const m = C.maps[selected], known = s().visited.includes(selected), qi = api.activeQuest(), q = C.quests[qi], goal = window.DreamGame?.inspect().journey, next = route(goal?.map ?? q?.map ?? s().map);
+        const m = C.maps[selected], known = s().visited.includes(selected), qi = api.activeQuest(), q = C.quests[qi] || (C.chapterBridge?.next(s())?{name:'다음 밤을 준비하는 마음',map:2}:null), goal = window.DreamGame?.inspect().journey, next = route(goal?.map ?? q?.map ?? s().map);
         api.openModal('map', '포근등대와 잠의 항구 · 탐험 지도', window.DreamAtlas.island({state:s(),selected,goal,quest:q,next,gateOpen}), 'OUR FIRST NIGHT · FIELD ATLAS');
         document.querySelectorAll('[data-place]').forEach(b => b.onclick = () => map(Number(b.dataset.place)));
         $('atlasSelect').onchange = event => { map(Number(event.target.value)); $('atlasSelect').focus(); };
@@ -277,6 +277,7 @@ window.createDreamWorld = function (api) {
                 api.toast('옛 지도에는 창고 골목과 기록실이 이어져 있어요.');
                 return;
             }
+            if(!s().flags.cookedFirst){api.toast('첫 순찰 도시락을 마들렌과 준비한 뒤 별지도를 읽어요.',4);return;}
             if (!s().flags.tideAttuned || !s().flags.windAttuned) {
                 api.toast('바다와 바람의 두 신호가 필요해요. 두 갈래 조사부터 마쳐요.', 4);
                 return;
