@@ -1720,7 +1720,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.29.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.30.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1730,6 +1730,7 @@
     async function boot() {
         fit();
         applySettings();
+        const loadingScreen = window.createDreamLoading({root:$('loading'),settings});
         let loaded = 0, failed = [];
         await Promise.all(imageKeys.map(key => new Promise(resolve => {
             const img = new Image();
@@ -1743,7 +1744,7 @@
                     images[key] = body;
                 }
                 loaded++;
-                $('loadBar').style.width = loaded / imageKeys.length * 100 + '%';
+                loadingScreen.progress(loaded,imageKeys.length);
                 resolve();
             };
             img.onerror = () => {
@@ -1753,7 +1754,7 @@
             img.src = window.DREAM_ART_V49.files[key] || 'assets/' + key + '.webp';
         })));
         if (failed.length) {
-            $('loadingText').textContent = '그림 파일을 열지 못했어요. 압축을 모두 푼 뒤 index.html을 다시 열어주세요. (' + failed.join(', ') + ')';
+            loadingScreen.fail(failed.length);
             return;
         }
         lobby=window.createDreamLobby({stage:$('stage'),settings});
@@ -1765,6 +1766,7 @@
         state = defaultState();
         player = makePlayer(185);
         enemies = [];
+        loadingScreen.finish();
         show('loading', false);
         toTitle();
         opening.maybeShow();
