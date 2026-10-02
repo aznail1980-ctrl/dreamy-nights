@@ -95,3 +95,9 @@
 }
 #stage #modal[data-kind="bag"] .item-detail{align-items:stretch}
 #stage #modal[data-kind="bag"] .kit-detail-body{width:100%}
+
+/* Crafting stays optional; the wardrobe grid only contains owned pieces. */
+#modal .look-crafting{margin-top:16px;border-top:1px solid #a6c4bd55;padding:12px;color:#eadabb}
+#modal .look-crafting summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+#modal .look-crafting article{padding:12px 0;border-top:1px solid #a6c4bd33}
+#modal .look-crafting p{font-size:13px;line-height:1.6}

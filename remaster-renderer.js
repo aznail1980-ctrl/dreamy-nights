@@ -103,8 +103,14 @@
         if (look.head) {
             const ribbon = look.head === 'roseBow', point = ribbon ? fit.bow : fit.head;
             const size = ribbon ? 1 : fit.scale;
-            const lift = look.head === 'starCrown' && pose.source === 'motion' ? 5 * size : 0;
-            this.wear(look.head, fit.view, point[0], point[1] - lift, size, fit.angle);
+            const lift = look.head === 'starCrown' ? 5 * size : 0;
+            this.wear(look.head, fit.view, point[0], point[1] - lift, size, ribbon ? pins.angle : fit.angle - (look.head === 'starCrown' ? .22 : 0));
+            if (rear && pose.who === 'ari' && !ribbon) {
+                // Trace the ponytail's painted outline, rather than clipping a rectangular patch.
+                const tail=[[-2,-130],[-6,-126],[-6,-121],[-3,-117],[2,-115],[4,-107],[2,-97],[-4,-86],[-4,-78],[-1,-70],[10,-66],[17,-69],[18,-75],[14,-72],[8,-74],[7,-79],[13,-90],[20,-99],[23,-109],[21,-120],[13,-127],[6,-129]];
+                const offsets=[[0,0],[-1,0],[0,0],[-1,-2],[-1,0],[0,-1]],offset=offsets[pose.frame]||[0,0];
+                c.save();c.beginPath();tail.forEach(([x,y],i)=>c[i?'lineTo':'moveTo'](x+offset[0],y+offset[1]));c.closePath();c.clip();drawBody();c.restore();
+            }
         }
         if (look.aura)
             for (let i = 0; i < 4; i++)

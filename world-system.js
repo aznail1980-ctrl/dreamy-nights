@@ -2,7 +2,7 @@
 window.createDreamWorld = function (api) {
     const C = window.DREAM_CONTENT, $ = id => document.getElementById(id), s = () => api.state;
     const lookSlots = { head: '머리', neck: '목', back: '등', aura: '발자국' };
-    let selectedLook = 'softScarf', lookFilter = 'all', lookOwnership = 'all';
+    let selectedLook = 'softScarf', lookFilter = 'all';
     function initialize(state) {
         for (const f of C.worldFlags)
             state.flags[f] = false;
@@ -109,34 +109,33 @@ window.createDreamWorld = function (api) {
             confirm(choice);
         };
     }
-    function wardrobe(id = selectedLook, filter = lookFilter, ownership = lookOwnership) {
+    function wardrobe(id = selectedLook, filter = lookFilter) {
         if (api.mode !== 'play' && !(api.mode === 'modal' && ['wardrobe', 'bag', 'npc', 'characterDetail'].includes(api.modalKind))) return;
-        if(arguments.length<2&&id!==selectedLook&&C.items[id]?.type==='costume'){filter='all';ownership='all';}
-        lookFilter=filter;lookOwnership=ownership;
+        if(arguments.length<2&&id!==selectedLook&&C.items[id]?.type==='costume'){filter='all';}
+        lookFilter=filter;
         const all=Object.keys(C.items).filter(k=>C.items[k].type==='costume');
-        const ids=all.filter(k=>(filter==='all'||C.items[k].cosmeticSlot===filter)&&(ownership==='all'||(ownership==='owned'?api.own(k)>0:api.own(k)===0)));
+        const ids=all.filter(k=>(filter==='all'||C.items[k].cosmeticSlot===filter)&&api.own(k)>0);
         if(!ids.includes(id))id=ids[0]||null;
         selectedLook=id;
-        const item=C.items[id],owned=api.own(id)>0,recipe=C.costumeRecipes[id],equipped=item&&s().world.look[item.cosmeticSlot]===id;
-        const canCraft=recipe&&Object.entries(recipe).every(([key,n])=>api.own(key)>=n);
-        const status=key=>Object.values(s().world.look).includes(key)?'착용 중':api.own(key)?'보유 중':C.costumeRecipes[key]?(Object.entries(C.costumeRecipes[key]).every(([k,n])=>api.own(k)>=n)?'제작 가능':'재료 필요'):'미발견';
-        api.openModal('wardrobe','순찰 옷장',`<div class="wardrobe-layout"><aside class="wardrobe-preview"><span class="small-label">${s().active==='ari'?'아리':'포포'} · 현재 착용 모습</span><canvas id="lookPreview" width="360" height="390" aria-label="현재 착용한 캐릭터 모습"></canvas><button id="wardrobeDetails" class="drop-guide">동작별 착용 모습 보기</button><div class="look-slots">${Object.entries(lookSlots).map(([key,label])=>`<button data-look-slot="${key}"><small>${label}</small><b>${C.items[s().world.look[key]]?.name||'비어 있음'}</b></button>`).join('')}</div><p class="wardrobe-note">꾸미기는 외형에만 적용돼요.<br>장비 능력은 그대로 유지돼요.</p></aside><section class="wardrobe-items"><label class="bag-grade-filter">수집 상태 <select id="lookOwnership"><option value="all" ${ownership==='all'?'selected':''}>모든 꾸미기</option><option value="owned" ${ownership==='owned'?'selected':''}>보유한 꾸미기</option><option value="missing" ${ownership==='missing'?'selected':''}>아직 없는 꾸미기</option></select></label><div class="look-tabs" role="group" aria-label="꾸미기 부위">${[['all','전체'],...Object.entries(lookSlots)].map(([key,label])=>`<button data-look-filter="${key}" aria-pressed="${key===filter}">${label}</button>`).join('')}</div><p class="kit-collection">수집 ${all.filter(k=>api.own(k)>0).length} / ${all.length} <span>선택하면 상세 정보를 볼 수 있어요</span></p><div class="costume-grid">${ids.map(key=>`<button data-look="${key}" data-grade="${C.items[key].grade}" aria-pressed="${key===id}" class="costume-item ${key===id?'selected':''}">${api.icon(C.items[key].icon,64)}<em class="grade-badge">${C.grades[C.items[key].grade].symbol} ${C.grades[C.items[key].grade].name}</em><b>${C.items[key].name}</b><small>${status(key)}</small></button>`).join('')||'<p class="empty-bag">이 조건에 맞는 꾸미기가 없어요.<br>다른 부위나 수집 상태를 선택해주세요.</p>'}</div></section><aside class="costume-detail"><button id="lookListBack" class="kit-list-back">← 꾸미기 목록으로</button>${item?`<div class="look-detail-visual"><div class="item-preview">${api.icon(item.icon,104)}</div>${owned?'<div class="kit-equipped-mini"><canvas id="lookDetailPreview" width="360" height="390"></canvas><small>현재 착용 모습</small></div>':''}</div><span class="item-rarity" data-grade="${item.grade}">${C.grades[item.grade].symbol} ${C.grades[item.grade].name} · ${lookSlots[item.cosmeticSlot]}</span><h3>${item.name}</h3><p class="kit-owned">${status(id)} · 외형 꾸미기</p><p>${item.lore}</p><div class="item-effect">${owned?'착용하면 캐릭터의 모습에 바로 적용돼요.':recipe?'필요한 재료를 모으면 이곳에서 만들 수 있어요.':item.effect}</div>${!owned&&recipe?`<h4>제작 재료 <small>보유 / 필요</small></h4><ul class="kit-recipe">${Object.entries(recipe).map(([key,n])=>`<li class="${api.own(key)>=n?'ready':'short'}">${api.icon(C.items[key].icon,28)}<span>${C.items[key].name}</span><b>${api.own(key)} / ${n}</b></li>`).join('')}</ul>`:''}<div class="item-actions">${owned?`<button id="wearLook" class="${equipped?'secondary':'primary'}">${equipped?'착용 해제':'착용하기'}</button>`:recipe?`<button id="craftLook" class="primary" ${canCraft?'':'disabled'}>${canCraft?'꾸미기 제작하기':'재료가 부족해요'}</button>`:'<p class="item-context">탐험 보상으로 발견해보세요.</p>'}</div>`:'<p>다른 부위나 수집 상태를 선택해주세요.</p>'}</aside></div>`,'DREAM KEEPER · WARDROBE');
+        const item=C.items[id],equipped=item&&s().world.look[item.cosmeticSlot]===id;
+        const craftable=Object.entries(C.costumeRecipes).filter(([key,cost])=>!api.own(key)&&Object.entries(cost).every(([k,n])=>api.own(k)>=n));
+        const status=key=>Object.values(s().world.look).includes(key)?'착용 중':'보유 중';
+        api.openModal('wardrobe','순찰 옷장',`<div class="wardrobe-layout"><aside class="wardrobe-preview"><span class="small-label">${s().active==='ari'?'아리':'포포'} · 현재 착용 모습</span><canvas id="lookPreview" width="360" height="390" aria-label="현재 착용한 캐릭터 모습"></canvas><button id="wardrobeDetails" class="drop-guide">동작별 착용 모습 보기</button><div class="look-slots">${Object.entries(lookSlots).map(([key,label])=>`<button data-look-slot="${key}"><small>${label}</small><b>${C.items[s().world.look[key]]?.name||'비어 있음'}</b></button>`).join('')}</div><p class="wardrobe-note">꾸미기는 외형에만 적용돼요.<br>장비 능력은 그대로 유지돼요.</p></aside><section class="wardrobe-items"><div class="look-tabs" role="group" aria-label="꾸미기 부위">${[['all','전체'],...Object.entries(lookSlots)].map(([key,label])=>`<button data-look-filter="${key}" aria-pressed="${key===filter}">${label}</button>`).join('')}</div><p class="kit-collection">내 꾸미기 ${all.filter(k=>api.own(k)>0).length}개 <span>선택하면 상세 정보를 볼 수 있어요</span></p><div class="costume-grid">${ids.map(key=>`<button data-look="${key}" data-grade="${C.items[key].grade}" aria-pressed="${key===id}" class="costume-item ${key===id?'selected':''}">${api.icon(C.items[key].icon,64)}<em class="grade-badge">${C.grades[C.items[key].grade].symbol} ${C.grades[C.items[key].grade].name}</em><b>${C.items[key].name}</b><small>${status(key)}</small></button>`).join('')||'<p class="empty-bag">아직 가진 꾸미기가 없어요.<br>모험에서 얻으면 여기에 담겨요.</p>'}</div><details class="look-crafting"><summary>모은 재료로 꾸미기 만들기</summary><p>지금 가진 재료로 만들 수 있는 물건만 보여요.</p>${craftable.map(([key,cost])=>`<article><b>${C.items[key].name}</b><p>${Object.entries(cost).map(([k,n])=>C.items[k].name+' '+n+'개').join(' · ')}</p><button class="secondary" data-craft-look="${key}">재료를 써서 만들기</button></article>`).join('')||'<p>재료를 더 모으면 만들 수 있는 꾸미기가 나타나요.</p>'}</details></section><aside class="costume-detail"><button id="lookListBack" class="kit-list-back">← 꾸미기 목록으로</button>${item?`<div class="look-detail-visual"><div class="item-preview">${api.icon(item.icon,104)}</div><div class="kit-equipped-mini"><canvas id="lookDetailPreview" width="360" height="390"></canvas><small>현재 착용 모습</small></div></div><span class="item-rarity" data-grade="${item.grade}">${C.grades[item.grade].symbol} ${C.grades[item.grade].name} · ${lookSlots[item.cosmeticSlot]}</span><h3>${item.name}</h3><p class="kit-owned">${status(id)} · 외형 꾸미기</p><p>${item.lore}</p><div class="item-effect">착용하면 캐릭터의 모습에 바로 적용돼요.</div><div class="item-actions"><button id="wearLook" class="${equipped?'secondary':'primary'}">${equipped?'벗기':'이 꾸미기 입기'}</button></div>`:'<p>가진 꾸미기를 골라주세요.</p>'}</aside></div>`,'DREAM KEEPER · WARDROBE');
         api.preview($('lookPreview'));
         if($('lookDetailPreview'))api.preview($('lookDetailPreview'));
         $('wardrobeDetails').onclick=()=>api.details();
         $('lookListBack').onclick=()=>window.DreamKit?.detail(false);
         const reveal=()=>window.DreamKit?.detail(true,`[data-look="${id}"]`);
-        $('lookOwnership').onchange=e=>wardrobe(null,filter,e.target.value);
         document.querySelectorAll('[data-look-filter]').forEach(b=>b.onclick=()=>{wardrobe(null,b.dataset.lookFilter);document.querySelector(`[data-look-filter="${b.dataset.lookFilter}"]`)?.focus({preventScroll:true});});
-        document.querySelectorAll('[data-look]').forEach(b=>b.onclick=()=>{wardrobe(b.dataset.look,filter,ownership);window.DreamKit?.detail(true,`[data-look="${b.dataset.look}"]`);});
-        document.querySelectorAll('[data-look-slot]').forEach(b=>b.onclick=()=>wardrobe(s().world.look[b.dataset.lookSlot],b.dataset.lookSlot,'all'));
-        if($('wearLook'))$('wearLook').onclick=()=>{s().world.look[item.cosmeticSlot]=equipped?null:id;api.sound('stamp');api.save();wardrobe(id,filter,ownership);reveal();};
-        if($('craftLook'))$('craftLook').onclick=()=>{
-            if(api.own(id)||!Object.entries(recipe).every(([key,n])=>api.own(key)>=n))return;
-            Object.entries(recipe).forEach(([key,n])=>api.take(key,n));api.add(id,1,false);api.sound('memory');api.save();
-            // The newly crafted piece leaves the missing filter; keep it selected for the equip step.
-            wardrobe(id,filter,'all');reveal();
-        };
+        document.querySelectorAll('[data-look]').forEach(b=>b.onclick=()=>{wardrobe(b.dataset.look,filter);window.DreamKit?.detail(true,`[data-look="${b.dataset.look}"]`);});
+        document.querySelectorAll('[data-look-slot]').forEach(b=>b.onclick=()=>wardrobe(s().world.look[b.dataset.lookSlot],b.dataset.lookSlot));
+        if($('wearLook'))$('wearLook').onclick=()=>{s().world.look[item.cosmeticSlot]=equipped?null:id;api.sound('stamp');api.save();wardrobe(id,filter);reveal();};
+        document.querySelectorAll('[data-craft-look]').forEach(button=>button.onclick=()=>{
+            const key=button.dataset.craftLook,cost=C.costumeRecipes[key];
+            if(!cost||api.own(key)||!Object.entries(cost).every(([k,n])=>api.own(k)>=n))return;
+            Object.entries(cost).forEach(([k,n])=>api.take(k,n));api.add(key,1,false);api.sound('memory');api.save();
+            wardrobe(key,'all');window.DreamKit?.detail(true,`[data-look="${key}"]`);
+        });
     }
     function gateOpen(gate) {
         if (!gate)
