@@ -4,13 +4,13 @@ const base=process.env.GAME_URL||'file://'+path.resolve(__dirname,'../index.html
  for(const supported of [true,false]){
  const p=await b.newPage({viewport:{width:844,height:390},isMobile:true,hasTouch:true});p.on('pageerror',e=>errors.push(e.message));
  await p.addInitScript(supported=>{
-  localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:true,voice:true,volume:.24}));window.__plays=[];window.__sessions=[];window.__contexts=0;
+  if(!localStorage.getItem('dreamy-nights-settings-v1'))localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:true,voice:true,volume:.24}));window.__plays=[];window.__sessions=[];window.__contexts=0;
   if(supported){let type='auto';Object.defineProperty(navigator,'audioSession',{value:{get type(){return type;},set type(v){type=v;__sessions.push(v);}}});}
   const old=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){__plays.push({tag:this.tagName,muted:this.muted,volume:this.volume,session:navigator.audioSession?.type});return old.call(this);};
   const Native=window.AudioContext;window.AudioContext=class extends Native{constructor(...args){super(...args);__contexts++;}};
   let q=[],t=0;requestAnimationFrame=f=>(q.push(f),q.length);window.__step=n=>{for(let i=0;i<n;i++){t+=1000/60;let jobs=q;q=[];jobs.forEach(f=>f(t));}};
  },supported);
- await p.goto(base);await p.waitForFunction(()=>DreamGame?.inspect().mode==='opening',{}, {timeout:120000});assert(await p.locator('.opening-video').evaluate(e=>e.muted));assert.equal(await p.evaluate(()=>__contexts),0);
+ await p.goto(base);await p.waitForSelector('#chooseSoundOff',{timeout:120000});await p.click('#chooseSoundOff');await p.waitForFunction(()=>DreamGame?.inspect().mode==='opening',{}, {timeout:120000});assert(await p.locator('.opening-video').evaluate(e=>e.muted));assert.equal(await p.evaluate(()=>__contexts),0);
  await p.click('.opening-play');await p.waitForTimeout(100);assert((await p.evaluate(()=>__plays)).every(e=>e.muted));
  await p.click('.opening-sound');assert.equal(await p.locator('.opening-video').evaluate(e=>e.muted),false);assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('dreamy-nights-settings-v1')).sound),true);
  await p.click('.opening-sound');assert(await p.locator('.opening-video').evaluate(e=>e.muted));
@@ -21,8 +21,8 @@ const base=process.env.GAME_URL||'file://'+path.resolve(__dirname,'../index.html
  if(supported)assert((await p.evaluate(()=>__sessions)).every(t=>t==='ambient'));
  await p.keyboard.press('Escape');await p.locator('#soundSetting').uncheck();await p.evaluate(()=>__step(3));assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),false);assert((await p.evaluate(()=>DreamGame.inspect().audioMix.tracks)).every(t=>!t.playing));await p.click('#resume');
  await p.locator('#hud .sound-toggle').click();
- await p.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),false,'background return must require a new sound choice');
- await p.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),false);if(await p.locator('#resume').isVisible())await p.click('#resume');await p.locator('#hud .sound-toggle').click();await p.reload();await p.waitForFunction(()=>DreamGame?.inspect().mode==='title',{}, {timeout:120000});await p.click('#continueButton');await p.evaluate(()=>__step(3));assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),false,'each mobile visit starts muted');
+ await p.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),true,'background must preserve the sound preference');
+ await p.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),true);if(await p.locator('#resume').isVisible())await p.click('#resume');await p.reload();await p.waitForFunction(()=>DreamGame?.inspect().mode==='title',{}, {timeout:120000});await p.click('#continueButton');await p.evaluate(()=>__step(3));assert.equal(await p.evaluate(()=>DreamGame.inspect().audioMix.sound),true,'explicit sound choice survives reload');
  await p.evaluate(()=>{const draw=DreamRenderer.prototype.draw;window.__draws=0;DreamRenderer.prototype.draw=function(r){__draws++;window.__renderer=this;return draw.call(this,r);};});await p.evaluate(()=>__step(1));
  if(supported){
   await p.click('#tagPortrait');await p.evaluate(()=>__step(1));const start=await p.evaluate(()=>__draws);await p.evaluate(()=>__step(120));assert.equal(await p.evaluate(()=>__draws),start,'paused menu must not redraw the world every frame');

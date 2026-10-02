@@ -16,13 +16,20 @@
   // A local soft glow, not a screen flash. Reduced motion keeps only the gentle crossfade.
   c.save();c.globalAlpha=pose.halo;this.glow(pose.x,pose.y-height*.55,height*.85,'#fff0b8');c.restore();
   draw(current,pose.dark,current.actionFrames?.hurt??0);
-  draw(gentle,pose.gentle,0,pose.bow);
+  draw(gentle,pose.gentle,pose.frame,pose.bow);
   if(pose.gentle>.1){
    c.save();c.globalAlpha=pose.gentle;
    if(!this.r.settings.reducedMotion){
     for(let i=0;i<3;i++){const a=i*Math.PI*2/3+pose.elapsed*.5;this.star(pose.x+Math.cos(a)*(height*.48+10),pose.y-height*.55+Math.sin(a)*height*.4-pose.rise,3,'#ffe6a6',a);}
    }
-   if(pose.elapsed>.38&&pose.elapsed<1.25)this.text('고마워!',pose.x,pose.y-height-19-pose.rise,13,'#fff1c4','center',700);
+   if(pose.elapsed>.38&&pose.elapsed<2.55){
+    const matrix=c.getTransform(),surface=c.canvas.getBoundingClientRect().width/c.canvas.width;
+    const font=Math.max(16,11/Math.max(.2,surface*Math.hypot(matrix.a,matrix.b)));
+    c.font=`700 ${font}px "Apple SD Gothic Neo","Malgun Gothic",sans-serif`;
+    const w=c.measureText(pose.message).width+font,y=pose.y-height-20-pose.rise;
+    this.round(pose.x-w/2,y-font*1.3,w,font*1.8,font*.4,'#fff7e9','#acd4c3');
+    this.text(pose.message,pose.x,y,font,'#3c6468','center',700);
+   }
    c.restore();
   }
  };

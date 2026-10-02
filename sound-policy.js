@@ -1,6 +1,6 @@
 'use strict';
 // AudioSession describes playback behavior; it does NOT expose the ringer switch.
-// Unsupported mobile browsers therefore start each visit silently, even with an old sound-on save.
+// Keep explicit user preferences. Unknown/legacy mobile preferences are chosen once at entry.
 window.DREAM_SOUND_POLICY = (() => {
     const mobile=()=>matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
     let sessionType='unsupported';
@@ -13,6 +13,6 @@ window.DREAM_SOUND_POLICY = (() => {
         }catch{}
         sessionType='unsupported';return false;
     }
-    function initialize(settings){if(mobile())settings.sound=false;respectDeviceMute();}
+    function initialize(settings){if(mobile()&&!settings.soundChosen)settings.sound=false;respectDeviceMute();}
     return {mobile,initialize,respectDeviceMute,inspect:()=>({mobile:mobile(),sessionType})};
 })();

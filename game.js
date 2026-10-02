@@ -16,7 +16,7 @@
     try {
         const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
         if (raw && typeof raw === 'object') {
-            for (const k of ['sound', 'voice', 'reducedMotion', 'largeText'])
+            for (const k of ['sound', 'soundChosen', 'voice', 'reducedMotion', 'largeText'])
                 if (typeof raw[k] === 'boolean')
                     settings[k] = raw[k];
             for(const k of ['musicVolume','effectsVolume','voiceVolume'])if(Number.isFinite(raw[k]))settings[k]=clamp(raw[k],0,1);
@@ -96,13 +96,12 @@
     }
     function setSound(enabled) {
         settings.sound=!!enabled;
+        settings.soundChosen=true;
         window.DREAM_SOUND_POLICY.respectDeviceMute();
         if(settings.sound)audio.unlock();
         saveSettings();
     }
-    document.addEventListener('visibilitychange',()=>{
-        if(document.hidden&&window.DREAM_SOUND_POLICY.mobile())setSound(false);
-    });
+    // The audio engine suspends background playback without overwriting the user preference.
     function applySettings() {
         $('stage').classList.toggle('reduced-motion', settings.reducedMotion);
         $('stage').classList.toggle('large-text', settings.largeText);
@@ -110,6 +109,7 @@
             b.textContent = settings.sound ? '♫' : '♪';
             b.setAttribute('aria-pressed', String(settings.sound));
             b.title = settings.sound ? '소리 끄기' : '소리 켜기';
+            b.setAttribute('aria-label',b.title);
             b.style.opacity = settings.sound ? '1' : '.55';
         });
         audio.volume();
@@ -363,6 +363,7 @@
     }
     function openModal(kind, title, html, eyebrow = 'DREAM KEEPER') {
         remaster?.stopVoice();
+        $('modal').querySelector('.modal-card > .hero-confirm')?.remove();
         const wasOpen=!$('modal').classList.contains('hidden');
         if(!wasOpen)lastFocus = document.activeElement;
         $('modal').dataset.refresh=String(wasOpen);
@@ -386,6 +387,7 @@
             mode=beforeModal;
             ({bag:()=>rpg.bag(),characterDetail:()=>rpg.details(),wardrobe:()=>world.wardrobe(),growth:()=>growthUI.open(),pets:()=>rpg.pets()})[page]?.();
         });
+        if(kind==='character'){const confirm=$('modalContent').querySelector('.hero-confirm');if(confirm)$('modalContent').after(confirm);}
         show('modal');
         $('modal').querySelector('.modal-card').scrollTop = 0;
         $('modalClose').focus({ preventScroll: true });
@@ -410,7 +412,7 @@
         if (mode !== 'play')
             return;
         save();
-        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>게임 소리<small>휴대폰에서는 접속할 때 소리가 꺼져 있어요.</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><a class="text-button audio-room-link" href="copyright.html" target="_blank" rel="noopener">© Aznail (김광석) · 저작권 안내 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
+        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>게임 소리<small>선택한 소리 설정을 다음 접속에도 유지해요.</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><a class="text-button audio-room-link" href="copyright.html" target="_blank" rel="noopener">© Aznail (김광석) · 저작권 안내 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
         $('soundSetting').checked = settings.sound;
         $('volumeSetting').value = settings.volume * 100;
         for(const k of ['musicVolume','effectsVolume','voiceVolume']){$(k+'Setting').value=settings[k]*100;$(k+'Setting').oninput=e=>{settings[k]=Number(e.target.value)/100;saveSettings();};}
@@ -1724,7 +1726,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.40.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.41.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1773,7 +1775,11 @@
         loadingScreen.finish();
         show('loading', false);
         toTitle();
-        opening.maybeShow();
+        if(window.DREAM_SOUND_POLICY.mobile()&&!settings.soundChosen){
+            openModal('soundChoice','소리와 함께 꿈길을 걸을까요?', '<div class="sound-choice-copy"><p>원하는 소리 설정을 한 번 골라주세요.<br>다음에 접속해도 이 선택을 기억해요.</p><p>휴대폰의 무음 상태를 따르는 기능은 브라우저마다 달라요. 조용히 플레이하려면 ‘소리 없이 시작’을 선택해주세요.</p><div class="sound-choice-actions"><button id="chooseSoundOn" class="primary">소리 켜고 시작 ♫</button><button id="chooseSoundOff" class="secondary">소리 없이 시작</button></div></div>','OUR DREAMY NIGHTS');
+            const choose=enabled=>{setSound(enabled);closeModal();opening.maybeShow();};
+            $('chooseSoundOn').onclick=()=>choose(true);$('chooseSoundOff').onclick=()=>choose(false);$('chooseSoundOn').focus({preventScroll:true});
+        }else opening.maybeShow();
         requestAnimationFrame(loop);
     }
     rpg = window.createDreamRPG({ get state() {

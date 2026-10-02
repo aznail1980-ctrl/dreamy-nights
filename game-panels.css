@@ -200,3 +200,22 @@
  #stage #modal[data-kit="true"] .modal-card{animation:none}
  #stage #modal[data-kit="true"] :is(button,summary,a){touch-action:manipulation;transition:background-color .06s,border-color .06s; -webkit-tap-highlight-color:transparent}
 }
+
+/* v4.41: action shelves are flex siblings of the scroll area, never sticky overlays. */
+#stage #modal[data-kit="true"] .item-actions{position:static;bottom:auto}
+#stage #modal[data-kit="true"][data-kind="wardrobe"][data-detail="false"] .kit-footer{display:none}
+#stage #modal[data-kind="character"] .modal-card{display:flex;flex-direction:column;height:calc(var(--screen-h,810px) - var(--u,44px));overflow:hidden}
+#stage #modal[data-kind="character"] #modalContent{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+#stage #modal[data-kind="character"] .hero-confirm{position:static;flex:none;bottom:auto;margin:0;padding:12px 0 0;box-shadow:none;border-top:1px solid #83bfb344}
+#stage #modal[data-kind="character"] .modal-card > :is(h2,.eyebrow){flex:none}
+@media(pointer:coarse){
+ #stage #modal[data-kind="character"] .hero-confirm{padding:calc(var(--u)*.12) 0 0}
+ #stage #modal[data-kind="character"] .hero-confirm p{display:none}
+ #stage #modal[data-kind="character"] #confirmHero{min-height:var(--u);width:100%}
+ #stage #modal[data-kind="soundChoice"] .modal-card{width:calc(100% - var(--u));max-width:none;padding:calc(var(--u)*.4)}
+ #stage #modal[data-kind="soundChoice"] h2{font-size:calc(var(--u)*.48)}
+ #stage #modal[data-kind="soundChoice"] p{font-size:calc(var(--u)*.31);line-height:1.5}
+ #stage #modal[data-kind="soundChoice"] button{min-height:var(--u);font-size:calc(var(--u)*.31)}
+}
+#modal[data-kind="soundChoice"] #modalClose{display:none}
+.sound-choice-actions{display:flex;flex-wrap:wrap;gap:12px}.sound-choice-actions button{flex:1}
