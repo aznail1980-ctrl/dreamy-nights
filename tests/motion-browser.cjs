@@ -15,8 +15,8 @@ const falling=await p.evaluate(()=>({hp:__fallTarget.hp,y:__fallTarget.y,floor:_
 assert(falling.hp<100,'actual attack must hit the airborne fixture');assert(falling.airFall&&falling.y<falling.floor,'hit must start gravity rather than snap to floor');
 await p.evaluate(()=>__step(60));assert(await p.evaluate(()=>!__fallTarget.airFall&&__fallTarget.y===__fallTarget.floorY));
 const summary=await p.evaluate(()=>{
- const source=__renderer,canvas=document.createElement('canvas');canvas.id='motionReview';canvas.width=1400;canvas.height=2200;Object.assign(canvas.style,{position:'absolute',left:'0',top:'0',zIndex:99999,width:'1400px',height:'2200px'});document.body.append(canvas);
- const r=new DreamRenderer(canvas,source.images,DREAM_CONTENT),c=r.ctx;r.r={state:JSON.parse(JSON.stringify(DreamGame.inspect().state)),player:{},settings:{reducedMotion:false},clock:1};c.fillStyle='#c6cfdb';c.fillRect(0,0,1400,2200);r.r.state.world.look={neck:'creamScarf'};
+ const source=__renderer,canvas=document.createElement('canvas');canvas.id='motionReview';canvas.width=1400;canvas.height=650+Math.ceil(Object.keys(DREAM_MOTION_ART.creatures).length/2)*265;Object.assign(canvas.style,{position:'absolute',left:'0',top:'0',zIndex:99999,width:'1400px',height:canvas.height+'px'});document.body.append(canvas);
+ const r=new DreamRenderer(canvas,source.images,DREAM_CONTENT),c=r.ctx;r.r={state:JSON.parse(JSON.stringify(DreamGame.inspect().state)),player:{},settings:{reducedMotion:false},clock:1};c.fillStyle='#c6cfdb';c.fillRect(0,0,1400,canvas.height);r.r.state.world.look={neck:'creamScarf'};
  const labels=['달리기 1','달리기 2','달리기 3','달리기 4','상승','정점','하강','착지'];
  for(const [row,who]of['ari','popo'].entries())for(let frame=0;frame<8;frame++){
   const x=88+frame*175,y=200+row*225;r.r.state.active=who;r.r.player={grounded:frame<4||frame===7,motionSpeed:frame<4?250:0,walkTime:frame*Math.PI/2,vy:frame===4?-400:frame===6?400:0,landSquash:frame===7?.1:0,groundY:y};
@@ -31,7 +31,7 @@ const summary=await p.evaluate(()=>{
   }
  });
  return {heroes:2,monsterTypes:ids.length,newImages:Object.keys(DREAM_MOTION_ART.sheets).map(k=>({key:k,loaded:!!source.images[k]?.complete,width:source.images[k]?.width}))};
-});assert.equal(summary.monsterTypes,11);assert(summary.newImages.every(a=>a.loaded&&a.width>0));await p.locator('#motionReview').screenshot({path:path.join(out,'motion-pose-review.png')});await p.evaluate(()=>{
+});assert.equal(summary.monsterTypes,19);assert(summary.newImages.every(a=>a.loaded&&a.width>0));await p.locator('#motionReview').screenshot({path:path.join(out,'motion-pose-review.png')});await p.evaluate(()=>{
  const source=__renderer,canvas=document.createElement('canvas');canvas.id='motionTransitions';canvas.width=1400;canvas.height=620;Object.assign(canvas.style,{position:'absolute',left:'0',top:'0',zIndex:100000,width:'1400px',height:'620px'});document.body.append(canvas);
  const r=new DreamRenderer(canvas,source.images,DREAM_CONTENT);r.r={state:JSON.parse(JSON.stringify(DreamGame.inspect().state)),settings:{reducedMotion:false},clock:1,player:{}};r.ctx.fillStyle='#c6cfdb';r.ctx.fillRect(0,0,1400,620);r.r.state.world.look={neck:'creamScarf'};
  const poses=[['걷기',{motionSpeed:100,walkTime:2}],['사다리',{climbing:{},climbPhase:2}],['대시',{dodgeT:.13,dodgeFacing:1}],['일반 공격',{attackT:.19,attackLength:.38}],['모으기',{chargeHeld:true,chargeT:.6}],['내려찍기',{grounded:false,plunge:{windup:0}}],['착지 회복',{plungeLandT:.15}]];
@@ -40,5 +40,5 @@ const summary=await p.evaluate(()=>{
  }
  // Exercise mirrored/new equipment poses and the remaining monster states without changing the live save.
  for(const who of['ari','popo'])for(const weapon of DREAM_EQUIPMENT.ids){r.r.state.active=who;r.r.state.rpg.equipment.weapon=weapon;for(const reduced of[false,true]){r.r.settings.reducedMotion=reduced;r.ctx.save();r.ctx.translate(-5000,0);r.r.player={grounded:false,vy:400};r.actor(who,0,0,-1,true);for(const [id,spec]of Object.entries(DREAM_MOTION_ART.creatures))for(const state of[{hurt:.2},{dead:true,fade:.3},{action:'recover'},{phase:'warn',zone:{kind:'stomp',x:0}},{phase:'release',zone:{kind:'stomp',x:0}}]){r.enemy({type:['sand','crab','box','boss'].includes(id)?id:'sand',variant:['sand','crab','box','boss'].includes(id)?undefined:id,x:0,y:651,floorY:651,face:-1,phase:'rest',elapsed:1,hp:3,max:8,...state});}r.ctx.restore();}}
-});await p.locator('#motionTransitions').screenshot({path:path.join(out,'motion-transitions.png')});assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'motion-result.json'),JSON.stringify({running,jumping,falling,summary,errors},null,2));console.log('PASS: actual run/jump inputs; 2 hero and 11 monster render paths; 7 loaded atlases; no browser errors');
+});await p.locator('#motionTransitions').screenshot({path:path.join(out,'motion-transitions.png')});assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'motion-result.json'),JSON.stringify({running,jumping,falling,summary,errors},null,2));console.log('PASS: actual run/jump inputs; 2 hero and 19 current/legacy monster render paths; 7 loaded atlases; no browser errors');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

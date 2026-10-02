@@ -24,7 +24,8 @@
         if (e.dead && e.fade <= 0) return;
         const c = this.ctx, r = this.r, floor = e.floorY ?? 651, reduced = r.settings.reducedMotion;
         const def = this.C.regionCreatures?.[id] || this.C.creatures[e.type];
-        const frame = motion.enemyFrame(e, reduced), height = spec.height;
+        const rawFrame = motion.enemyFrame(e, reduced), height = spec.height;
+        const frame = spec.actionFrames ? (e.hurt>0?spec.actionFrames.hurt:e.windup>0?spec.actionFrames.warn:e.action==='strike'?spec.actionFrames.attack:typeof rawFrame==='number'?rawFrame:spec.actionFrames[rawFrame]) : rawFrame;
         let key = spec.key, box, pivot, sc = spec.scale;
         if (typeof frame === 'number') { box = spec.frames[frame]; pivot = spec.pivots[frame]; }
         else {

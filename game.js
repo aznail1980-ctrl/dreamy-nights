@@ -50,7 +50,7 @@
                 s.flags[k] = raw.flags[k] === true;
         if (!s.visited.includes(s.map))
             s.visited.push(s.map);
-        s.y = raw.version === 4 && Number.isFinite(raw.y) ? clamp(raw.y, 31, GROUND) : GROUND;
+        s.y = raw.version === 4 && Number.isFinite(raw.y) ? clamp(raw.y, Math.min(31,...C.maps[s.map].platforms.map(p=>p.y)), GROUND) : GROUND;
         const migrated=remaster.initialize(world.migrate(rpg.migrate(s, raw), raw), raw);
         const gearHP=['weapon','charm','keepsake'].reduce((n,slot)=>n+(DREAM_GEAR.stats(DREAM_GEAR.equipped(s.rpg,slot)).hp||0),0);
         window.DREAM_PROGRESS.initialize(s, raw);
@@ -459,7 +459,9 @@
         else {
             content = '<div class="creature-list">' + Object.entries(C.creatures).map(([key, c]) => {
                 const seen = C.maps.flatMap(m => m.enemies).some(e => e.type === key && state.killed.includes(e.id));
-                return `<article class="creature-card"><img src="assets/${key}.webp" alt="${c.name}" style="opacity:${seen ? 1 : .35}"><div><b>${c.name}</b><p>${seen ? '“' + c.worry + '”<br>' + c.memory : '처음 정화하면 걱정의 정체를 알 수 있어요.'}</p></div></article>`;
+                const art=window.DREAM_DUNGEON_ART?.[key];
+                const portrait=art?`<svg viewBox="${art.frames[0].join(' ')}" role="img" aria-label="${c.name}" style="width:110px;height:110px;flex-shrink:0;opacity:${seen?1:.35}"><image href="assets/${art.key}.png" width="${art.size[0]}" height="${art.size[1]}"/></svg>`:`<img src="assets/${key}.webp" alt="${c.name}" style="opacity:${seen?1:.35}">`;
+                return `<article class="creature-card">${portrait}<div><b>${c.name}</b><p>${seen ? '“' + c.worry + '”<br>' + c.memory : '처음 정화하면 걱정의 정체를 알 수 있어요.'}</p></div></article>`;
             }).join('') + '</div>';
         }
         openModal('journal', '지킴이 수첩', `<div class="journal-tabs"><button data-tab="missions" class="${tab === 'missions' ? 'active' : ''}">첫 순찰 의뢰</button><button data-tab="memories" class="${tab === 'memories' ? 'active' : ''}">반짝 기억 ${state.memories.length}/${C.memories.length}</button><button data-tab="creatures" class="${tab === 'creatures' ? 'active' : ''}">어둑이 도감</button><button data-tab="people" class="${tab === 'people' ? 'active' : ''}">마을의 부탁</button></div>${content}`, 'OUR LITTLE MEMORIES');
@@ -890,47 +892,15 @@
             toast('꿈나침반을 따라 이동해요. 전투와 조작을 하면 멈춰요.', 2.5);
     }
     function navigationDirection() {
-        const qi = activeQuest();
-        if (qi < 0) {
-            autoWalk = false;
-            return 0;
-        }
-        const q = C.quests[qi];
-        let target, targetY = GROUND;
-        if (q.map !== state.map) {
-            const route = world.route(q.map);
-            if (!route) {
-                autoWalk = false;
-                toast('지도를 펼쳐 다음 단서와 열리지 않은 길을 확인해요.');
-                return 0;
-            }
-            target = route.x;
-            targetY = route.y ?? GROUND;
-        }
-        else if (q.npc || q.targetX) {
-            target = C.npcs[q.npc]?.x || q.targetX;
-            targetY = C.npcs[q.npc]?.y ?? q.targetY ?? GROUND;
-            if (q.flag === 'tideAttuned') {
-                const o = C.objects.find(o => o.id === 'tideBell' + [0, 2, 1][Math.min(2, state.world.tideStep)]);
-                target = o.x;
-                targetY = o.y;
-            }
-            if (q.flag === 'windAttuned') {
-                const index = state.world.vanes.findIndex((v, i) => v !== [1, 3, 0][i]);
-                const o = C.objects.find(o => o.id === 'windVane' + Math.max(0, index));
-                target = o.x;
-                targetY = o.y;
-            }
-        }
-        else {
-            const foe = enemies.find(e => !e.dead && !e.wild);
-            target = foe ? foe.x : player.x;
-            targetY = foe?.floorY ?? GROUND;
-            if (foe && Math.abs(foe.x - player.x) < 200 && Math.abs(foe.y - player.y) < 100) {
-                autoWalk = false;
-                say('여기부터는 함께 정화하자!', 2);
-                return 0;
-            }
+        const goal = journey?.target();
+        if (!goal) { autoWalk = false; return 0; }
+        let target = goal.x, targetY = goal.y ?? GROUND;
+        if (goal.map !== state.map) {
+            const exit = world.route(goal.map);
+            if (!exit) { autoWalk = false; toast('수첩에서 열리지 않은 길의 단서를 확인해요.'); return 0; }
+            target = exit.x; targetY = exit.y ?? GROUND;
+        } else if (goal.kind === 'enemy' && Math.abs(target-player.x)<200 && Math.abs(targetY-player.y)<100) {
+            autoWalk=false; say('여기부터는 함께 정화하자!',2); return 0;
         }
         const routePoint = remaster.routePoint({ x: target, y: targetY });
         autoClimb = routePoint.climb;
@@ -1729,7 +1699,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.34.1' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.35.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

@@ -198,6 +198,10 @@ window.createDreamRemaster = function (api) {
     }
     function routePoint(target) {
         const p = api.player, ty = target.y ?? G;
+        // Keep the chosen direction while between floors, then choose the next connected ladder.
+        if (p.climbing) return {x:p.climbing.x,climb:Math.sign(p.climbSpeed)||Math.sign(ty-p.y)||-1};
+        const connection=C.nextRouteLadder?.(m(),p,target);
+        if(connection){const l=connection.ladder;return{x:l.x,climb:Math.abs(l.x-p.x)<30?(connection.up?-1:1):0};}
         if (Math.abs(ty - p.y) < 70)
             return { x: target.x, climb: 0 };
         const up = ty < p.y;

@@ -2,7 +2,7 @@
 window.updateDreamRegionEnemy=function(e,dt,api){
     const d=window.DREAM_CONTENT.regionCreatures[e.variant];
     const {player,waves,advance,damage,sound}=api,floor=e.floorY??651;
-    const fire=(vy=0,gravity=0)=>waves.push({x:e.x+e.attackFace*48,y:floor-55,vx:e.attackFace*(d.pattern==='seed'?175:190),vy,gravity,life:1.55,r:d.pattern==='wake'?19:14,damage:1,kind:d.pattern==='wake'?'tideBubble':'region',icon:d.material,hit:false});
+    const fire=(vy=0,gravity=0)=>waves.push({x:e.x+e.attackFace*48,y:floor-55,vx:e.attackFace*(d.pattern==='seed'?175:190),vy,gravity,life:1.55,r:d.pattern==='wake'?19:14,damage:1,kind:d.projectile||(d.pattern==='wake'?'tideBubble':'region'),icon:d.material,hit:false});
     e.timer-=dt;
     if(e.action==='recover'){
         e.y=floor;e.actionT-=dt;

@@ -8,6 +8,7 @@ window.createDreamJourney=function(api){
   }}));return options.sort((a,b)=>(a.map===s().map?0:1)-(b.map===s().map?0:1)||Math.abs(a.x-api.player.x)-Math.abs(b.x-api.player.x))[0];
  }
  function target(){
+  const local=C.dungeonObjective?.(s(),api.player,api.enemies);if(local)return local;
   const q=C.quests[api.activeQuest()];if(!q)return C.chapterBridge?.target(s())||null;
   if(q.ids)return enemyTarget(q.ids);
   if(q.npc){const n=C.npcs[q.npc];return{map:q.map,x:n.x,y:n.y,label:{cookedFirst:'마들렌과 도시락 만들기',letterRead:'뒤뚱에게 편지 조각 맡기기',readyForBoss:'루멘에게 임명장 보여주기',journalReturned:'루멘에게 순찰 일지 돌려주기'}[q.flag]||n.name+' 만나기',kind:'npc'};}
@@ -38,6 +39,7 @@ window.createDreamJourney=function(api){
  $('journeyToggle').onclick=()=>{collapsed=!collapsed;fold();try{localStorage.setItem(foldKey,collapsed?'collapsed':'expanded');}catch{}};fold();
  let miniKey='';
  function update(){if(!s())return;const t=target(),line=instruction(t);if($('nextAction').textContent!==line)$('nextAction').textContent=line;
+  if(t?.dungeon){$('questTitle').textContent=t.dungeon;$('questDetail').textContent=t.detail;$('questCard').querySelector('.eyebrow').firstChild.textContent='현재 던전 · ';$('questStep').textContent='지역 조사';$('questCount').textContent='조사 '+t.progress+' / '+t.total;$('questFill').style.width=(t.progress/t.total*100)+'%';}
   $('questCard').setAttribute('aria-label','현재 목표: '+line+' · 수첩 열기');$('questHint').textContent='수첩 열기 ↗';
   const key=s().map+':'+s().visited.join(',')+':'+t?.map;if(key===miniKey)return;miniKey=key;
   $('journeyCompactName').textContent=C.maps[s().map].name;

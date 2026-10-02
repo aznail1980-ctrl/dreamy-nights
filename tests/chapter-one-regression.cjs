@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert/strict');
 const root=path.resolve(__dirname,'..'),c=vm.createContext({});c.window=c;
-for(const n of ['story','rpg-content','world-content','remaster-content','illustrated-content','exploration-content','art-v49','art-v44','motion-assets','wear-content','loot-content','tide-content','region-art','region-content','region-layout','chapter-one','equipment-art','equipment-content','pet-art','pet-system','pet-ui','gear-system','gear-ui','equipment-ui','region-ui','rpg-system','world-system','remaster-system','progression-system'])vm.runInContext(fs.readFileSync(path.join(root,n+'.js'),'utf8'),c);
+for(const n of ['story','rpg-content','world-content','remaster-content','illustrated-content','exploration-content','art-v49','art-v44','motion-assets','wear-content','loot-content','tide-content','region-art','region-content','region-layout','chapter-one','dungeon-content','equipment-art','equipment-content','pet-art','pet-system','pet-ui','gear-system','gear-ui','equipment-ui','region-ui','rpg-system','world-system','remaster-system','progression-system'])vm.runInContext(fs.readFileSync(path.join(root,n+'.js'),'utf8'),c);
 const C=c.DREAM_CONTENT,plain=x=>JSON.parse(JSON.stringify(x));let count=0;
 function test(name,f){f();console.log('PASS',name);count++;}
 const floor=(m,p)=>p.y===651||m.platforms.some(f=>f.y===p.y&&p.x>=f.x&&p.x<=f.x+f.w);
@@ -61,4 +61,5 @@ test('Existing completion saves and partially prepared departure saves retain in
  const old=plain(raw);for(const step of C.chapterBridge.steps)delete old.flags[step.flag];const migrated=c.validateSave(old);assert(migrated.flags.completed);assert.equal(C.chapterBridge.next(migrated).npc,'madeleine');
  const partial=plain(raw);partial.flags.ovenRouteReady=false;assert.equal(C.chapterBridge.next(c.validateSave(partial)).npc,'lumen');
 });
+test('New upper garden saves preserve their elevation rather than falling below the mission platform',()=>{const raw=plain(s);raw.version=4;raw.map=6;raw.x=4140;raw.y=-69;const loaded=c.validateSave(raw);assert.equal(loaded.y,-69);assert.equal(loaded.map,6);});
 console.log(count+' first-world route, story, ending and departure checks passed');

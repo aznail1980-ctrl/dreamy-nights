@@ -56,7 +56,8 @@ window.DreamAudioEngine=class DreamAudioEngine{
         const species=subject?.variant||subject?.type||'sand',key=species+kind,now=this.ctx?.currentTime||0;
         if(now<(this.cooldowns.get(key)||0))return;
         this.cooldowns.set(key,now+(kind==='attack'?.85:.45));
-        this.play('cry-'+species,{gain:kind==='attack'?.38:.17,rate:kind==='attack'?1:1.07,pan:((subject?.x||0)-this.getScene().playerX)/800});
+        const def=window.DREAM_CONTENT?.regionCreatures?.[species];
+        this.play('cry-'+(def?.voice||species),{gain:kind==='attack'?.38:.17,rate:(kind==='attack'?1:1.07)*(def?.voiceRate||1),pan:((subject?.x||0)-this.getScene().playerX)/800});
     }
     combatSwing(profile){
         this.record({combatSwing:profile.kind,hero:profile.hero,grade:profile.grade,level:profile.level});
