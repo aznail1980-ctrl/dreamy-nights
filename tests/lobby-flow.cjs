@@ -3,9 +3,10 @@ const fs=require('fs'),path=require('path'),assert=require('assert/strict');
 const {chromium}=require('playwright');
 const url='file://'+path.resolve(__dirname,'../index.html');
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||undefined}),checks=[],errors=[];
-try{for(const [w,h,mobile] of [[1440,920,false],[390,844,true],[320,568,true],[844,390,true]]){
+try{for(let [w,h,mobile] of [[1440,920,false],[390,844,true],[320,568,true],[844,390,true]]){
  const page=await browser.newPage({viewport:{width:w,height:h},isMobile:mobile,hasTouch:mobile});page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{window.__lobbyDraws=new WeakMap();const draw=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){__lobbyDraws.set(this.canvas,(__lobbyDraws.get(this.canvas)||0)+1);return draw.apply(this,args);};});await page.goto(url);await page.waitForFunction(()=>window.DreamGame?.inspect().mode==='opening',{},{timeout:45000});
+ if(mobile&&h>w){assert(await page.locator('#rotateGate').isVisible());[w,h]=[h,w];await page.setViewportSize({width:w,height:h});await page.waitForFunction(()=>!DreamGame.inspect().orientationBlocked);}
  await page.waitForTimeout(720);await page.screenshot({path:`${QA_OUT}/lobby-v418-intro-${w}.png`});
  for(const sel of ['.opening-play','.opening-skip','.opening-sound']){const b=await page.locator(sel).boundingBox();assert(b&&b.x>=-1&&b.y>=-1&&b.x+b.width<=w+1&&b.y+b.height<=h+1,sel+' clipped '+w);if(mobile)assert(b.height>=43.9,sel+' too small');}
  await page.click('.opening-skip');await page.waitForFunction(()=>DreamGame.inspect().lobby.ready.ari&&DreamGame.inspect().lobby.ready.popo);await page.waitForTimeout(720);

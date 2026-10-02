@@ -1,6 +1,7 @@
 'use strict';
 window.createDreamOpening = function ({mount, source, poster, settings, onOpen, onClose}) {
     const KEY = 'dreamy-nights-opening-v1';
+    let orientationSuspended = false;
     let active = false, played = false, seen = false, loadTimer = 0, previousFocus;
     try { seen = localStorage.getItem(KEY) === 'seen'; } catch {}
     const root = document.createElement('section');
@@ -50,7 +51,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
         pause.hidden = true;
     }
     async function startVideo() {
-        if (!active) return;
+        if (!active || orientationSuspended) return;
         if (root.classList.contains('has-error')) { close(); return; }
         play.disabled = true;
         status.textContent = '꿈의 문을 열고 있어요…';
@@ -60,17 +61,19 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
             if (!video.getAttribute('src')) video.src = source;
             await video.play();
             if (!active) { video.pause(); return; }
+            if (orientationSuspended) video.pause();
             played = true;
             stopTimer();
             root.classList.add('is-playing');
             play.disabled = false;
             pause.hidden = false;
-            paint(pause,'잠시 멈추기','pause');
+            paint(pause,orientationSuspended?'계속 보기':'잠시 멈추기',orientationSuspended?'play':'pause');
             pause.focus({preventScroll:true});
         } catch (error) {
             if (!active) return;
             stopTimer();
             play.disabled = false;
+            if (error.name === 'AbortError' && orientationSuspended) { status.textContent = '가로 화면에서 꿈의 문을 다시 열어주세요.'; return; }
             if (error.name === 'NotAllowedError') status.textContent = '꿈의 문 열기를 한 번 더 눌러주세요.';
             else mediaError();
         }
@@ -101,7 +104,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
     sound.onclick = () => { video.muted = !video.muted; updateSound(); };
     video.onended = () => close();
     video.onerror = mediaError;
-    video.onwaiting = () => { if (active && played) { stopTimer(); loadTimer = setTimeout(mediaError, 15000); } };
+    video.onwaiting = () => { if (active && played && !orientationSuspended) { stopTimer(); loadTimer = setTimeout(mediaError, 15000); } };
     video.onplaying = stopTimer;
     video.ontimeupdate = () => {
         const duration = video.duration;
@@ -121,5 +124,5 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && active && played && !video.paused) { video.pause(); paint(pause,'계속 보기','play'); }
     });
-    return {open, maybeShow: () => !seen && open(), close, inspect: () => ({active, seen, played, paused:video.paused, error:root.classList.contains('has-error')})};
+    return {setOrientationBlocked(blocked){orientationSuspended=blocked;if(blocked){video.pause();stopTimer();paint(pause,'계속 보기','play');}}, open, maybeShow: () => !seen && open(), close, inspect: () => ({active, seen, played, paused:video.paused, error:root.classList.contains('has-error')})};
 };

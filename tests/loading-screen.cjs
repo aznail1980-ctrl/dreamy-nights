@@ -1,10 +1,11 @@
 const {chromium}=require('playwright'),assert=require('assert/strict'),path=require('path'),fs=require('fs');
 const url=process.env.GAME_URL||'http://127.0.0.1:8769/',out=path.resolve(__dirname,'../test-results');fs.mkdirSync(out,{recursive:true});
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN});try{
- for(const [width,height,mobile] of [[1440,920,false],[852,393,true],[390,844,true],[320,568,true]]){
+ for(let [width,height,mobile] of [[1440,920,false],[852,393,true],[390,844,true],[320,568,true]]){
   const p=await browser.newPage({viewport:{width,height},isMobile:mobile,hasTouch:mobile});const errors=[];p.on('pageerror',e=>errors.push(e.message));let release;const gate=new Promise(r=>release=r);let n=0;
   await p.route('**/assets/**',async r=>{if(!r.request().url().includes('LobbyV418')&&n++%5!==0)await gate;await r.continue().catch(()=>{});});
   await p.goto(url,{waitUntil:'domcontentloaded'});await p.waitForFunction(()=>document.querySelectorAll('#loading .load-hero.ready').length===2);await p.waitForFunction(()=>Number(document.getElementById('loadProgress').getAttribute('aria-valuenow'))>0);
+  if(mobile&&height>width){assert(await p.locator('#rotateGate').isVisible());[width,height]=[height,width];await p.setViewportSize({width,height});await p.waitForFunction(()=>!document.documentElement.classList.contains('needs-landscape'));}
   assert.equal(await p.evaluate(()=>DreamGame.inspect().mode),'loading');let percent=Number(await p.getAttribute('#loadProgress','aria-valuenow'));assert(percent>0&&percent<100);assert.equal(await p.textContent('#loadingPercent'),percent+'%');
   for(const sel of ['#loading h1','#loadingText','#loadProgress','#loadingMotion','#loadingTip','.load-ari','.load-popo']){const b=await p.locator(sel).boundingBox();assert(b&&b.x>=-.5&&b.y>=-.5&&b.x+b.width<=width+.5&&b.y+b.height<=height+.5,sel+' clipped '+width);}
   if(mobile)assert((await p.locator('#loadingMotion').boundingBox()).height>=43.8);

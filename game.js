@@ -3,6 +3,7 @@
     const C = window.DREAM_CONTENT, AIR = window.DREAM_AIR, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
     const $ = id => document.getElementById(id), clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const imageKeys = [...new Set([...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'])];
+    let orientationBlocked = false, orientationGate;
     let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby, growthUI;
     let cameraY = 0, dialogueKey = '', autoClimb = 0;
     let images = {}, renderer, mode = 'loading', modalKind = '', beforeModal = 'play', state, player, enemies = [], particles = [], texts = [], waves = [], rings = [], camera = 0, clock = 0, lastTime = 0, uiTime = 0, saveTime = 0, hitstop = 0, shake = 0, transition = 0, autoWalk = false, interaction = null, dialogue = null, dialogueIndex = 0, dialogueDone = null, lastQuest = -1, dialogueBefore = 'play';
@@ -106,13 +107,12 @@
         const padding = getComputedStyle(document.body);
         const coarse = matchMedia('(pointer:coarse)').matches;
         const safe = window.DREAM_MOBILE_SURFACE.insets();
-        const view = window.visualViewport;
-        if (coarse && view && Math.abs(view.scale - 1) > .02) return;
-        const layout = window.dreamViewport({ width: view?.width || innerWidth, height: view?.height || innerHeight,
+        const view = window.DREAM_ORIENTATION.viewport(coarse);
+        const layout = window.dreamViewport({ width: view.width, height: view.height,
             coarse,
             left: parseFloat(padding.paddingLeft) || 0, right: parseFloat(padding.paddingRight) || 0,
             top: parseFloat(padding.paddingTop) || 0, bottom: parseFloat(padding.paddingBottom) || 0 });
-        document.documentElement.style.setProperty('--viewport-height', (view?.height || innerHeight) + 'px');
+        document.documentElement.style.setProperty('--viewport-height', view.height + 'px');
         $('shell').style.width = layout.width + 'px';
         $('shell').style.height = layout.height + 'px';
         $('stage').style.height = layout.stageHeight + 'px';
@@ -123,6 +123,7 @@
         $('stage').style.setProperty('--stage-width', layout.stageWidth + 'px');
         $('stage').dataset.layout = layout.portrait ? 'portrait' : layout.coarse ? 'landscape' : 'desktop';
         for (const side of ['left','right','top','bottom']) $('stage').style.setProperty('--safe-'+side,(coarse ? safe[side]/layout.scale : 0)+'px');
+        orientationGate?.sync(coarse && view.height > view.width);
     }
     function show(id, on = true) {
         $(id).classList.toggle('hidden', !on);
@@ -775,6 +776,7 @@
             player.pendingStrike = null;
     }
     function action(name) {
+        if (orientationBlocked) return;
         if (mode !== 'play')
             return;
         audio.unlock();
@@ -1528,6 +1530,7 @@
     function loop(time) {
         const dt = Math.min(.04, (time - lastTime) / 1000 || .016);
         lastTime = time;
+        if (orientationBlocked) { requestAnimationFrame(loop); return; }
         tick(dt);
         lobby?.update(dt,mode,modalKind);
         renderer.draw({ state, player, enemies, particles, texts, waves, rings, camera, cameraY, clock, companion, pet, mode, shake, transition, settings, rpgInfo: rpg.view(), impacts, gateOpen: world.gateOpen });
@@ -1535,6 +1538,7 @@
     }
     const keyMap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyJ: 'attack', Space: 'jump' };
     addEventListener('keydown', e => {
+        if (orientationBlocked) return;
         if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) && !['Escape', 'Tab'].includes(e.code))
             return;
         const dialogueControl = mode === 'dialogue' && e.target.closest('button') && e.target.id !== 'dialogueNext';
@@ -1649,14 +1653,17 @@
     }
     addEventListener('resize', refitViewport);
     window.visualViewport?.addEventListener('resize', refitViewport);
-    let orientationFitTimer;
-    addEventListener('orientationchange', () => {
-        clearControls(); fit(); requestAnimationFrame(fit);
-        clearTimeout(orientationFitTimer); orientationFitTimer=setTimeout(fit,250);
-    });
-    document.addEventListener('fullscreenchange', fit);
+    let orientationFitTimers=[];
+    function settleOrientation() {
+        clearControls(); orientationFitTimers.forEach(clearTimeout); fit(); requestAnimationFrame(fit);
+        orientationFitTimers=[80,250,500,1000].map(delay=>setTimeout(fit,delay));
+    }
+    addEventListener('orientationchange',settleOrientation);
+    screen.orientation?.addEventListener('change',settleOrientation);
+    addEventListener('pageshow',settleOrientation);
+    document.addEventListener('fullscreenchange',settleOrientation);
     controls = window.createDreamControls({
-        keys, keyMap, playing: () => mode === 'play',
+        keys, keyMap, playing: () => mode === 'play' && !orientationBlocked,
         action, activate: () => { autoWalk = false; audio.unlock(); },
         releaseJump, releaseAttack
     });
@@ -1713,14 +1720,15 @@
             if (document.fullscreenElement)
                 await document.exitFullscreen();
             else
-                await $('shell').requestFullscreen();
+                await document.documentElement.requestFullscreen();
+            if (document.fullscreenElement && matchMedia('(pointer:coarse)').matches) { try { await screen.orientation?.lock?.('landscape'); } catch {} }
         }
         catch {
             toast('이 환경에서는 브라우저의 전체 화면 기능을 사용해 주세요.');
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.30.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.31.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1806,5 +1814,10 @@
             audio.ducked = v;
         } });
     journey = window.createDreamJourney({get state(){return state;},get player(){return player;},get enemies(){return enemies;},get renderer(){return renderer;},activeQuest,route:world.route,openModal,closeModal,islandMap:()=>world.map(),archive:()=>remaster.archive()});
+    orientationGate=window.DREAM_ORIENTATION.create(blocked=>{
+        orientationBlocked=blocked; clearControls();
+        if(blocked){audio.silence();remaster?.stopVoice();}
+        opening?.setOrientationBlocked(blocked);
+    });
     boot();
 })();
