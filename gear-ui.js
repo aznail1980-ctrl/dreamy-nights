@@ -10,7 +10,8 @@ window.createDreamGearUI=({C,G,api,state,icon,bag,details})=>{
         const before=G.stats(g),after=next?G.stats({...g,level:g.level+1}):before;
         return `<dl class="forge-stats">${Object.entries(names).filter(([k])=>(before[k]||after[k])).map(([k,label])=>`<div><dt>${label}</dt><dd>${fmt(k,before[k]||0)}${next?` <span>→ ${fmt(k,after[k]||0)}</span>`:''}</dd></div>`).join('')||'<div><dt>기본 장비</dt><dd>강화로 능력을 더해요.</dd></div>'}</dl>`;
     }
-    function open(uid){
+    function open(uid,requestedMode){
+        if(['upgrade','dismantle'].includes(requestedMode)){mode=requestedMode;notice='';}
         if(api.mode!=='play'&&!(api.mode==='modal'&&['bag','npc','characterDetail','gearWorkshop','gearConfirm'].includes(api.modalKind)))return;
         if(uid&&G.find(r(),uid)){selected=uid;grade='all';page=0;}
         marked=new Set([...marked].filter(id=>!G.protection(r(),G.find(r(),id))));

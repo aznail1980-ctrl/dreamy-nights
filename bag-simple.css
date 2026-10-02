@@ -1,0 +1,97 @@
+/* Task-first bag: pick a category, pick an item, act without visiting another menu. */
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-layout{grid-template-columns:190px minmax(0,1fr) 365px;gap:18px}
+#stage #modal[data-kind="bag"] .bag-center{display:flex;flex-direction:column;gap:8px}
+#stage #modal[data-kind="bag"] .bag-tabs button{font-size:15px;min-height:44px}
+#stage #modal[data-kind="bag"] .bag-task-hint{font-size:13px;line-height:1.6;color:#d4e4d7;margin:0}
+#stage #modal[data-kind="bag"] .bag-wearing{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#stage #modal[data-kind="bag"] .bag-wearing button{display:flex;align-items:center;gap:7px;min-width:0;min-height:59px;text-align:left;padding:7px;border:1px solid #acba936b;border-radius:5px;background:#19333f;color:#f3e4bc}
+#stage #modal[data-kind="bag"] .bag-wearing button>span{min-width:0}
+#stage #modal[data-kind="bag"] .bag-wearing :is(small,b){display:block;overflow-wrap:anywhere}
+#stage #modal[data-kind="bag"] .bag-wearing small{font-size:10px;color:#b3ccc5;margin-bottom:3px}
+#stage #modal[data-kind="bag"] .bag-wearing b{font-size:12px;line-height:1.3}
+#stage #modal[data-kind="bag"] .bag-search,#stage #modal[data-kind="bag"] .bag-more{border-top:1px solid #bcab6a40;color:#c7d8d0}
+#stage #modal[data-kind="bag"] summary{padding:10px 3px;min-height:36px;font-size:13px;color:#dacb9c}
+#stage #modal[data-kind="bag"] .bag-more p,#stage #modal[data-kind="bag"] .bag-little-help{font-size:12px;color:#b7cbc5;line-height:1.7}
+#stage #modal[data-kind="bag"] .bag-grade-filter label{display:flex;align-items:center;gap:8px;min-width:0}
+#stage #modal[data-kind="bag"] .item-grid{min-height:200px;max-height:245px;grid-auto-rows:minmax(106px,auto)}
+#stage #modal[data-kind="bag"] .item-slot{min-height:106px}
+#stage #modal[data-kind="bag"] .item-slot.equipped:after{content:'사용';font-size:9px}
+#stage #modal[data-kind="bag"] .item-slot small{color:#cbdcbd}
+#stage #modal[data-kind="bag"] .bag-item-visual{display:flex;align-items:center;justify-content:center;gap:12px}
+#stage #modal[data-kind="bag"] .bag-item-visual .item-preview{flex:1;min-width:0;height:100px;margin:0;border:0}
+#stage #modal[data-kind="bag"] .bag-item-visual figure{width:120px;flex:none;margin:0;text-align:center;border-left:1px solid #bda76c45}
+#stage #modal[data-kind="bag"] .bag-item-visual canvas{width:105px;height:115px;object-fit:contain}
+#stage #modal[data-kind="bag"] .bag-item-visual figcaption{font-size:10px;color:#c4d3bd}
+#stage #modal[data-kind="bag"] .bag-message{padding:10px;border-left:3px solid #bbd8af;background:#44645f4d;color:#ebf0d8;line-height:1.6;font-size:13px;margin:9px 0}
+#stage #modal[data-kind="bag"] .bag-compare>b{font-size:12px;color:#c7d9c2}
+#stage #modal[data-kind="bag"] .bag-item-more{margin-top:12px;border-top:1px solid #bcb58340}
+#stage #modal[data-kind="bag"] .bag-item-more label{display:grid;gap:8px;font-size:12px;color:#d0decf}
+#stage #modal[data-kind="bag"] .bag-item-more button{min-height:44px;padding:8px 12px}
+#stage #modal[data-kind="bag"] .bag-upgrade{margin-top:10px;padding:14px;border:1px solid #e4c27d;border-radius:5px;background:#122e3c}
+#stage #modal[data-kind="bag"] .bag-upgrade h4{font-size:17px;color:#ffe3a4;margin:0 0 10px}
+#stage #modal[data-kind="bag"] .bag-upgrade>b{font-size:14px;color:#f4e1b6}
+#stage #modal[data-kind="bag"] .bag-upgrade dl{padding:10px 0;border-block:1px solid #9ab59a44}
+#stage #modal[data-kind="bag"] .bag-upgrade dl>div{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:4px 0}
+#stage #modal[data-kind="bag"] .bag-upgrade dd{margin:0;color:#f9e6b0}
+#stage #modal[data-kind="bag"] .bag-upgrade strong{color:#b6ebc5}
+#stage #modal[data-kind="bag"] .bag-upgrade small{font-size:11px;line-height:1.7;color:#b6cac7}
+#stage #modal[data-kind="bag"] .item-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#stage #modal[data-kind="bag"] .item-actions:has(>button:only-child){grid-template-columns:1fr}
+#stage #modal[data-kind="bag"] .item-actions button{font-size:14px;line-height:1.4;min-height:48px}
+@media(pointer:coarse){
+ #stage[data-layout] #modal[data-kind="bag"] .bag-layout{display:block}
+ #stage #modal[data-kind="bag"] .bag-center{gap:calc(var(--gu)*.12)}
+ #stage #modal[data-kind="bag"] .bag-tabs button{font-size:calc(var(--gu)*.3);min-height:var(--gu)}
+ #stage #modal[data-kind="bag"] .bag-task-hint{font-size:calc(var(--gu)*.28);margin:0}
+ #stage #modal[data-kind="bag"] .bag-wearing{gap:calc(var(--gu)*.12)}
+ #stage #modal[data-kind="bag"] .bag-wearing button{min-height:var(--gu);padding:calc(var(--gu)*.1);gap:calc(var(--gu)*.12)}
+ #stage #modal[data-kind="bag"] .bag-wearing .item-art{width:calc(var(--gu)*.65);height:calc(var(--gu)*.65);flex:none}
+ #stage #modal[data-kind="bag"] .bag-wearing small{font-size:calc(var(--gu)*.22);margin-bottom:2px}
+ #stage #modal[data-kind="bag"] .bag-wearing b{font-size:calc(var(--gu)*.25)}
+ #stage #modal[data-kind="bag"] summary{min-height:var(--gu);font-size:calc(var(--gu)*.28);padding:calc(var(--gu)*.25) 0}
+ #stage #modal[data-kind="bag"] .bag-more p{font-size:calc(var(--gu)*.28)}
+ #stage[data-layout] #modal[data-kind="bag"] .item-grid{min-height:calc(var(--gu)*2.1);max-height:none;grid-auto-rows:minmax(calc(var(--gu)*2.05),auto)}
+ #stage[data-layout] #modal[data-kind="bag"] .item-slot{min-height:calc(var(--gu)*2.05)}
+ #stage #modal[data-kind="bag"] .bag-item-visual{gap:calc(var(--gu)*.2)}
+ #stage #modal[data-kind="bag"] .bag-item-visual .item-preview{height:calc(var(--gu)*2);flex:0 1 calc(var(--gu)*3)}
+ #stage #modal[data-kind="bag"] .bag-item-visual figure{width:calc(var(--gu)*2.6)}
+ #stage #modal[data-kind="bag"] .bag-item-visual canvas{width:calc(var(--gu)*1.85);height:calc(var(--gu)*2)}
+ #stage #modal[data-kind="bag"] .bag-item-visual figcaption{font-size:calc(var(--gu)*.24)}
+ #stage #modal[data-kind="bag"] :is(.bag-message,.bag-item-more label,.bag-compare>b){font-size:calc(var(--gu)*.29)}
+ #stage #modal[data-kind="bag"] .bag-upgrade{padding:calc(var(--gu)*.25)}
+ #stage #modal[data-kind="bag"] .bag-upgrade h4{font-size:calc(var(--gu)*.4)}
+ #stage #modal[data-kind="bag"] .bag-upgrade>b,#stage #modal[data-kind="bag"] .bag-upgrade dl>div{font-size:calc(var(--gu)*.31)}
+ #stage #modal[data-kind="bag"] .bag-upgrade small{font-size:calc(var(--gu)*.26)}
+ #stage #modal[data-kind="bag"] .kit-footer{display:none}
+ #stage #modal[data-kind="bag"][data-detail="true"] .kit-footer{display:block}
+ #stage #modal[data-kind="bag"] .kit-footer .item-actions{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:0;margin:0;background:none;border:0}
+ #stage #modal[data-kind="bag"] .kit-footer .item-actions:has(>button:only-child){grid-template-columns:1fr}
+ #stage #modal[data-kind="bag"] .item-actions button{min-height:var(--gu);font-size:calc(var(--gu)*.3);padding:calc(var(--gu)*.12)}
+ #stage #modal[data-kind="bag"] .bag-item-more button{min-height:var(--gu);font-size:calc(var(--gu)*.29)}
+}
+/* Reviewing an upgrade focuses on the exact item, gain and cost, not a second portrait. */
+#stage #modal[data-kind="bag"] .item-detail:has(.bag-upgrade) :is(.bag-item-visual,.bag-message,.bag-item-more){display:none}
+/* In a phone detail screen, one Back button replaces the unrelated top-level tabs. */
+@media(pointer:coarse){
+ #stage #modal[data-kind="bag"][data-detail="true"] .kit-nav{display:none}
+ #stage #modal[data-kind="bag"] .kit-detail-body{display:grid;grid-template-columns:minmax(0,.36fr) minmax(0,.64fr);column-gap:calc(var(--gu)*.3);align-items:start}
+ #stage #modal[data-kind="bag"] .kit-detail-body>*{grid-column:2;min-width:0}
+ #stage #modal[data-kind="bag"] .kit-detail-body>.bag-item-visual{grid-column:1;grid-row:1/7;gap:calc(var(--gu)*.1);align-self:start;padding-top:calc(var(--gu)*.1)}
+ #stage #modal[data-kind="bag"] .bag-item-visual .item-preview{flex:1;height:calc(var(--gu)*2.3)}
+ #stage #modal[data-kind="bag"] .bag-item-visual .item-art{width:calc(var(--gu)*1.5);height:calc(var(--gu)*1.5)}
+ #stage #modal[data-kind="bag"] .bag-item-visual figure{width:calc(var(--gu)*1.9)}
+ #stage #modal[data-kind="bag"] .bag-item-visual canvas{width:calc(var(--gu)*1.7);height:calc(var(--gu)*1.85)}
+ #stage #modal[data-kind="bag"] .kit-detail-body>h3{font-size:calc(var(--gu)*.41);margin:calc(var(--gu)*.1) 0}
+ #stage #modal[data-kind="bag"] .bag-message{font-size:calc(var(--gu)*.28);padding:calc(var(--gu)*.14);margin:calc(var(--gu)*.1) 0}
+ #stage #modal[data-kind="bag"] .item-effect{font-size:calc(var(--gu)*.28);margin:calc(var(--gu)*.12) 0;padding:calc(var(--gu)*.1) 0}
+ #stage #modal[data-kind="bag"] .bag-item-more{margin-top:calc(var(--gu)*.12)}
+ #stage #modal[data-kind="bag"] .kit-detail-body:has(.bag-upgrade)>.item-rarity{grid-column:1;grid-row:1}
+ #stage #modal[data-kind="bag"] .kit-detail-body:has(.bag-upgrade)>h3{grid-column:1;grid-row:2}
+ #stage #modal[data-kind="bag"] .bag-upgrade{grid-column:2;grid-row:1/5;width:100%;margin:0;padding:calc(var(--gu)*.2)}
+ #stage #modal[data-kind="bag"] .bag-upgrade h4{display:none}
+ #stage #modal[data-kind="bag"] .bag-upgrade dl{margin:calc(var(--gu)*.12) 0;padding:calc(var(--gu)*.1) 0}
+ #stage #modal[data-kind="bag"] .bag-upgrade p{font-size:calc(var(--gu)*.28);line-height:1.5;margin:calc(var(--gu)*.12) 0}
+ #stage #modal[data-kind="bag"] .bag-upgrade small{display:none}
+}
+#stage #modal[data-kind="bag"] .item-detail{align-items:stretch}
+#stage #modal[data-kind="bag"] .kit-detail-body{width:100%}

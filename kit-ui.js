@@ -34,8 +34,8 @@ window.DreamKit = (() => {
             const help=document.createElement('details');help.className='kit-help';help.innerHTML='<summary>알과 꿈 친구 돌봄 안내</summary>';
             content.querySelectorAll('.pet-intro,.pet-next').forEach(el=>help.append(el));content.append(help);
         }
-        const actions=kind==='pets'?content.querySelector('.pet-growth .pet-actions'):kind==='petChoice'?content.querySelector('.pet-actions'):null;
-        if(actions){const footer=document.createElement('footer');footer.className='kit-footer';footer.setAttribute('aria-label',kind==='pets'?'꿈 친구 돌보기':'알 선택');footer.append(actions);content.after(footer);}
+        const actions=kind==='bag'&&matchMedia('(pointer:coarse)').matches?content.querySelector('.item-actions'):kind==='pets'?content.querySelector('.pet-growth .pet-actions'):kind==='petChoice'?content.querySelector('.pet-actions'):null;
+        if(actions){const footer=document.createElement('footer');footer.className='kit-footer';footer.setAttribute('aria-label',kind==='bag'?'고른 물건 쓰기':kind==='pets'?'꿈 친구 돌보기':'알 선택');footer.append(actions);content.after(footer);}
         const active=['gearWorkshop','gearConfirm','regionGuide','regionWorkshop','dropGuide'].includes(kind)?'bag':['pets','petChoice','petHatch'].includes(kind)?'pets':kind;
         content.insertAdjacentHTML('beforebegin',`<nav class="kit-nav" aria-label="꿈 지킴이 메뉴">${entries.map(([id,label,path])=>`<button data-kit-page="${id}" ${id===active?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"/></svg><span>${label}</span></button>`).join('')}<span class="kit-nav-note">순찰 준비실 <i>✦</i></span></nav>`);
         modal.querySelectorAll('[data-kit-page]').forEach(button=>button.onclick=()=>navigate(button.dataset.kitPage));
