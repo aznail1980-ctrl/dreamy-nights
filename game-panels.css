@@ -1,0 +1,193 @@
+/* v4.32: one diegetic patrol kit. Existing DOM/transactions remain the source of truth.
+   --gu is 44 physical pixels on touch screens; every layout fits inside the stage. */
+#stage #modal[data-kit="true"]{--gu:44px;--ink:#f7edcf;--muted:#bccdcc;--line:#b99e655c;--gold:#f9d78e;--mint:#b9dfc6;background:#07152099;backdrop-filter:blur(6px)}
+#stage #modal[data-kit="true"] .modal-card{display:flex;flex-direction:column;isolation:isolate;width:1360px;height:750px;max-height:calc(100% - 38px);padding:22px 26px 20px;border:2px solid #a99159;border-radius:8px;background:radial-gradient(ellipse at 10% 0,#42717770,transparent 50%),repeating-linear-gradient(0deg,#ffffff02 0 1px,transparent 1px 5px),linear-gradient(125deg,#233f4a,#182d3c 65%,#283d48);box-shadow:0 25px 90px #0009,0 0 0 4px #142631,inset 0 0 0 5px #c5a56726,inset 0 0 70px #0004;overflow:hidden;color:var(--ink);animation:kitReveal .18s ease-out}
+#stage #modal[data-kit="true"] .modal-card::before{content:'✦';position:absolute;pointer-events:none;right:80px;top:20px;color:#e1c281;font-size:24px;text-shadow:0 0 15px #e8d1a047}
+#stage #modal[data-kit="true"] #modalEyebrow{display:block;flex:none;color:#bdd5cb;font-size:10px;letter-spacing:2px;margin:0 0 5px}
+#stage #modal[data-kit="true"] #modalTitle{flex:none;height:auto;font-size:28px;letter-spacing:-.03em;margin:0 105px 14px 0;color:#ffebbb;text-shadow:0 2px 2px #071723}
+#stage #modal[data-kit="true"] .modal-close{top:18px;right:22px;width:44px;height:44px;border:1px solid #dec17e;border-radius:50%;background:radial-gradient(circle at 35% 15%,#516673,#233c49 70%);box-shadow:inset 0 0 0 3px #192d39,0 3px 0 #0c1c29;color:#ffe2a6}
+#stage #modal[data-kit="true"] #modalContent{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;padding:4px 3px 7px;scrollbar-width:thin;scrollbar-color:#b7a77c #142e3a;overscroll-behavior:contain}
+#stage #modal[data-kit="true"] .kit-nav{position:static;flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;border-bottom:1px solid #d2b27066;padding:0 0 12px;margin:0 0 12px}
+#stage #modal[data-kit="true"] .kit-nav-note{display:none}
+#stage #modal[data-kit="true"] .kit-nav button{min-width:0;min-height:48px;padding:8px;border-radius:5px;background:linear-gradient(#3d5a63,#243e4b);border:1px solid #aabdac60;box-shadow:inset 0 1px #cee3d324,0 3px #0f2734;gap:10px;color:#d7e3d6}
+#stage #modal[data-kit="true"] .kit-nav svg{display:block;width:22px;height:22px}
+#stage #modal[data-kit="true"] .kit-nav button[aria-current]{background:linear-gradient(#ffe6a7,#caab6b);border-color:#fff0b7;color:#263e47;box-shadow:inset 0 0 0 3px #725c3826,0 3px #6f593b;text-shadow:0 1px #fff6}
+#stage #modal[data-kit="true"] :is(.primary,.pet-actions button,.pet-name button){border:1px solid #ffe7ab;border-radius:6px;background:linear-gradient(#ffe3a0,#ceac69);color:#2e3c42;box-shadow:inset 0 0 0 3px #73582c26,0 3px #79613e;font-weight:750}
+#stage #modal[data-kit="true"] :is(.secondary,.bag-tools button,#wardrobeDetails,.kit-list-back){border-radius:5px;border:1px solid #a7c7b47a;background:linear-gradient(#40626a,#294652);color:#f1edd6;box-shadow:inset 0 1px #d5e4d52b,0 2px #102b38}
+#stage #modal[data-kit="true"] :is(button,select,input,summary):focus-visible{outline:3px solid #fff1b9;outline-offset:2px}
+#stage #modal[data-kit="true"] :is(select,input){border-radius:5px;border:1px solid #b49d67;background:#112b38;color:#fff0d0;box-shadow:inset 0 2px 4px #0005}
+#stage #modal[data-kit="true"] select{appearance:none;padding-right:30px;background-image:linear-gradient(45deg,transparent 50%,#efd194 50%),linear-gradient(135deg,#efd194 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+#stage #modal[data-kit="true"] :is(.bag-layout,.wardrobe-layout){grid-template-columns:224px minmax(0,1fr) 310px;gap:18px;align-items:stretch}
+#stage #modal[data-kit="true"] :is(.bag-character,.wardrobe-preview,.keeper-preview){position:relative;isolation:isolate;background:radial-gradient(ellipse at 50% 35%,#ffedb022,transparent 65%),linear-gradient(#24444ae0,#172e3aef),url('assets/harbor.webp') center/cover;border:1px solid #b49a5e99;border-radius:70px 70px 7px 7px;box-shadow:inset 0 0 0 5px #d5c5940b;padding:18px 13px}
+#stage #modal[data-kit="true"] :is(.paper-doll,.wardrobe-preview>canvas,.keeper-preview>canvas){position:relative;background:radial-gradient(ellipse at 50% 89%,#d5c1833b 0 19%,transparent 20%),radial-gradient(ellipse at 50% 89%,transparent 21%,#d0bb8059 22%,transparent 23%)}
+#stage #modal[data-kit="true"] :is(.character-stats,.keeper-stats){gap:0;border:1px solid #a68e5d80;border-radius:5px;overflow:hidden;background:#102b37;box-shadow:inset 0 2px 8px #07121c80}
+#stage #modal[data-kit="true"] :is(.character-stats,.keeper-stats)>div{background:none;border:0;border-bottom:1px solid #b9ba9040;border-radius:0;padding:12px 8px}
+#stage #modal[data-kit="true"] :is(.character-stats,.keeper-stats) dt{color:#b7cfcc;font-size:12px}
+#stage #modal[data-kit="true"] :is(.character-stats,.keeper-stats) dd{color:#ffe6a8;font-size:23px;text-shadow:0 2px #081d29}
+#stage #modal[data-kit="true"] :is(.equipment-slot,.look-slots button,.keeper-slot){border-radius:5px;background:linear-gradient(110deg,#375862,#203d4b);border:1px solid #b5ac796b;box-shadow:inset 0 1px #cad9c514;color:#fff0d4}
+#stage #modal[data-kit="true"] .bag-center{min-width:0;gap:9px}
+#stage #modal[data-kit="true"] :is(.bag-tabs,.look-tabs){display:flex;gap:4px;border-bottom:1px solid #b9a47066;padding-bottom:7px}
+#stage #modal[data-kit="true"] :is(.bag-tabs,.look-tabs) button{flex:1;border:0;border-bottom:3px solid transparent;border-radius:3px 3px 0 0;min-height:42px;padding:7px 3px;background:#102c3766;color:#bfd1c7;font-size:12px}
+#stage #modal[data-kit="true"] :is(.bag-tabs,.look-tabs) button:is(.active,[aria-pressed="true"]){background:linear-gradient(#9bb7aa24,#d5bd782e);border-bottom-color:#f4d089;color:#ffdf9d}
+#stage #modal[data-kit="true"] .kit-count{background:none;color:#a9bdb7;margin-left:4px;min-width:0}
+#stage #modal[data-kit="true"] :is(.item-grid,.costume-grid){grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(114px,auto);min-height:280px;max-height:335px;padding:6px;gap:8px;border:1px solid #122c37;background:repeating-linear-gradient(135deg,#203946 0 3px,#213b47 3px 6px);box-shadow:inset 0 3px 10px #061b2890}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item){--rim:#8bb5a0;border:1px solid var(--rim);border-top-width:1px;border-radius:5px;min-height:114px;gap:3px;padding:7px 3px;background:radial-gradient(circle at 50% 30%,#52758280,transparent 65%),linear-gradient(#304e5b,#18323f);box-shadow:inset 0 0 0 3px #091e355e,inset 0 1px #fff5,0 2px 3px #0004}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item)[data-grade="rare"]{--rim:#b6a2e9;border-top-color:var(--rim)}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item)[data-grade="unique"]{--rim:#f1c56c;border-top-color:var(--rim)}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item)[data-grade="low"]{--rim:#92a0a5;border-top-color:var(--rim)}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item).selected{border:2px solid #ffe49a;background:radial-gradient(circle at 50% 35%,#eed08a33,transparent 70%),#3b5559;box-shadow:inset 0 0 0 2px #ffe49a33,0 0 9px #fce19a40}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item) .item-art{width:56px;height:56px;filter:drop-shadow(0 4px 2px #0008)}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item) b{font-size:11px;line-height:1.3}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item) :is(small,.grade-badge){font-size:10px}
+#stage #modal[data-kit="true"] .item-slot.equipped:after{top:3px;right:3px;border-radius:2px;background:#bedcc3;color:#173f43;padding:1px 4px}
+#stage #modal[data-kit="true"] :is(.item-detail,.costume-detail){height:490px;max-height:490px;padding:17px;border-radius:6px;border:1px solid #d6bc7b;background:linear-gradient(110deg,#ffeec71a,transparent 60%),#203e4a;box-shadow:inset 0 0 0 4px #c8b67b12}
+#stage #modal[data-kit="true"] .item-preview{height:116px;border-bottom:1px solid #bfab734a;background:radial-gradient(ellipse at 50% 85%,#d5ba7436,transparent 64%)}
+#stage #modal[data-kit="true"] :is(.item-detail,.costume-detail) h3{font-size:23px;color:#ffe4a9}
+#stage #modal[data-kit="true"] .item-actions{border-top:1px solid #b9a0656b;padding-top:12px}
+#stage #modal[data-kit="true"] .bag-money{border-top:1px solid #baa6765e;color:#e0d9b6}
+#stage #modal[data-kit="true"] .keeper-layout{grid-template-columns:340px minmax(0,1fr);gap:24px}
+#stage #modal[data-kit="true"] .keeper-preview>canvas{height:275px;max-height:275px;width:auto;max-width:100%}
+#stage #modal[data-kit="true"] .keeper-level{display:inline-block;border-radius:4px;background:linear-gradient(#647b79,#294951);border:1px solid #c5b77d;color:#ffe8b4;padding:7px 24px}
+#stage #modal[data-kit="true"] .keeper-information h3{font-size:16px;margin:13px 0 9px;color:#ebcf91}
+#stage #modal[data-kit="true"] .keeper-information h3::before{content:'✦';margin-right:8px;color:#bea067}
+#stage #modal[data-kit="true"] .keeper-slot-art{border:1px solid #b2a16b6b;background:#162d37;border-radius:4px;box-shadow:inset 0 2px 5px #0005}
+#stage #modal[data-kit="true"] .keeper-pose-buttons button{border-radius:4px;min-height:38px;background:#233f4b;border:1px solid #b5a37466}
+#stage #modal[data-kit="true"] .keeper-pose-buttons button[aria-pressed="true"]{background:#c9b67f;color:#243b43}
+/* Companions get a nest portrait and care controls, not a form page. */
+#stage #modal[data-kit="true"] .pet-layout{grid-template-columns:minmax(230px,.8fr) minmax(0,1.2fr);gap:25px;margin:16px 0}
+#stage #modal[data-kit="true"] .pet-portrait{border:1px solid #a5b88585;border-radius:70px 70px 7px 7px;background:linear-gradient(#173e4050,#172f39ed),url('assets/backdrop-garden-v49.png') center/cover;padding:22px;box-shadow:inset 0 0 0 5px #d5d3a218}
+#stage #modal[data-kit="true"] .pet-portrait>.pet-art{filter:drop-shadow(0 10px 5px #061e3266)}
+#stage #modal[data-kit="true"] .pet-bond-badge{border:1px solid #c2be8c;border-radius:4px;padding:6px 18px;background:#19383eda;color:#eae2ad;font-size:12px}
+#stage #modal[data-kit="true"] .pet-growth{padding:18px 24px;background:#153240;border:1px solid #b19f6a75;box-shadow:inset 0 0 0 4px #b2bc9510;border-radius:6px}
+#stage #modal[data-kit="true"] .pet-growth h3{margin:0 0 18px;font-size:23px;color:#ffe1a4}
+#stage #modal[data-kit="true"] :is(.pet-growth,.pet-nest) progress{appearance:none;height:14px;border:1px solid #a79259;border-radius:4px;background:#0b2733;overflow:hidden;color:#bbd795}
+#stage #modal[data-kit="true"] :is(.pet-growth,.pet-nest) progress::-webkit-progress-bar{background:#0b2733;border-radius:3px;box-shadow:inset 0 2px 5px #0006}
+#stage #modal[data-kit="true"] :is(.pet-growth,.pet-nest) progress::-webkit-progress-value{border-radius:2px;background:linear-gradient(#d3eab9,#73b09f);box-shadow:inset 0 2px #fff5}
+#stage #modal[data-kit="true"] :is(.pet-growth,.pet-nest) progress::-moz-progress-bar{background:linear-gradient(#d3eab9,#73b09f)}
+#stage #modal[data-kit="true"] .pet-help{border-radius:4px;border-left:3px solid #c9b776;background:#34535b}
+#stage #modal[data-kit="true"] .pet-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0}
+#stage #modal[data-kit="true"] .pet-collection button{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr);grid-template-rows:1fr 1fr;text-align:left;column-gap:12px;min-width:0;padding:9px;border:1px solid #9aaf9877;border-radius:5px;background:linear-gradient(#335560,#203c49);color:#eee5c8;box-shadow:inset 0 0 0 3px #b2b88a0d}
+#stage #modal[data-kit="true"] .pet-collection .pet-art{grid-row:1/3;width:64px;height:64px}
+#stage #modal[data-kit="true"] .pet-collection b{align-self:end;font-size:15px;overflow-wrap:anywhere}
+#stage #modal[data-kit="true"] .pet-collection small{margin:3px 0 0;color:#b6c8bf;align-self:start}
+#stage #modal[data-kit="true"] :is(.pet-collection button,.pet-choices button)[aria-pressed="true"]{outline:none;border:2px solid #f5d38b;background:linear-gradient(#526b67,#2c474e);box-shadow:inset 0 0 0 2px #ffe29b22}
+#stage #modal[data-kit="true"] :is(.pet-nest,.pet-choices>button){border:1px solid #c1ac70;border-radius:7px;background:radial-gradient(ellipse at 50% 15%,#afbf8133,transparent 70%),#213e48;color:#f0e5c8}
+#stage #modal[data-kit="true"] .pet-choices h3{color:#ffe0a3}
+#stage #modal[data-kit="true"] .pet-locked{padding:70px 30px;text-align:center;background:radial-gradient(ellipse,#9ebda527,transparent 70%);color:#dfdec2}
+#stage #modal[data-kit="true"] .kit-help,#stage #modal[data-kit="true"] .pet-rename{color:#bfd0c8;font-size:13px;border-top:1px solid #b2ad7d55;padding-top:8px;margin-top:12px}
+#stage #modal[data-kit="true"] summary{cursor:pointer;padding:10px 4px;color:#e0d3a4}
+#stage #modal[data-kit="true"] #petDetails{display:none}
+#stage #modal[data-kit="true"] .pet-next{color:#bdc8bd!important;border:0}
+#stage #modal[data-kit="true"] .pet-name{margin:8px 0}
+/* Related equipment and skills carry the same material language. */
+#stage #modal[data-kit="true"] :is(.forge-card,.forge-detail,.region-card,.region-book,.growth-detail,.growth-loadout article){border:1px solid #b3a16e77;border-radius:5px;background:linear-gradient(135deg,#34515b,#1b3543)}
+#stage #modal[data-kit="true"] .growth-node{border-radius:6px;border-color:#a8a27490;background:linear-gradient(125deg,#35525b,#17313f)}
+#stage #modal[data-kit="true"] .growth-node.selected{border-color:#f3d38b;box-shadow:inset 0 0 0 2px #e3c98b33,0 0 12px #e3c98b14}
+#stage #modal[data-kit="true"] .growth-node.learned{background:linear-gradient(125deg,#496966,#263e4a)}
+#stage #modal[data-kit="true"] .growth-point{border-radius:50%;border:2px solid #c9b576;background:radial-gradient(circle,#52685f,#253d48);box-shadow:inset 0 0 0 4px #d3be801a}
+@keyframes kitReveal{from{opacity:0;filter:brightness(.8)}to{opacity:1;filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){#stage #modal[data-kit="true"] .modal-card{animation:none}}
+#stage.reduced-motion #modal[data-kit="true"] .modal-card{animation:none}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"]{--gu:var(--u)}
+ #stage[data-layout] #modal[data-kit="true"] .modal-card{width:calc(100% - var(--gu)*.4);max-width:calc(100% - var(--gu)*.4);height:calc(var(--screen-h) - var(--safe-top) - var(--safe-bottom) - var(--gu)*.4);max-height:calc(var(--screen-h) - var(--safe-top) - var(--safe-bottom) - var(--gu)*.4);padding:calc(var(--gu)*.22);border-radius:calc(var(--gu)*.12)}
+ #stage #modal[data-kit="true"] #modalEyebrow{display:none}
+ #stage[data-layout] #modal[data-kit="true"] #modalTitle{height:auto;display:block;font-size:calc(var(--gu)*.42);margin:0 calc(var(--gu)*1.3) calc(var(--gu)*.15) 0;min-height:calc(var(--gu)*.65);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #stage #modal[data-kit="true"] .modal-card::before{display:none}
+ #stage #modal[data-kit="true"] .modal-close{width:var(--gu);height:var(--gu);top:calc(var(--gu)*.12);right:calc(var(--gu)*.2);font-size:calc(var(--gu)*.5);z-index:2}
+ #stage[data-layout] #modal[data-kit="true"] .kit-nav{position:static;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));min-height:0;gap:calc(var(--gu)*.12);padding:0 0 calc(var(--gu)*.15);margin:0 0 calc(var(--gu)*.15);border-bottom:1px solid #cdb07977}
+ #stage #modal[data-kit="true"] .kit-nav button{min-height:var(--gu);font-size:calc(var(--gu)*.3);padding:calc(var(--gu)*.1);border-radius:calc(var(--gu)*.08);gap:calc(var(--gu)*.15)}
+ #stage[data-layout] #modal[data-kit="true"] .kit-nav svg{display:block;width:calc(var(--gu)*.42);height:calc(var(--gu)*.42)}
+ #stage #modal[data-kit="true"] #modalContent{padding:calc(var(--gu)*.06) calc(var(--gu)*.07) calc(var(--gu)*.2);touch-action:pan-y}
+ #stage[data-layout] #modal[data-kit="true"] :is(.bag-layout,.wardrobe-layout){display:block}
+ #stage #modal[data-kit="true"] :is(.bag-tabs,.look-tabs){display:flex;padding-bottom:calc(var(--gu)*.12);gap:calc(var(--gu)*.06)}
+ #stage #modal[data-kit="true"] :is(.bag-tabs,.look-tabs) button{min-height:var(--gu);font-size:calc(var(--gu)*.28);padding:calc(var(--gu)*.08);border-radius:3px}
+ #stage #modal[data-kit="true"] .kit-count{display:none}
+ #stage #modal[data-kit="true"] .bag-grade-filter{font-size:calc(var(--gu)*.28);margin-bottom:calc(var(--gu)*.14)}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-grid,.costume-grid){grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(calc(var(--gu)*2.15),auto);min-height:calc(var(--gu)*2.3);max-height:none;gap:calc(var(--gu)*.14);padding:calc(var(--gu)*.12);overflow:visible}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-slot,.costume-item){min-height:calc(var(--gu)*2.15);padding:calc(var(--gu)*.12) calc(var(--gu)*.06);gap:calc(var(--gu)*.04);border-radius:calc(var(--gu)*.08)}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-slot,.costume-item) .item-art{width:calc(var(--gu)*1.05);height:calc(var(--gu)*1.05)}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-slot,.costume-item) b{font-size:calc(var(--gu)*.27)}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-slot,.costume-item) :is(small,.grade-badge){font-size:calc(var(--gu)*.23)}
+ #stage[data-layout] #modal[data-kit="true"][data-detail="true"] :is(.item-detail,.costume-detail){height:auto;max-height:none;padding:calc(var(--gu)*.26);border-radius:calc(var(--gu)*.08)}
+ #stage #modal[data-kit="true"] .item-actions{position:sticky;bottom:calc(var(--gu)*-.2);background:#203e4a;padding:calc(var(--gu)*.2) 0;margin-top:calc(var(--gu)*.2);z-index:1}
+ #stage[data-layout] #modal[data-kit="true"] .keeper-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:calc(var(--gu)*.3)}
+ #stage #modal[data-kit="true"] .keeper-preview{padding:calc(var(--gu)*.25);align-self:start;border-radius:calc(var(--gu)*1.2) calc(var(--gu)*1.2) 5px 5px}
+ #stage[data-layout] #modal[data-kit="true"] .keeper-preview>canvas{height:calc(var(--gu)*4.3);max-height:calc(var(--gu)*4.3);width:auto;max-width:100%}
+ #stage #modal[data-kit="true"] .keeper-pose-buttons button{min-height:var(--gu);font-size:calc(var(--gu)*.27);border-radius:4px}
+ #stage #modal[data-kit="true"] :is(.keeper-stats) dt{font-size:calc(var(--gu)*.26)}
+ #stage #modal[data-kit="true"] :is(.keeper-stats) dd{font-size:calc(var(--gu)*.47)}
+ #stage #modal[data-kit="true"] .keeper-information h3{font-size:calc(var(--gu)*.33)}
+ #stage #modal[data-kit="true"] .keeper-slot-list{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #stage #modal[data-kit="true"] .keeper-slot{min-height:var(--gu);border-radius:4px}
+ #stage #modal[data-kit="true"] .pet-layout{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:calc(var(--gu)*.3);margin:calc(var(--gu)*.3) 0}
+ #stage #modal[data-kit="true"] .pet-portrait{align-self:start;border-radius:calc(var(--gu)*1.2) calc(var(--gu)*1.2) 5px 5px;padding:calc(var(--gu)*.3)}
+ #stage #modal[data-kit="true"] .pet-portrait>.pet-art{width:calc(var(--gu)*3.5);height:calc(var(--gu)*3.5)}
+ #stage #modal[data-kit="true"] .pet-growth{padding:calc(var(--gu)*.3)}
+ #stage #modal[data-kit="true"] :is(.pet-portrait h3,.pet-growth h3,.pet-nest h3){font-size:calc(var(--gu)*.44);margin:calc(var(--gu)*.15) 0}
+ #stage #modal[data-kit="true"] :is(.pet-portrait>small,.pet-portrait>span,.pet-growth label,.pet-growth>small,.pet-nest small,.pet-collection small,.kit-help,.pet-rename){font-size:calc(var(--gu)*.27)}
+ #stage #modal[data-kit="true"] :is(.pet-growth p,.pet-intro p,.pet-nest p,.pet-next,.pet-choices p){font-size:calc(var(--gu)*.29)!important;line-height:1.6}
+ #stage #modal[data-kit="true"] :is(.pet-actions button,.pet-name button,.pet-event,.pet-hatch button){min-height:var(--gu);font-size:calc(var(--gu)*.29);padding:calc(var(--gu)*.15) calc(var(--gu)*.25)}
+ #stage #modal[data-kit="true"] summary{min-height:var(--gu);font-size:calc(var(--gu)*.29);padding:calc(var(--gu)*.25) 0}
+ #stage #modal[data-kit="true"] .pet-collection{gap:calc(var(--gu)*.14)}
+ #stage #modal[data-kit="true"] .pet-collection button{grid-template-columns:var(--gu) minmax(0,1fr);padding:calc(var(--gu)*.15);gap:0 calc(var(--gu)*.15)}
+ #stage #modal[data-kit="true"] .pet-collection .pet-art{width:var(--gu);height:var(--gu)}
+ #stage #modal[data-kit="true"] .pet-collection b{font-size:calc(var(--gu)*.3)}
+ #stage #modal[data-kit="true"] .pet-collection small{font-size:calc(var(--gu)*.23)}
+ #stage #modal[data-kit="true"] .pet-nest>.pet-art{width:calc(var(--gu)*2.4);height:calc(var(--gu)*2.4)}
+ #stage #modal[data-kit="true"] .pet-choices{gap:calc(var(--gu)*.2);margin:calc(var(--gu)*.25) 0}
+ #stage #modal[data-kit="true"] .pet-choices>button{padding:calc(var(--gu)*.2)}
+ #stage #modal[data-kit="true"] .pet-choices .pet-art{width:calc(var(--gu)*2.3);height:calc(var(--gu)*2.3)}
+ #stage #modal[data-kit="true"] .pet-choices h3{font-size:calc(var(--gu)*.36)}
+ #stage #modal[data-kit="true"] .pet-choices b,#stage #modal[data-kit="true"] .pet-choices small{font-size:calc(var(--gu)*.26)}
+}
+@media(pointer:coarse) and (max-width:650px){
+ #stage #modal[data-kit="true"] .kit-nav svg{display:none}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-grid,.costume-grid){grid-template-columns:repeat(4,minmax(0,1fr))}
+ #stage #modal[data-kit="true"] .pet-collection small{display:none}
+ #stage #modal[data-kit="true"] .pet-collection b{grid-row:1/3;align-self:center}
+}
+/* Keep the whole starting kit visible; reserve scroll for the collection itself. */
+#stage #modal[data-kit="true"] .forge-notice:empty{display:none}
+@media(pointer:fine){
+ #stage #modal[data-kit="true"] .paper-doll,#stage #modal[data-kit="true"] .paper-doll canvas{height:145px}
+ #stage #modal[data-kit="true"] .bag-character{padding-top:13px;padding-bottom:10px}
+ #stage #modal[data-kit="true"] .character-stats>div{padding:8px 5px}
+ #stage #modal[data-kit="true"] .bag-character h3{margin:0 0 8px}
+ #stage #modal[data-kit="true"] .item-grid{min-height:245px;max-height:285px}
+ #stage #modal[data-kit="true"] .bag-tools{gap:7px;margin-top:2px}
+ #stage #modal[data-kit="true"] .bag-money{margin-top:6px;font-size:12px;padding-top:8px}
+ #stage #modal[data-kit="true"] .keeper-equipment-note{font-size:12px;line-height:1.5;margin:10px 0}
+}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"] .pet-collection button{grid-template-columns:calc(var(--gu)*.85) minmax(0,1fr);min-height:var(--gu);padding:calc(var(--gu)*.09)}
+ #stage #modal[data-kit="true"] .pet-collection .pet-art{width:calc(var(--gu)*.85);height:calc(var(--gu)*.85)}
+ #stage #modal[data-kit="true"] .pet-layout{margin:calc(var(--gu)*.2) 0}
+ #stage #modal[data-kit="true"] .pet-portrait{padding:calc(var(--gu)*.17)}
+ #stage #modal[data-kit="true"] .pet-portrait>.pet-art{width:calc(var(--gu)*2.5);height:calc(var(--gu)*2.5)}
+ #stage #modal[data-kit="true"] .pet-portrait>small{margin:calc(var(--gu)*.14);line-height:1.5}
+ #stage #modal[data-kit="true"] .pet-bond-badge{padding:calc(var(--gu)*.08) calc(var(--gu)*.2)}
+ #stage #modal[data-kit="true"] .pet-growth{padding:calc(var(--gu)*.2)}
+}
+@media(pointer:fine){#stage #modal[data-kit="true"] .keeper-slot-list .keeper-slot{min-height:104px;padding:8px 6px}#stage #modal[data-kit="true"] .keeper-information h3{margin:9px 0 7px}}
+#stage #modal[data-kit="true"] :is(.pet-choices p,.pet-choices small,.pet-hatch p){color:#c8d8c8}
+#stage #modal[data-kit="true"] #modalContent>p{color:#c8d8c8;font-size:14px;line-height:1.6}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item) b{font-size:13px}
+#stage #modal[data-kit="true"] :is(.item-slot,.costume-item) :is(small,.grade-badge){font-size:11px}
+#stage #modal[data-kit="true"] :is(#modalContent,.item-grid,.costume-grid,.kit-detail-body)::-webkit-scrollbar{width:6px;height:6px}
+#stage #modal[data-kit="true"] :is(#modalContent,.item-grid,.costume-grid,.kit-detail-body)::-webkit-scrollbar-track{background:#102b37}
+#stage #modal[data-kit="true"] :is(#modalContent,.item-grid,.costume-grid,.kit-detail-body)::-webkit-scrollbar-thumb{background:#af9e6f;border:1px solid #d1bd80;border-radius:4px}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"] #modalContent>p{font-size:calc(var(--gu)*.29)}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-slot,.costume-item) b{font-size:calc(var(--gu)*.28)}
+ #stage[data-layout] #modal[data-kit="true"] :is(.item-slot,.costume-item) :is(small,.grade-badge){font-size:calc(var(--gu)*.25)}
+}
+
+#stage #modal[data-kit="true"] .kit-footer{flex:none;border-top:1px solid #c3ad7170;padding-top:10px;margin-top:7px;background:#1e3944}
+#stage #modal[data-kit="true"] .kit-footer .pet-actions{display:flex;justify-content:flex-end;gap:12px;margin:0}
+#stage #modal[data-kit="true"] .kit-footer button{min-width:190px;min-height:44px}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"] .kit-footer{padding-top:calc(var(--gu)*.14);margin-top:calc(var(--gu)*.12)}
+ #stage #modal[data-kit="true"] .kit-footer .pet-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--gu)*.2)}
+ #stage #modal[data-kit="true"] .kit-footer button{min-width:0;min-height:var(--gu);margin:0}
+}

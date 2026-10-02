@@ -362,10 +362,11 @@
         $('modalTitle').textContent = title;
         $('modalEyebrow').textContent = eyebrow;
         $('modalContent').innerHTML = html;
+        $('modalContent').scrollTop = 0;
         window.DreamKit?.mount(kind, page => {
             // Return to the paused mode before routing; individual menus retain their own state.
             closeModal();
-            ({bag:()=>rpg.bag(),characterDetail:()=>rpg.details(),wardrobe:()=>world.wardrobe(),growth:()=>growthUI.open()})[page]?.();
+            ({bag:()=>rpg.bag(),characterDetail:()=>rpg.details(),wardrobe:()=>world.wardrobe(),growth:()=>growthUI.open(),pets:()=>rpg.pets()})[page]?.();
         });
         show('modal');
         $('modal').querySelector('.modal-card').scrollTop = 0;
@@ -1728,7 +1729,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.31.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.32.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
