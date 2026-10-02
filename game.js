@@ -402,7 +402,7 @@
         lastFocus?.focus?.({ preventScroll: true });
     }
     function help() {
-        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← → / A D'], ['이단 점프', 'Space → Space'], ['내려찍기', '공중에서 J'], ['사다리', '↑ ↓ / W S'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'J'], ['꿈빛 파동', 'K'], ['캐릭터 · 장비', 'C / Q'], ['대시', 'Shift / ←← · →→ / AA · DD'], ['대화 · 포털', 'E'], ['간식 먹기', 'H'], ['지도 · 수첩', 'M / N'], ['작은 꿈 친구들', 'P'], ['인벤토리', 'I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">공중에서 점프를 다시 누르면 한 번 더 뛰어요. 공중에서 정화 버튼이나 J를 누르면 아래로 내려찍어요. 대시로 내려찍기를 취소할 수도 있어요.<br>지상에서 정화 버튼이나 J를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→ 또는 A/D)를 빠르게 두 번 누르거나 Shift로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 I에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
+        openModal('help', '오늘 밤의 순찰 방법', '<div class="help-grid">' + [['이동', '← →'], ['이단 점프', 'Space → Space'], ['내려찍기', '공중에서 A'], ['사다리', '↑ ↓'], ['탐험 지도', 'L'], ['세계의 기록', 'V'], ['정화 공격', 'A'], ['선택 스킬', 'S'], ['캐릭터 · 장비', 'C'], ['대시', 'D / ←← · →→'], ['대화 · 포털', 'E'], ['간식 · 회복', 'Q'], ['지도 · 수첩', 'M / N'], ['작은 꿈 친구들', 'P'], ['가방', 'W / I'], ['공명 정화', 'F']].map(([a, b]) => `<div class="help-item"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '</div><div class="hint-block">공중에서 점프를 다시 누르면 한 번 더 뛰어요. 공중에서 정화 버튼이나 A를 누르면 아래로 내려찍어요. 대시로 내려찍기를 취소할 수도 있어요.<br>지상에서 정화 버튼이나 A를 짧게 눌렀다 놓으면 기본 공격, 길게 모았다 놓으면 강한 공격이 나가요. 반짝이는 신호에 놓으면 최대 위력! 점프·대시로 모으기를 취소할 수 있어요.<br>같은 방향키(←/→)를 빠르게 두 번 누르거나 D로 대시해요. 대시 버튼의 게이지가 가득 차면 다시 쓸 수 있어요. 기본 대기시간은 1.35초이며 ‘답장을 싣는 바람’ 부적으로 줄일 수 있어요.<br>반짝이는 발판 위에는 기억 조각이 숨어 있어요.<br>먼지대장의 바닥 예고를 보면 점프하거나 대시하세요.<br>정화하며 꿈빛 공명을 채우면 F로 기억의 힘을 펼쳐요.<br>가방 W에서 장비를 장착하고 도시락을 사용해보세요.<br>터치 화면에서는 왼손 스틱으로 이동하고 위아래로 사다리를 타요. 오른손으로 정화를 짧게 눌렀다 놓거나, 길게 모아 강한 공격을 쓸 수 있어요. 이동 중 점프·대시도 함께 사용할 수 있어요. 점프를 짧게 누르면 낮게, 길게 누르면 높이 뛰어요. 왼쪽 위 캐릭터 얼굴에서 장비와 동작별 착용 모습을 확인하고 옷장으로 이동할 수 있어요. 진행은 이 브라우저에 자동 저장됩니다.</div>');
     }
     function pause() {
         if (mode === 'modal') {
@@ -1067,11 +1067,11 @@
         if (player.attackBuffer > 0 && !player.chargeHeld) attack();
         if (state.map === 0 && player.x > 430 && !state.flags.walkHint) {
             state.flags.walkHint = true;
-            say(controls?.touch ? '점프를 공중에서 한 번 더 누르면 이단 점프! 공중에서 정화 버튼을 누르면 아래 적을 내려찍어.' : 'Space로 점프, 공중에서 한 번 더 누르면 이단 점프! 공중에서 J로 아래 적을 내려찍어.');
+            say(controls?.touch ? '점프를 공중에서 한 번 더 누르면 이단 점프! 공중에서 정화 버튼을 누르면 아래 적을 내려찍어.' : 'Space로 점프, 공중에서 한 번 더 누르면 이단 점프! 공중에서 A로 아래 적을 내려찍어.');
         }
         if (state.map === 1 && player.x > 460 && !state.flags.skillHint) {
             state.flags.skillHint = true;
-            say(controls?.touch ? '스킬 버튼으로 배운 힘을 사용해! 왼쪽 위 얼굴 → 꿈빛 성장에서 기술을 고를 수 있어.' : 'K는 선택 스킬, F는 공명 정화! C → 꿈빛 성장 또는 U로 새 기술을 배워보자.');
+            say(controls?.touch ? '스킬 버튼으로 배운 힘을 사용해! 왼쪽 위 얼굴 → 꿈빛 성장에서 기술을 고를 수 있어.' : 'S는 선택 스킬, F는 공명 정화! C → 꿈빛 성장 또는 U로 새 기술을 배워보자.');
         }
         if (state.map === 4 && !state.flags.bossIntroduced && player.x > 580) {
             state.flags.bossIntroduced = true;
@@ -1354,7 +1354,7 @@
         button.classList.toggle('dash-cooling', !ready);
         $('dashFill').style.transform = `scaleX(${progress})`;
         $('dashStatus').textContent = ready ? '준비' : (Math.ceil(remaining * 10) / 10).toFixed(1) + '초';
-        button.setAttribute('aria-label', `대시 · ${ready ? '준비 완료' : $('dashStatus').textContent + ' 후 사용 가능'} · Shift 또는 같은 방향키 두 번`);
+        button.setAttribute('aria-label', `대시 · ${ready ? '준비 완료' : $('dashStatus').textContent + ' 후 사용 가능'} · D 또는 같은 방향키 두 번`);
     }
     function updateHUD() {
         if (!state)
@@ -1537,9 +1537,9 @@
         }
         requestAnimationFrame(loop);
     }
-    const keyMap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyJ: 'attack', Space: 'jump' };
+    const keyMap = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', KeyA: 'attack', KeyJ: 'attack', Space: 'jump' };
     addEventListener('keydown', e => {
-        if (orientationBlocked) return;
+        if (orientationBlocked || e.ctrlKey || e.metaKey || e.altKey) return;
         if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) && !['Escape', 'Tab'].includes(e.code))
             return;
         const dialogueControl = mode === 'dialogue' && e.target.closest('button') && e.target.id !== 'dialogueNext';
@@ -1573,7 +1573,7 @@
                     retry();
                 return;
             }
-            if (e.code === 'Escape' || (e.code === 'KeyM' && modalKind === 'map') || (e.code === 'KeyN' && modalKind === 'journal') || (e.code === 'KeyI' && modalKind === 'bag') || (e.code === 'KeyP' && ['pets','petChoice','petHatch'].includes(modalKind)) || (['KeyC', 'KeyQ'].includes(e.code) && ['wardrobe', 'characterDetail'].includes(modalKind)))
+            if (e.code === 'Escape' || (e.code === 'KeyM' && modalKind === 'map') || (e.code === 'KeyN' && modalKind === 'journal') || (['KeyW','KeyI'].includes(e.code) && modalKind === 'bag') || (e.code === 'KeyP' && ['pets','petChoice','petHatch'].includes(modalKind)) || (e.code === 'KeyC' && ['wardrobe', 'characterDetail'].includes(modalKind)))
                 closeModal();
             return;
         }
@@ -1585,7 +1585,7 @@
             if (keyMap[e.code] !== 'attack')
                 autoWalk = false;
         }
-        const acts = { KeyJ: 'attackPress', Space: 'jump', ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyK: 'skill', KeyQ: 'wardrobe', KeyC: 'wardrobe', KeyP:'pets', KeyU:'growth' };
+        const acts = { KeyA: 'attackPress', KeyJ: 'attackPress', Space: 'jump', KeyD: 'dodge', ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyS: 'skill', KeyK: 'skill', KeyC: 'wardrobe', KeyP:'pets', KeyU:'growth' };
         if (acts[e.code])
             action(acts[e.code]);
         if (e.code === 'KeyE')
@@ -1600,9 +1600,9 @@
             journal('toggle');
         if (e.code === 'Escape')
             pause();
-        if (e.code === 'KeyH')
+        if (['KeyQ','KeyH'].includes(e.code))
             heal();
-        if (e.code === 'KeyI')
+        if (['KeyW','KeyI'].includes(e.code))
             rpg.bag('toggle');
         if (e.code === 'KeyF')
             action('burst');
@@ -1610,7 +1610,7 @@
     addEventListener('keyup', e => {
         if (keyMap[e.code])
             controls.keyUp(e.code);
-        if (e.code === 'KeyJ') releaseAttack();
+        if (['KeyA','KeyJ'].includes(e.code)) releaseAttack();
         if (player && ['up', 'down'].includes(keyMap[e.code]))
             player.climbLatch = false;
         if (e.code === 'Space') releaseJump();
@@ -1726,7 +1726,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.41.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.42.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
