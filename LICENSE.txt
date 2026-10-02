@@ -1,0 +1,22 @@
+Copyright © 2026 Aznail (김광석). All rights reserved.
+우리의 드리미 나이츠 — 저작권 및 이용 안내
+
+1. 적용 범위
+이 안내는 본 게임의 코드, 스토리, 화면 구성 및 시각·음향 자산 중 Aznail (김광석)이 적법하게 보유한 저작권의 범위에 적용됩니다. 공개 저장소에 게시되었다는 사실만으로 오픈소스 이용 허락을 부여하지 않습니다.
+
+2. 허용하는 이용
+공식 배포 주소에서 개인적으로 게임을 플레이하고 공식 링크를 다른 사람에게 공유할 수 있습니다. 플레이에 필요한 브라우저의 다운로드·임시 저장을 허용합니다.
+공식 주소: https://aznail1980-ctrl.github.io/dreamy-nights/
+
+3. 사전 허락이 필요한 이용
+권리자의 사전 허락 없는 게임 및 보호되는 구성 요소의 복제·재배포·변형 배포·별도 서버 운영·판매·상업적 이용을 금지합니다. 저작권 표시를 지우거나 바꾸어 자신이 제작한 것으로 사칭하지 마세요. 권리 침해가 확인되는 경우 게시 중단 요청 등 필요한 조치를 취할 수 있습니다.
+
+4. 예외 및 제3자 권리
+법령상 허용되는 이용, 이미 유효하게 부여된 이용 권한, GitHub 이용약관에 따라 허용되는 공개 저장소의 열람·포크 등 플랫폼 내 이용에는 해당 조건이 우선합니다. 이 예외가 게임의 별도 배포·판매 등에 대한 포괄적인 이용 허락을 뜻하지는 않습니다.
+외부 음악·효과음 등은 각 원작자의 권리와 별도 라이선스를 따릅니다. THIRD_PARTY_NOTICES.txt 및 각 자산의 CREDITS/LICENSE 파일을 확인하세요. 해당 라이선스가 허용하는 이용을 이 문구로 제한하지 않습니다.
+AI 도구로 제작된 부분의 보호 가능성과 범위는 사람의 창작적 기여와 적용 법령에 따라 달라질 수 있습니다. 본 표시는 법률상 보호되지 않는 요소에 새로운 독점권을 설정하지 않습니다.
+
+5. 표시의 의미
+이 표시는 권리 귀속 및 이용 범위 안내이며 저작권 등록증이나 모든 개별 자산의 권리 증명서를 대신하지 않습니다.
+
+English summary: Personal play on the official site and sharing its link are permitted, including browser downloads necessary for play. Other reproduction, redistribution, adaptation for distribution or commercial exploitation of protected first-party material requires prior permission. Applicable law, previously granted rights, GitHub Terms of Service and third-party licenses remain unaffected. No exclusive rights are claimed in unprotectable material.

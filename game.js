@@ -1,3 +1,4 @@
+/*! © 2026 Aznail (김광석). Protected first-party material; see LICENSE.txt. */
 'use strict';
 (() => {
     const C = window.DREAM_CONTENT, AIR = window.DREAM_AIR, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
@@ -409,7 +410,7 @@
         if (mode !== 'play')
             return;
         save();
-        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>게임 소리<small>휴대폰에서는 접속할 때 소리가 꺼져 있어요.</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
+        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>게임 소리<small>휴대폰에서는 접속할 때 소리가 꺼져 있어요.</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><a class="text-button audio-room-link" href="copyright.html" target="_blank" rel="noopener">© Aznail (김광석) · 저작권 안내 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
         $('soundSetting').checked = settings.sound;
         $('volumeSetting').value = settings.volume * 100;
         for(const k of ['musicVolume','effectsVolume','voiceVolume']){$(k+'Setting').value=settings[k]*100;$(k+'Setting').oninput=e=>{settings[k]=Number(e.target.value)/100;saveSettings();};}
@@ -1673,6 +1674,7 @@
     $('startButton').onclick = newGame;
     $('continueButton').onclick = () => start();
     $('titleHelp').onclick = help;
+    $('titleRights').onclick = () => openModal('rights', '꿈길을 만든 사람 · 이용 안내', window.DREAM_RIGHTS_HTML, 'OUR DREAMY NIGHTS');
     $('mapButton').onclick = openMap;
     $('journalButton').onclick = () => journal('toggle');
     $('questCard').onclick = () => journal('missions');
@@ -1722,7 +1724,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.38.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.39.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

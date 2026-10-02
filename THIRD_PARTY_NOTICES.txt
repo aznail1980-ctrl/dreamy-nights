@@ -1,0 +1,28 @@
+우리의 드리미 나이츠 — 외부 자산 및 제작 도구 안내
+
+게임 권리 표시: © 2026 Aznail (김광석). 적용 범위는 LICENSE.txt 참조.
+아래 원작자·별도 이용 조건을 유지하며 외부 자산을 Aznail의 단독 창작물로 표시하지 않습니다.
+
+음악: Scott Buckley — CC BY 4.0
+Childhood, Wanderlust, Echoes Of Home, The Long Way Home, Jade, Undertow,
+A Kind Of Hope, Celestial, Reverie, Moonlight.
+https://www.scottbuckley.com.au
+https://creativecommons.org/licenses/by/4.0/
+곡별 원본 링크·변경 사항: assets/audio-v426/CREDITS.txt
+인트로 Echoes Of Home 발췌·음량·페이드 편집: assets/intro/CREDITS.txt
+
+효과음: Kenney Impact Sounds / RPG Audio — CC0
+https://kenney.nl/assets/impact-sounds
+https://kenney.nl/assets/rpg-audio
+원문: assets/audio-v426/Kenney-impact-LICENSE.txt
+원문: assets/audio-v426/Kenney-rpg-LICENSE.txt
+
+몬스터 발성 원음: pauliuw — Some kind of beings sounds(7), CC0
+https://opengameart.org/content/some-kind-of-beings-sounds7
+https://creativecommons.org/publicdomain/zero/1.0/
+편집 내역: assets/audio-v426/CREDITS.txt, assets/audio-v427/CREDITS.txt
+게임용 합성 효과음 제작 내역: assets/audio-v429/CREDITS.txt
+
+이미지·영상·음성 일부 제작에는 AI 도구가 사용되었습니다.
+인트로 영상에는 Higgsfield로 제작한 영상이 포함됩니다. 도구 사용 사실은 모든 산출물의 독점 저작권 또는 개별 이용 조건 검토 완료를 뜻하지 않습니다.
+보호 범위는 사람의 창작적 기여, 원자료에 대한 권리 및 적용되는 조건에 따라 달라집니다. 개별 외부 자산의 기존 안내와 이용 조건을 존중합니다.
