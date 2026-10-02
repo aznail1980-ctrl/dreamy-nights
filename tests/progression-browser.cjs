@@ -10,12 +10,13 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results'),url='
  await open();assert.equal((await inspect()).state.growth.nodes.length,0);
  for(const branch of ['attack','guard','control']){
   if(branch!=='attack'){await p.locator('#growthReset').click();await p.locator('#growthConfirm').click();}
+  if(mobile&&await p.locator('#growthTreeBack').isVisible())await p.locator('#growthTreeBack').click();
   await p.locator('#growthTab-'+branch).click();
-  for(const stage of [1,2,3]){await p.locator('#growthNode-'+branch+stage).click();await p.locator('#growthLearn').click();}
+  for(const stage of [1,2,3]){if(mobile)await p.locator('#growthTreeBack').click();await p.locator('#growthNode-'+branch+stage).click();await p.locator('#growthLearn').click();}
   let v=await inspect();assert.equal(v.state.growth.active,branch);assert.equal(v.state.growth.nodes.length,3);assert(v.state.growth.passives.includes(branch));
   if(branch==='attack'){
    await p.screenshot({path:path.join(out,'progression-'+hero+(mobile?'-mobile':'-desktop')+'.png')});
-   const overflow=await p.evaluate(()=>[...document.querySelectorAll('.growth-screen,.growth-detail,.growth-node')].filter(e=>e.scrollWidth>e.clientWidth+2).map(e=>e.className));assert.deepEqual(overflow,[]);
+   const overflow=await p.evaluate(()=>[...document.querySelectorAll('.growth-screen,.st-detail,.st-node')].filter(e=>e.scrollWidth>e.clientWidth+2).map(e=>e.className));assert.deepEqual(overflow,[]);
    // Learning freezes the world, so opening menus never consumes skill timers.
    const before=await inspect();await step(90);assert.equal((await inspect()).player.x,before.player.x);
   }
