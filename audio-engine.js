@@ -9,6 +9,8 @@ window.DreamAudioEngine=class DreamAudioEngine{
         document.addEventListener('visibilitychange',()=>{this.hidden=document.hidden;if(this.hidden)this.silence();});
     }
     unlock(){
+        window.DREAM_SOUND_POLICY?.respectDeviceMute();
+        if(!this.settings.sound)return;
         try{
             if(!this.ctx){
                 this.ctx=new(window.AudioContext||window.webkitAudioContext)();
@@ -139,5 +141,5 @@ window.DreamAudioEngine=class DreamAudioEngine{
             if(d.audio.paused&&!d.playing&&this.ctx.currentTime>=this.nextRetry){d.playing=true;d.audio.play().catch(()=>{this.nextRetry=this.ctx.currentTime+2;}).finally(()=>d.playing=false);}
         }
     }
-    inspect(){return {theme:this.scoreTheme,tracks:this.decks.map(d=>({theme:d.theme,file:d.track.file,playing:!d.audio.paused,level:d.level,time:d.audio.currentTime,failed:d.failed})),buffers:this.buffers.size,clips:this.clips.size,ducked:!!this.ducked,musicLevel:this.musicLevel};}
+    inspect(){return {sound:!!this.settings.sound,policy:window.DREAM_SOUND_POLICY?.inspect(),theme:this.scoreTheme,tracks:this.decks.map(d=>({theme:d.theme,file:d.track.file,playing:!d.audio.paused,level:d.level,time:d.audio.currentTime,failed:d.failed})),buffers:this.buffers.size,clips:this.clips.size,ducked:!!this.ducked,musicLevel:this.musicLevel};}
 };

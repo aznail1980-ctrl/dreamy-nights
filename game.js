@@ -10,7 +10,7 @@
     let impacts = [];
     let toastTimer = 0, speechTimer = 0, splashTimer = 0, saveUnavailable = false, lastFocus = null, companion = { x: 100, y: GROUND }, pet = { x: 40, y: GROUND - 60 };
     const keys = new Set(), cooldowns = { attack: 0, skill: 0, tag: 0, dodge: 0 };
-    let dodgeCooldownDuration = 1.35;
+    let dodgeCooldownDuration = 1.35, menuBackdropDirty = true, lastDrawMode = null;
     const settings = { voice: true, sound: true, volume: .24, musicVolume:.55, effectsVolume:.85, voiceVolume:1, reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches, largeText: false };
     try {
         const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
@@ -25,6 +25,7 @@
     }
     catch {
     }
+    window.DREAM_SOUND_POLICY.initialize(settings);
     const audio = new window.DreamAudioEngine({settings,getScene:()=>({mode,theme:C.maps[state?.map||0].theme,hero:state?.active||'ari',clock,playerX:player?.x||0})});
     function defaultState() {
         const s = remaster.initialize(world.initialize(rpg.initialize({ version: 3, map: 0, x: 185, hp: 6, active: 'ari', xp: 0, light: 0, snacks: 3, killed: [], memories: [], claimed: [], visited: [0], flags: { introSeen: false, firstMemory: false, metLumen: false, bossIntroduced: false, completed: false, walkHint: false, skillHint: false, jumped: false, pomiRescue: false }, time: 0 })));
@@ -92,6 +93,15 @@
         }
         applySettings();
     }
+    function setSound(enabled) {
+        settings.sound=!!enabled;
+        window.DREAM_SOUND_POLICY.respectDeviceMute();
+        if(settings.sound)audio.unlock();
+        saveSettings();
+    }
+    document.addEventListener('visibilitychange',()=>{
+        if(document.hidden&&window.DREAM_SOUND_POLICY.mobile())setSound(false);
+    });
     function applySettings() {
         $('stage').classList.toggle('reduced-motion', settings.reducedMotion);
         $('stage').classList.toggle('large-text', settings.largeText);
@@ -102,8 +112,11 @@
             b.style.opacity = settings.sound ? '1' : '.55';
         });
         audio.volume();
+        if(!settings.sound)remaster?.stopVoice();
+        opening?.syncSound();
     }
     function fit() {
+        menuBackdropDirty=true;
         const padding = getComputedStyle(document.body);
         const coarse = matchMedia('(pointer:coarse)').matches;
         const safe = window.DREAM_MOBILE_SURFACE.insets();
@@ -349,7 +362,10 @@
     }
     function openModal(kind, title, html, eyebrow = 'DREAM KEEPER') {
         remaster?.stopVoice();
-        lastFocus = document.activeElement;
+        const wasOpen=!$('modal').classList.contains('hidden');
+        if(!wasOpen)lastFocus = document.activeElement;
+        $('modal').dataset.refresh=String(wasOpen);
+        menuBackdropDirty=true;
         if (mode !== 'modal')
             beforeModal = mode;
         modalKind = kind;
@@ -364,8 +380,9 @@
         $('modalContent').innerHTML = html;
         $('modalContent').scrollTop = 0;
         window.DreamKit?.mount(kind, page => {
-            // Return to the paused mode before routing; individual menus retain their own state.
-            closeModal();
+            // Route synchronously without hiding/reanimating the paused menu shell.
+            if(page===modalKind)return;
+            mode=beforeModal;
             ({bag:()=>rpg.bag(),characterDetail:()=>rpg.details(),wardrobe:()=>world.wardrobe(),growth:()=>growthUI.open(),pets:()=>rpg.pets()})[page]?.();
         });
         show('modal');
@@ -392,16 +409,14 @@
         if (mode !== 'play')
             return;
         save();
-        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>소리<small>맵별 배경음악 · 전투 효과음 · 인물 대사</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
+        openModal('pause', '잠깐, 별을 바라볼까요?', '<p>순찰은 여기서 잠시 쉬고 있어요. 준비되면 계속해요.</p><label class="settings-row"><span>게임 소리<small>휴대폰에서는 접속할 때 소리가 꺼져 있어요.</small></span><input type="checkbox" id="soundSetting"></label><div class="audio-levels"><label class="settings-row"><span>전체 음량</span><input type="range" id="volumeSetting" min="0" max="100" aria-label="소리 크기"></label><label class="settings-row"><span>배경음악</span><input type="range" id="musicVolumeSetting" min="0" max="100" aria-label="배경음악 음량"></label><label class="settings-row"><span>효과음</span><input type="range" id="effectsVolumeSetting" min="0" max="100" aria-label="효과음 음량"></label><label class="settings-row"><span>인물 대사</span><input type="range" id="voiceVolumeSetting" min="0" max="100" aria-label="인물 대사 음량"></label></div><a class="text-button audio-room-link" href="audio-room.html" target="_blank" rel="noopener">소리 감상실 · 음악 출처 ↗</a><label class="settings-row"><span>편안한 연출<small>화면 흔들림과 입자 움직임을 줄여요.</small></span><input type="checkbox" id="motionSetting"></label><label class="settings-row"><span>큰 글씨<small>대사와 수첩 글씨를 키워요.</small></span><input type="checkbox" id="textSetting"></label><div class="pause-actions"><button id="resume" class="primary">순찰 계속하기 →</button><button id="pauseHelp" class="secondary">조작 방법</button><button id="backTown" class="secondary">항구로 돌아가기</button><button id="backTitle" class="secondary">저장하고 타이틀로</button></div>');
         $('soundSetting').checked = settings.sound;
         $('volumeSetting').value = settings.volume * 100;
         for(const k of ['musicVolume','effectsVolume','voiceVolume']){$(k+'Setting').value=settings[k]*100;$(k+'Setting').oninput=e=>{settings[k]=Number(e.target.value)/100;saveSettings();};}
         $('motionSetting').checked = settings.reducedMotion;
         $('textSetting').checked = settings.largeText;
         $('soundSetting').onchange = e => {
-            settings.sound = e.target.checked;
-            audio.unlock();
-            saveSettings();
+            setSound(e.target.checked);
         };
         $('volumeSetting').oninput = e => {
             settings.volume = Number(e.target.value) / 100;
@@ -1403,6 +1418,12 @@
     }
     function tick(dt) {
         clock += dt;
+        if(mode==='modal'){
+            audio.update(dt);
+            if(modalKind==='cook')rpg.update(dt);
+            if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)show('toast',false);}
+            return;
+        }
         if (mode === 'dialogue') conversation.update(dt);
         if(mode==='play'||mode==='dialogue')for(const e of enemies)window.DREAM_PURIFICATION.tick(e,dt);
         if (mode === 'play') {
@@ -1507,7 +1528,10 @@
         if (orientationBlocked) { requestAnimationFrame(loop); return; }
         tick(dt);
         lobby?.update(dt,mode,modalKind);
-        renderer.draw({ state, player, enemies, particles, texts, waves, rings, camera, cameraY, clock, companion, pet, mode, shake, transition, settings, rpgInfo: rpg.view(), impacts, gateOpen: world.gateOpen });
+        if(mode!=='modal'||menuBackdropDirty||lastDrawMode!==mode){
+            renderer.draw({ state, player, enemies, particles, texts, waves, rings, camera, cameraY, clock, companion, pet, mode, shake, transition, settings, rpgInfo: rpg.view(), impacts, gateOpen: world.gateOpen });
+            menuBackdropDirty=false;lastDrawMode=mode;
+        }
         requestAnimationFrame(loop);
     }
     const keyMap = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyJ: 'attack', Space: 'jump' };
@@ -1683,11 +1707,7 @@
     };
     $('endingTitle').onclick = toTitle;
     document.querySelectorAll('.sound-toggle').forEach(b => b.onclick = () => {
-        settings.sound = !settings.sound;
-        if (!settings.sound)
-            remaster.stopVoice();
-        audio.unlock();
-        saveSettings();
+        setSound(!settings.sound);
     });
     document.querySelectorAll('.fullscreen').forEach(b => b.onclick = async () => {
         try {
@@ -1702,9 +1722,9 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.37.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.38.0' });
     opening = window.createDreamOpening({
-        mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
+        mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
         onClose() { toTitle(); $('startButton').focus({preventScroll:true}); }
     });

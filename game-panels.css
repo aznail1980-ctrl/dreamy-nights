@@ -191,3 +191,12 @@
  #stage #modal[data-kit="true"] .kit-footer .pet-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--gu)*.2)}
  #stage #modal[data-kit="true"] .kit-footer button{min-width:0;min-height:var(--gu);margin:0}
 }
+
+/* v4.38: keep the menu shell steady during tab/item changes. */
+#stage #modal[data-kit="true"][data-refresh="true"] .modal-card{animation:none}
+#stage #modal[data-kit="true"] button.is-touch-pressed{filter:brightness(1.22);box-shadow:inset 0 0 0 2px #ffe7aa!important}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"]{backdrop-filter:none;-webkit-backdrop-filter:none;background:#071520c9}
+ #stage #modal[data-kit="true"] .modal-card{animation:none}
+ #stage #modal[data-kit="true"] :is(button,summary,a){touch-action:manipulation;transition:background-color .06s,border-color .06s; -webkit-tap-highlight-color:transparent}
+}

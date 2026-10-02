@@ -1,5 +1,5 @@
 'use strict';
-window.createDreamOpening = function ({mount, source, poster, settings, onOpen, onClose}) {
+window.createDreamOpening = function ({mount, source, poster, settings, setSound, onOpen, onClose}) {
     const KEY = 'dreamy-nights-opening-v1';
     let orientationSuspended = false;
     let active = false, played = false, seen = false, loadTimer = 0, previousFocus;
@@ -18,11 +18,17 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
     const paint=(node,label,icon,caption='')=>{if(window.DREAM_LOBBY_UI)DREAM_LOBBY_UI.button(node,label,icon,caption);else if(node.querySelector('b'))node.querySelector('b').textContent=label;else node.textContent=label;};
     paint(play,'꿈의 문 열기','play','첫 번째 밤의 프롤로그');
     paint(skip,'건너뛰기','skip');
+    video.defaultMuted=true;video.muted=true;
     video.poster = poster;
     mount.append(root);
     function updateSound() {
         paint(sound,video.muted?'소리 켜기':'소리 끄기',video.muted?'mute':'sound');
         sound.setAttribute('aria-pressed', String(!video.muted));
+    }
+    function syncSound(){
+        video.muted=!settings.sound;
+        video.volume=Math.min(1,Math.max(0,settings.volume*2*(settings.musicVolume??.55)));
+        updateSound();
     }
     function stopTimer() { clearTimeout(loadTimer); loadTimer = 0; }
     function recordSeen() {
@@ -87,8 +93,8 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
         play.querySelector('b').textContent = '꿈의 문 열기';
         caption.textContent = '';
         play.disabled = false; pause.hidden = true;
-        video.muted = !settings.sound;
-        video.volume = Math.min(1, Math.max(0, settings.volume * 2 * (settings.musicVolume ?? .55)));
+        window.DREAM_SOUND_POLICY?.respectDeviceMute();
+        syncSound();
         if (video.readyState) video.currentTime = 0;
         updateSound();
         onOpen();
@@ -101,7 +107,7 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
         if (video.paused) startVideo();
         else { video.pause(); paint(pause,'계속 보기','play'); }
     };
-    sound.onclick = () => { video.muted = !video.muted; updateSound(); };
+    sound.onclick = () => { if(setSound)setSound(!settings.sound);else settings.sound=!settings.sound;window.DREAM_SOUND_POLICY?.respectDeviceMute();syncSound(); };
     video.onended = () => close();
     video.onerror = mediaError;
     video.onwaiting = () => { if (active && played && !orientationSuspended) { stopTimer(); loadTimer = setTimeout(mediaError, 15000); } };
@@ -124,5 +130,5 @@ window.createDreamOpening = function ({mount, source, poster, settings, onOpen, 
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && active && played && !video.paused) { video.pause(); paint(pause,'계속 보기','play'); }
     });
-    return {setOrientationBlocked(blocked){orientationSuspended=blocked;if(blocked){video.pause();stopTimer();paint(pause,'계속 보기','play');}}, open, maybeShow: () => !seen && open(), close, inspect: () => ({active, seen, played, paused:video.paused, error:root.classList.contains('has-error')})};
+    return {syncSound,setOrientationBlocked(blocked){orientationSuspended=blocked;if(blocked){video.pause();stopTimer();paint(pause,'계속 보기','play');}}, open, maybeShow: () => !seen && open(), close, inspect: () => ({active, seen, played, paused:video.paused, muted:video.muted, error:root.classList.contains('has-error')})};
 };
