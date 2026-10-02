@@ -67,3 +67,11 @@
  #stage .modal-card,#stage .dialogue-card,#stage .hero-story{overscroll-behavior:none;touch-action:pan-y}
  #stage input:not([type="range"]):not([type="checkbox"]),#stage textarea{font-size:max(16px,calc(var(--u)*.37))}
 }
+
+/* Declare on the actual tap surfaces as well as the root: iOS overlays and
+   transformed game layers must not acquire a separate double-tap zoom gesture. */
+@media(pointer:coarse){
+ body,#shell,#stage,#rotateGate,#loading,#opening{touch-action:manipulation}
+ button,a,summary,[role="button"],input,textarea,select{touch-action:manipulation}
+ #world,#hud,#moveStick,[data-action],[data-hold]{touch-action:none}
+}
