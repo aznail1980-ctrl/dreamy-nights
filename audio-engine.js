@@ -96,7 +96,7 @@ window.DreamAudioEngine=class DreamAudioEngine{
         if(subject)this.enemy(subject);
         if(kind==='step'){const floor=['town','alley','boss','archive'].includes(scene.theme)?'wood':['trail','garden'].includes(scene.theme)?'grass':'concrete';this.play(this.variant('step-'+floor,2),{gain:.12});return;}
         if(kind==='attack'){this.combatSwing({kind:'basic',hero:scene.hero==='popo'?'popo':'ari'});return;}
-        const actions={jump:['jump',.35],dodge:['dodge',.36],hurt:['hurt',.48],chargeReady:['ready',.38],chargeRelease:['skill',.65],skill:['skill',.65],playerGuard:['guard',.48],playerControl:['control',.48],playerBurst:['burst',.7],purify:['purify',.34]};
+        const actions={jump:['jump',.29],doubleJump:['doubleJump',.30],dodge:['dodge',.36],hurt:['hurt',.48],chargeReady:['ready',.38],chargeRelease:['skill',.65],skill:['skill',.65],playerGuard:['guard',.48],playerControl:['control',.48],playerBurst:['burst',.7],purify:['purify',.34]};
         if(actions[kind]){const [clip,gain]=actions[kind];this.play('action-'+clip+'-'+(scene.hero==='popo'?'popo':'ari'),{gain});return;}
         const map={
             jump:['cloth',.33,1.15],dodge:['swish-1',.57,1.3],hurt:['hit-soft-1',.6,.97],hit:['hit-soft-0',.7,1],

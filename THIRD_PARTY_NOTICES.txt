@@ -22,6 +22,7 @@ https://opengameart.org/content/some-kind-of-beings-sounds7
 https://creativecommons.org/publicdomain/zero/1.0/
 편집 내역: assets/audio-v426/CREDITS.txt, assets/audio-v427/CREDITS.txt
 게임용 합성 효과음 제작 내역: assets/audio-v429/CREDITS.txt
+점프·이단 점프 전용 합성 효과음: assets/audio-v440/CREDITS.txt
 
 이미지·영상·음성 일부 제작에는 AI 도구가 사용되었습니다.
 인트로 영상에는 Higgsfield로 제작한 영상이 포함됩니다. 도구 사용 사실은 모든 산출물의 독점 저작권 또는 개별 이용 조건 검토 완료를 뜻하지 않습니다.

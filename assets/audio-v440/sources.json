@@ -1,0 +1,34 @@
+{
+  "action-jump-ari": {
+    "file": "assets/audio-v440/action-jump-ari.wav",
+    "seconds": 0.185,
+    "design": "soft continuous rising breath whistle; no impact percussion",
+    "peak": 0.52,
+    "hero": "ari",
+    "airJump": false
+  },
+  "action-doubleJump-ari": {
+    "file": "assets/audio-v440/action-doubleJump-ari.wav",
+    "seconds": 0.225,
+    "design": "soft continuous rising breath whistle; no impact percussion",
+    "peak": 0.52,
+    "hero": "ari",
+    "airJump": true
+  },
+  "action-jump-popo": {
+    "file": "assets/audio-v440/action-jump-popo.wav",
+    "seconds": 0.185,
+    "design": "soft continuous rising breath whistle; no impact percussion",
+    "peak": 0.52,
+    "hero": "popo",
+    "airJump": false
+  },
+  "action-doubleJump-popo": {
+    "file": "assets/audio-v440/action-doubleJump-popo.wav",
+    "seconds": 0.225,
+    "design": "soft continuous rising breath whistle; no impact percussion",
+    "peak": 0.52,
+    "hero": "popo",
+    "airJump": true
+  }
+}

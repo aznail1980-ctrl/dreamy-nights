@@ -1043,7 +1043,7 @@
             const jump = AIR.jump(player);
             if (jump) {
                 companion.jumpDelay = .14;
-                audio.sfx('jump');
+                audio.sfx(jump === 'air' ? 'doubleJump' : 'jump');
                 spark(player.x, player.y, jump === 'air' ? 16 : 8, '#fff1d3', jump === 'air' ? 140 : 80);
                 if (jump === 'air') ring(player.x, player.y + 4, 57, '#cceeea');
                 state.flags.jumped = true;
@@ -1724,7 +1724,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.39.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.40.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

@@ -28,7 +28,7 @@ Object.assign(DREAM_AUDIO_ASSETS.effects,{
     "file": "assets/audio-v429/swing-charged-ari.wav"
   },
   "action-jump-ari": {
-    "file": "assets/audio-v429/action-jump-ari.wav"
+    "file": "assets/audio-v440/action-jump-ari.wav"
   },
   "action-dodge-ari": {
     "file": "assets/audio-v429/action-dodge-ari.wav"
@@ -82,7 +82,7 @@ Object.assign(DREAM_AUDIO_ASSETS.effects,{
     "file": "assets/audio-v429/swing-charged-popo.wav"
   },
   "action-jump-popo": {
-    "file": "assets/audio-v429/action-jump-popo.wav"
+    "file": "assets/audio-v440/action-jump-popo.wav"
   },
   "action-dodge-popo": {
     "file": "assets/audio-v429/action-dodge-popo.wav"
@@ -125,5 +125,11 @@ Object.assign(DREAM_AUDIO_ASSETS.effects,{
   },
   "swish-1": {
     "file": "assets/audio-v429/swish-1.wav"
+  },
+  "action-doubleJump-ari": {
+    "file": "assets/audio-v440/action-doubleJump-ari.wav"
+  },
+  "action-doubleJump-popo": {
+    "file": "assets/audio-v440/action-doubleJump-popo.wav"
   }
 });
