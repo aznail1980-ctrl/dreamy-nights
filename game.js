@@ -549,12 +549,13 @@
         updateHUD();
     }
     function defeat(e) {
+        if(e.dead)return;
         e.dead = true;
-        e.fade = .55;
+        const revealDelay=window.DREAM_PURIFICATION.begin(e);
         if (!state.killed.includes(e.id))
             if (!e.wild)
                 state.killed.push(e.id);
-        rpg.rewardKill(e);
+        rpg.rewardKill(e,revealDelay);
         const c = C.creatures[e.type], oldLevel = level();
         window.DREAM_PROGRESS.gain(state, c.exp);
         state.light += c.light;
@@ -1120,11 +1121,12 @@
         e.hurt = Math.max(0, e.hurt - dt);
         e.stun = Math.max(0, e.stun - dt);
         if (e.dead) {
-            e.fade = Math.max(0, e.fade - dt);
             if (e.wild) {
                 e.respawn = (e.respawn ?? 28) - dt;
                 if (e.respawn <= 0 && Math.abs(e.x - player.x) > 700) {
                     e.dead = false;
+                    delete e.purification;
+                    e.fade=0;
                     e.hp = e.max;
                     e.x = e.home;
                     e.y = e.floorY;
@@ -1402,6 +1404,7 @@
     function tick(dt) {
         clock += dt;
         if (mode === 'dialogue') conversation.update(dt);
+        if(mode==='play'||mode==='dialogue')for(const e of enemies)window.DREAM_PURIFICATION.tick(e,dt);
         if (mode === 'play') {
             for (const v of impacts)
                 v.life -= dt;
@@ -1699,7 +1702,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.35.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.36.0' });
     opening = window.createDreamOpening({
         mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

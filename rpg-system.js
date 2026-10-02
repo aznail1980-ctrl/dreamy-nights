@@ -5,13 +5,14 @@ window.createDreamRPG = function (api) {
     const labels = { equipment: '장비', supply: '소모품', material: '재료', story: '이야기', costume: '꾸미기' }, slots = { weapon: '정화 도구', charm: '가슴 장식', keepsake: '기억 부적' };
     const extraFlags = ['cookedFirst', 'letterRead', 'readyForBoss', 'journalReturned', 'herbsDelivered', 'replyDelivered', 'beaconsRewarded', 'metBaker', 'metPost', 'bakerGift', 'bossRecovered', 'ovenInvitationRead', 'ovenParcelPacked', 'ovenRouteReady'];
     let selectedGearUid = '', bagSlot = 'all', bagMessage = '', bagUpgradeOpen = false;
-    let selection = 'baton', bagTab = 'equipment', bagGrade = 'all', mini = null, loot = [], comboTime = 0, combo = 0;
+    let selection = 'baton', bagTab = 'equipment', bagGrade = 'all', mini = null, loot = [], lootNotices = [], comboTime = 0, combo = 0;
     const state = () => api.state, own = id => state()?.rpg.inventory[id] || 0;
     const regionUI=window.createDreamRegionUI({C,api,state,own,add,take,icon,bag});
     const equipmentUI=window.createDreamEquipmentUI({C,api,state,stats,icon,bag});
     const gearUI=window.createDreamGearUI({C,G,api,state,icon,bag,details:equipmentUI.details});
     const petUI=window.createDreamPetUI({api,state,own,take,details:equipmentUI.details});
     function initialize(s) {
+        loot=[];lootNotices=[];
         extraFlags.forEach(f => s.flags[f] = false);
         s.version = 2;
         s.rpg = { inventory: { baton: 1, rookieBadge: 1, cookie: 3 }, equipment: { weapon: 'baton', charm: 'rookieBadge', keepsake: null }, accepted: [], gathered: [], opened: [], beacons: [], resonance: 0, protection: 0, stats: { hits: 0, bestCombo: 0, perfectDodges: 0, cooked: 0 } };
@@ -234,18 +235,24 @@ window.createDreamRPG = function (api) {
         if(s.pets.egg?.warmth>=8&&!wasReady)api.toast('알이 움직여요! 캐릭터 수첩 → 작은 꿈 친구들에서 만나봐요. · P',4);
         else if(pet&&!wasGrown&&DREAM_PETS.grown(pet))api.toast(pet.name+'이 어른 모습으로 자랐어요! · P',4);
     }
-    function rewardKill(enemy) {
+    function rewardKill(enemy, revealDelay = 0) {
+        revealDelay=Math.max(0,Math.min(3,Number(revealDelay)||0));
         petProgress('enemy',enemy.id);
         const rewards = C.rollDrops(enemy, state().map);
         for (const [id, n] of rewards) {
             add(id, n, false);
-            loot.push({ grade: C.items[id].grade, id, count: n, icon: C.items[id].icon, name: C.items[id].name, x: enemy.x + (rewards.findIndex(v => v[0] === id) - (rewards.length - 1) / 2) * 64, y: enemy.y - 60, originY: enemy.y - 60, age: 0, duration: 2.7 });
+            loot.push({ grade: C.items[id].grade, id, count: n, icon: C.items[id].icon, name: C.items[id].name, x: enemy.x + (rewards.findIndex(v => v[0] === id) - (rewards.length - 1) / 2) * 64, y: enemy.y - 60, originY: enemy.y - 60, age: -revealDelay, map:state().map, duration: 2.7 });
         }
         if (!rewards.length)
             return;
-        api.sound(rewards.some(([id]) => C.items[id].grade === 'unique') ? 'clear' : 'loot');
-        api.spark(enemy.x, enemy.y - 45, 40, '#fff0b1', 280);
-        api.toast(rewards.map(([id, n]) => C.items[id].name + ' +' + n).join(' · '), 2.2);
+        const notice={map:state().map,x:enemy.x,y:enemy.y,delay:revealDelay,rewards};
+        if(revealDelay>0)lootNotices.push(notice);else revealLoot(notice);
+    }
+    function revealLoot(notice){
+        if(notice.map!==state().map)return;
+        api.sound(notice.rewards.some(([id]) => C.items[id].grade === 'unique') ? 'clear' : 'loot');
+        api.spark(notice.x,notice.y-45,40,'#fff0b1',280);
+        if(api.mode==='play')api.toast(notice.rewards.map(([id,n])=>C.items[id].name+' +'+n).join(' · '),2.2);
     }
     function gainResonance(n) {
         state().rpg.resonance = clamp(state().rpg.resonance + n * (1 + stats().resonance), 0, 100);
@@ -702,8 +709,16 @@ window.createDreamRPG = function (api) {
             comboTime -= dt;
             if (comboTime <= 0)
                 combo = 0;
+        }
+        // Inventory was granted at impact. Only this disposable presentation waits for purification.
+        if(api.mode==='play'||api.mode==='dialogue'){
+            loot=loot.filter(l=>l.map===state().map);
+            lootNotices=lootNotices.filter(n=>n.map===state().map);
+            for(const n of lootNotices){n.delay-=dt;if(n.delay<=0)revealLoot(n);}
+            lootNotices=lootNotices.filter(n=>n.delay>0);
             for (const l of loot) {
                 l.age += dt;
+                if(l.age<0)continue;
                 if (l.age < .5)
                     l.y -= dt * 130;
                 else if (l.age > 1.65) {
@@ -737,7 +752,7 @@ window.createDreamRPG = function (api) {
         return false;
     }
     function view() {
-        return { loot, combo: comboTime > 0 ? combo : 0, npcMarks: Object.fromEntries(Object.keys(C.npcs).map(id => [id, npcMark(id)])) };
+        return { loot:loot.filter(l=>l.age>=0&&l.map===state().map), combo: comboTime > 0 ? combo : 0, npcMarks: Object.fromEntries(Object.keys(C.npcs).map(id => [id, npcMark(id)])) };
     }
     return { pets:petUI.open, petProgress, gearWorkshop: gearUI.open, details: equipmentUI.details, initialize, migrate, stats, add, take, own, bag, use, quickHeal, icon, rewardKill, gainResonance, hit, perfectDodge, absorb, teamBurst, objective, nearest, handleInteraction, recoverJournal, sideHTML, update, key, view, npc, ritual };
 };
