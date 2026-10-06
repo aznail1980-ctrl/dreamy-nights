@@ -47,7 +47,7 @@
         const a=DREAM_LOBBY_ART[id],b=a.frames[pose.frame],pivot=a.pivots[pose.frame],ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
         ctx.clearRect(0,0,w,h);
         // Planted feet are the pivot: no floating cutout or weapon clipping at frame changes.
-        const sc=Math.min((w-50)/Math.max(...a.frames.map(x=>x[2])),(h-50)/b[3]);
+        const sc=Math.min((w-50)/Math.max(...a.frames.map(x=>x[2])),(h-50)/(a.referenceHeight||Math.max(...a.frames.map(x=>x[3]))));
         ctx.save();ctx.translate(w*.46+parallax,h-24);ctx.rotate(pose.lean);ctx.scale(1,pose.breath);
         ctx.drawImage(image,...b,(b[0]-pivot[0])*sc,(b[1]-pivot[1])*sc+pose.offset,b[2]*sc,b[3]*sc);ctx.restore();
     }
