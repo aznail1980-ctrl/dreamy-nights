@@ -1,0 +1,3 @@
+'use strict';
+window.DREAM_BOSS_ART={"boss": {"key": "bossLeap_dust", "file": "assets/boss-dust-leap.png", "height": 315, "frames": [[71, 155, 736, 383], [865, 14, 594, 536], [36, 615, 779, 377], [836, 590, 670, 403]], "pivots": [[439.0, 538], [1162.0, 550], [425.5, 992], [1171.0, 993]], "scale": 0.5876865671641791}, "underbakedGhost": {"key": "bossLeap_dough", "file": "assets/boss-dough-leap.png", "height": 280, "frames": [[178, 157, 502, 355], [889, 17, 419, 553], [98, 607, 752, 378], [885, 586, 517, 404]], "pivots": [[429.0, 512], [1098.5, 570], [474.0, 985], [1143.5, 990]], "scale": 0.5063291139240507}};
+for(const [id,s]of Object.entries(DREAM_BOSS_ART)){if(id==='boss'||window.DREAM_WORLD2_CONTENT)DREAM_ART_V49.files[s.key]=s.file;}

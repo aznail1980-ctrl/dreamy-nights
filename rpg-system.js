@@ -115,6 +115,8 @@ window.createDreamRPG = function (api) {
         return true;
     }
     function icon(kind, size = 34) {
+        const chapterIcon=window.DREAM_W2_ITEMS?.icon(kind,size);
+        if(chapterIcon)return chapterIcon;
         const weaponIcon=window.DREAM_EQUIPMENT.icon(kind,state()?.active||'ari',size);
         if(weaponIcon)return weaponIcon;
         const regionIndex=C.regionIcons?.[kind];
@@ -125,7 +127,7 @@ window.createDreamRPG = function (api) {
         const wearable = window.DREAM_WEAR.icons[kind];
         if (wearable) {
             const asset = window.DREAM_WEAR.items[wearable].asset, spec = window.DREAM_WEAR.assets[asset], b = spec.frames[1];
-            return `<svg class="item-art" width="${size}" height="${size}" viewBox="${b.join(' ')}" aria-hidden="true"><image href="assets/${asset}.webp" width="${spec.size[0]}" height="${spec.size[1]}"/></svg>`;
+            return `<svg class="item-art" width="${size}" height="${size}" viewBox="${b.join(' ')}" aria-hidden="true"><image href="${window.DREAM_ART_V49.files[asset] || `assets/${asset}.webp`}" width="${spec.size[0]}" height="${spec.size[1]}"/></svg>`;
         }
         const aliases = { star: 'dust', wing: 'cape' };
         kind = aliases[kind] || kind;
@@ -156,6 +158,7 @@ window.createDreamRPG = function (api) {
         $('bagGrade').onchange=e=>{bagMessage='';bagUpgradeOpen=false;bag(tab,null,e.target.value);};
         if($('bagSlot'))$('bagSlot').onchange=e=>{bagMessage='';bagUpgradeOpen=false;bag(tab,null,grade,e.target.value);};
         $('bagDetails').onclick=equipmentUI.details;
+        if($('bagReturnCharacter'))$('bagReturnCharacter').onclick=equipmentUI.details;
         $('gearWorkshop').onclick=()=>gearUI.open(chosen?.uid,'dismantle');
         $('dropGuide').onclick=dropGuide;$('regionGuide').onclick=regionUI.guide;
         if($('materialRecipes'))$('materialRecipes').onclick=regionUI.workshop;
@@ -426,7 +429,7 @@ window.createDreamRPG = function (api) {
                 s.flags[step.flag]=true;
                 if(!own(step.item))add(step.item,1,false);
                 api.save();api.refresh();
-                api.say(C.chapterBridge.next(s)?.label||'출항 준비 완료! 다음 세계가 열리기 전까지 남은 기억을 찾아보자.');
+                api.say(C.chapterBridge.next(s)?.label||'출항 준비 완료! 잠의 항구 왼쪽 몽글 항로 포털에서 출발하자.');
             });
             return;
         }

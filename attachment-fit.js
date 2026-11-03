@@ -56,5 +56,17 @@ window.DREAM_ATTACHMENTS = (() => {
         }
         return {head,bow,scale,angle,back,lean,view:rear?2:0};
     }
-    return {fit,point,motion,scalp};
+    // Back accessories keep the body's facing view. Action names are not camera views.
+    function backFit(pose,id,swing=0){
+        const fitted=fit(pose),rear=pose.kind==='climb',neck=pose.pins.neck;
+        const hanging=id==='lampPack';
+        if(id==='nightCape'){
+            const sweep=rear?0:pose.kind==='dash'?1.25:pose.source==='charge'?(pose.frame>=3&&pose.frame<=4?1.08:.8):pose.kind==='attack'?1.05:pose.kind==='run'?1:pose.kind==='jump'?.85:pose.kind==='walk'?.3:.12;
+            return {x:neck[0]-1,y:neck[1]+3,view:rear?2:0,size:pose.who==='ari'?.88:1,angle:sweep+swing};
+        }
+        const x=fitted.back?fitted.back[0]-(hanging?3:0):rear?neck[0]:neck[0]-(hanging?28:24);
+        const y=fitted.back?fitted.back[1]:neck[1]+(rear?12:9);
+        return {x,y,view:id==='mailBag'?(rear?1:0):0,size:rear?.95:1,angle:swing+fitted.lean*.25};
+    }
+    return {fit,point,motion,scalp,backFit};
 })();

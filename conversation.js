@@ -7,7 +7,7 @@ window.createDreamConversation = function ({settings, images}) {
         if (!current) return;
         const next = expressions.choose(cues, shown);
         if (next === expression) return;
-        const visible = expressions.draw(portraitCanvas, current.who, next, images);
+        const visible = expressions.draw(portraitCanvas, current.expressionWho || current.who, next, images);
         portraitCanvas.classList.toggle('hidden', !visible);
         $('dialoguePortrait').classList.toggle('hidden', visible || !current.portrait);
         root.dataset.expression = visible ? next : '';
@@ -34,8 +34,8 @@ window.createDreamConversation = function ({settings, images}) {
         $('dialogueInk').textContent = letters.join('');
         updateButton();
     }
-    function render({who, name, portrait, line, index, total, active, key}) {
-        current = {who, line, index, total, key, portrait, expression:null};
+    function render({who, name, portrait, line, index, total, active, key, expressionWho}) {
+        current = {who, line, index, total, key, portrait, expressionWho, expression:null};
         cues = expressions.timeline(key, index, line);
         expression = '';
         portraitCanvas.classList.add('hidden');

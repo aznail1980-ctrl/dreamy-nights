@@ -38,7 +38,7 @@
  for(const [id,name,icon,lore,effect] of [
   ['ovenInvitation','버터 향이 남은 초대장','letter','“예쁘게 굽지 못해도 다시 와 주세요.” 마들렌이 오래 접어 둔 제과 대회 초대장. 등대가 켜진 밤에 다시 펼쳤다.','뒤뚱과 몽글 오븐 마을의 주소 확인'],
   ['ovenParcel','다시 굽는 약속 꾸러미','lunch','빈 레시피 쪽지와 초대장을 한데 묶었다. 완벽한 빵보다 다시 구워 볼 용기를 가져가려 한다.','루멘에게 보여주고 다음 항로 준비'],
-  ['ovenPass','몽글 항로 준비표','compass','바다와 바람의 신호, 귀항 길과 순찰 도시락을 확인한 기록. 다음 밤의 항해를 기다린다.','출항 준비 완료 · 다음 세계는 아직 개방 전']
+  ['ovenPass','몽글 항로 준비표','compass','바다와 바람의 신호, 귀항 길과 순찰 도시락을 확인한 기록. 다음 밤의 항해를 기다린다.','출항 준비 완료 · 잠의 항구 왼쪽 몽글 항로로 이동']
  ])C.items[id]={name,icon,lore,effect,type:'story',rarity:'이야기',grade:'common'};
  Object.assign(C.dialogue,{
   ovenInvitation:[['madeleine','등대가 다시 켜지니, 접어 둔 이 초대장도 읽어 볼 마음이 생기는구나.\n몽글 오븐 마을에서 열린 제과 대회 초대장이란다.'],['madeleine','한 번 빵을 태운 뒤로 다시 가는 게 두려웠어.\n그런데 오늘 너희를 보니, 서툰 시작도 버릴 필요는 없겠더구나.'],['ari','다시 구워 보면 되죠. 그 마음을 함께 가져갈게요.'],['madeleine','고맙구나. 초대장 뒷면의 글씨가 번졌으니, 뒤뚱에게 주소를 확인해 주겠니?']],
@@ -51,7 +51,7 @@
 DREAM_CONTENT.chapterBridge.journal=function(s){
  if(!s.flags.completed)return '';
  const done=s.flags.ovenRouteReady;
- return `<section class="departure-journal"><span>첫 번째 밤 이후</span><h3>${done?'몽글 항로 · 출항 준비 완료':'다음 밤을 준비하는 마음'}</h3><p>등대를 밝힌 용기가 마들렌에게도 닿았어요. 오래 접어 둔 제과 대회 초대장을 함께 펼쳐요.</p><ol>${this.steps.map(step=>`<li class="${s.flags[step.flag]?'done':''}">${s.flags[step.flag]?'✓':'○'} ${step.label}</li>`).join('')}</ol><small>현재는 출항 준비 이야기까지 플레이할 수 있어요. 몽글 오븐 마을의 실제 맵과 전투는 아직 개방 전이에요.</small></section>`;
+ return `<section class="departure-journal"><span>첫 번째 밤 이후</span><h3>${done?'몽글 항로 · 출항 준비 완료':'다음 밤을 준비하는 마음'}</h3><p>등대를 밝힌 용기가 마들렌에게도 닿았어요. 오래 접어 둔 제과 대회 초대장을 함께 펼쳐요.</p><ol>${this.steps.map(step=>`<li class="${s.flags[step.flag]?'done':''}">${s.flags[step.flag]?'✓':'○'} ${step.label}</li>`).join('')}</ol><small>준비를 마치면 잠의 항구 왼쪽 몽글 항로 포털에서 출항해요. 몽글 선착장 왼쪽 포털로 돌아올 수 있어요.</small></section>`;
 };
 // Follow authored platforms through ladder connections, including a descent around a gap.
 DREAM_CONTENT.nextRouteLadder=function(map,player,target){

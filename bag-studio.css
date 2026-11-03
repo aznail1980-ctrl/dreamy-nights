@@ -1,0 +1,38 @@
+/* Illustrated equipment desk. Item art is shared with drops and equipped previews. */
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-character{border-radius:14px 4px;background:linear-gradient(#24464d,#183641);padding:12px}
+#stage #modal[data-kit="true"][data-kind="bag"] .paper-doll{background:url('assets/keeper-preparation-room.png') center/100% 100%;border:1px solid #bd9f6666;border-radius:45px 45px 6px 6px;height:205px;margin-top:9px;display:flex;justify-content:center;align-items:flex-end;overflow:hidden}
+#stage #modal[data-kit="true"][data-kind="bag"] .paper-doll canvas{margin:0;width:165px;height:180px;object-fit:contain}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-wearing button{border:1px solid #bda36a;border-radius:8px 3px;background:linear-gradient(#385b60,#203e4c);box-shadow:inset 0 0 0 2px #142e3a,inset 0 0 0 3px #d8bd7830}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-slot{--rarity:#9ed3b9;border:1px solid var(--rarity);border-radius:12px 3px;background:radial-gradient(ellipse at 50% 5%,#bddcca26,transparent 65%),linear-gradient(#294c55,#173641);box-shadow:inset 0 0 0 3px #102d39,inset 0 0 0 4px #c5b57435,0 3px 0 #102a35;padding:12px 6px}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-slot[data-grade="rare"]{--rarity:#cbb2ed}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-slot[data-grade="unique"]{--rarity:#efc471;background:radial-gradient(ellipse at 50% 5%,#e1ba5a26,transparent 70%),linear-gradient(#3c5353,#233c46)}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-slot[data-grade="low"]{--rarity:#afafa5}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-slot.selected{outline:2px solid #ffe8ae;outline-offset:1px;box-shadow:inset 0 0 0 3px #13323e,inset 0 0 0 4px #ffdc9a,0 3px 0 #102a35}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-grade-label{font-size:10px;line-height:1.2;letter-spacing:.05em;color:var(--rarity);font-weight:700}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-slot.equipped:after{border:1px solid #caead5;border-radius:5px 2px;background:#bde3c9;color:#173d3e}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-item-visual{background:radial-gradient(ellipse at 50% 50%,#a6d9bf20,transparent 70%),#153440;border:1px solid #beab7277;border-radius:12px 4px;padding:10px}
+#stage #modal[data-kit="true"][data-kind="bag"] .item-preview .item-art{filter:drop-shadow(0 5px 8px #061e2699)}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade{background:linear-gradient(#35534f,#203e44);border:1px solid #e2bf7c;border-radius:12px 4px;box-shadow:inset 0 0 0 3px #dec08a16}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps>div{display:grid;justify-items:center;gap:7px;padding:10px;min-width:95px;border:1px solid #c9b47c80;border-radius:9px 3px;background:#163640}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps>div:last-child{border-color:#ffe0a0;background:radial-gradient(ellipse at 50% 0,#e0c77935,#284746)}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps span{font-size:12px;color:#d6e2ce}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps b{color:#ffe3a5;font-size:18px}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps .bag-upgrade-arrow{font-size:26px;color:#ffe3a5}
+#stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps .item-art{width:48px;height:48px}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-grade-label{font-size:calc(var(--gu)*.2)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .item-slot{padding:calc(var(--gu)*.12)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-item-visual{padding:calc(var(--gu)*.1)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps{gap:calc(var(--gu)*.15);margin:calc(var(--gu)*.15) 0}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps>div{min-width:calc(var(--gu)*1.8);padding:calc(var(--gu)*.1);gap:calc(var(--gu)*.08)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps span{font-size:calc(var(--gu)*.24)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps b{font-size:calc(var(--gu)*.34)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps .item-art{width:calc(var(--gu)*.8);height:calc(var(--gu)*.8)}
+}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps>div{display:flex;align-items:center;min-width:0;gap:calc(var(--gu)*.12)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps .item-art{width:calc(var(--gu)*.55);height:calc(var(--gu)*.55)}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade-steps span:not(.bag-upgrade-arrow){display:grid;gap:2px;text-align:center}
+ #stage #modal[data-kit="true"][data-kind="bag"] .bag-upgrade>b{display:none}
+}

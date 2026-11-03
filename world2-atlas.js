@@ -1,0 +1,11 @@
+'use strict';
+(()=>{
+ window.DreamAtlas={...window.DreamAtlas};
+ const original=DreamAtlas.mini;
+ function terrain(s,target){const m=DREAM_CONTENT.maps[s.map],x=v=>v/m.width*1000,y=v=>(v+300)/1000*600;return '<svg viewBox="0 0 1000 660" role="img" aria-label="현재 지역의 실제 발판과 사다리"><rect width="1000" height="660" fill="#634831"/>'+m.platforms.map(p=>`<path d="M${x(p.x)} ${y(p.y)}h${x(p.w)}" stroke="${p.seal!==undefined?'#ffc667':p.dough!==undefined?'#fff3bf':'#e6c698'}" stroke-width="14"/>`).join('')+m.ladders.map(l=>`<path d="M${x(l.x)} ${y(l.top)}V${y(l.bottom)}" stroke="#fff4d6" stroke-width="4" stroke-dasharray="5 7"/>`).join('')+`<circle cx="${x(s.x)}" cy="${y(s.y??651)-15}" r="14" fill="#fff5a5"/>`+(target?`<text x="${x(target.x)}" y="${y(target.y)-20}" fill="#ffe391" font-size="36">★</text>`:'')+'</svg>';}
+ DreamAtlas.mini=(s,t)=>s.map>=10?terrain(s,t):original(s,t);
+ const detail=DreamAtlas.worldDetail;
+ DreamAtlas.worldDetail=(i,s)=>i===1?'<span>'+(s.flags.ovenRouteReady?'항로 개방':'첫 번째 밤 이후 출항 준비')+'</span><h3>몽글 오븐 마을</h3><p>봉순과 마들렌의 잊힌 약속을 따라 다시 굽는 용기를 찾아요.</p><small>'+(s.flags.ovenRouteReady?'잠의 항구 왼쪽 몽글 항로 포털에서 출항할 수 있어요.':'포근등대의 이야기를 마친 뒤 마들렌, 뒤뚱, 루멘과 출항을 준비하세요.')+'</small>':detail(i,s);
+ const sea=DreamAtlas.world;DreamAtlas.world=s=>sea(s).replace('첫 번째 섬 탐험 지도','현재 지역 탐험 지도').replace('출항 준비를 마쳤어요. 다음 항로가 열리기 전까지 남은 기억을 찾아보세요.','잠의 항구에서 몽글 오븐 마을로 출항할 수 있어요.');
+ const base=DreamAtlas.island;DreamAtlas.island=function(args){if(args.state.map<10)return base(args);return '<div class="atlas-layout"><div class="painted-atlas">'+terrain(args.state,DREAM_WORLD2.target(args.state))+'</div><aside class="atlas-sidebar"><h3>'+DREAM_CONTENT.maps[args.state.map].name+'</h3><p>금색 별은 목표, 노란 점은 저장된 내 위치예요. 열린 길과 사다리를 확인하세요.</p><select id="atlasSelect"><option value="'+args.state.map+'">현재 지역</option></select><button id="atlasTravel" disabled>다른 지역은 연결된 포털로 이동해요</button><button id="islandSea">세계 지도</button><button id="islandLocal">주변 지도</button></aside></div>';};
+})();

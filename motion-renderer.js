@@ -5,7 +5,7 @@
     R.actor = function (who, x, y, face = 1, active = false) {
         const r = this.r, p = r.player, frame = active ? motion.heroFrame(p) : -1;
         if (frame < 0 || !art.hero[who]) return oldActor.call(this, who, x, y, face, active);
-        const spec = art.hero[who], box = spec.frames[frame], pivot = spec.pivots[frame], sc = spec.scale, c = this.ctx;
+        const spec = art.hero[who], box = this.capeFrame?.('motion', frame, spec.frames[frame]) || spec.frames[frame], pivot = spec.pivots[frame], sc = spec.scale, c = this.ctx;
         const pose = { who, source: 'motion', kind: frame < 4 ? 'run' : 'jump', frame, pins: spec.pins[frame] };
         const floor = p.groundY ?? y;
         this.ellipse(x, floor + 3, Math.max(12, 24 - Math.max(0, floor - y) * .028), 4, '#48455630');
@@ -19,13 +19,16 @@
         c.restore();
     };
     R.enemy = function (e) {
-        const id = e.variant || e.type, spec = art.creatures[id];
+        const id = e.variant || e.type;
+        const leapArt=window.DREAM_BOSS_ART?.[id];
+        const useLeap=!!leapArt&&!e.dead&&e.lastBossAttack==='leap'&&['warn','release','recover'].includes(e.phase);
+        const spec = useLeap?leapArt:art.creatures[id];
         if (!spec) return oldEnemy.call(this, e);
         if (e.dead && e.fade <= 0) return;
         const c = this.ctx, r = this.r, floor = e.floorY ?? 651, reduced = r.settings.reducedMotion;
         const def = this.C.regionCreatures?.[id] || this.C.creatures[e.type];
-        const rawFrame = motion.enemyFrame(e, reduced), height = spec.height;
-        const frame = spec.actionFrames ? (e.hurt>0?spec.actionFrames.hurt:e.windup>0?spec.actionFrames.warn:e.action==='strike'?spec.actionFrames.attack:typeof rawFrame==='number'?rawFrame:spec.actionFrames[rawFrame]) : rawFrame;
+        const rawFrame = useLeap?(e.phase==='warn'?0:e.phase==='release'?1:e.phaseT>1.65?2:3):motion.enemyFrame(e, reduced), height = spec.height;
+        const frame = spec.actionFrames ? (e.hurt>0?spec.actionFrames.hurt:e.windup>0?spec.actionFrames.warn:e.action==='strike'?spec.actionFrames.attack:e.action==='recover'&&spec.actionFrames.recover!==undefined?spec.actionFrames.recover:typeof rawFrame==='number'?rawFrame:spec.actionFrames[rawFrame]) : rawFrame;
         let key = spec.key, box, pivot, sc = spec.scale;
         if (typeof frame === 'number') { box = spec.frames[frame]; pivot = spec.pivots[frame]; }
         else {

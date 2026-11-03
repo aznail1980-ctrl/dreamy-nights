@@ -1,11 +1,11 @@
 /*! © 2026 Aznail (김광석). Protected first-party material; see LICENSE.txt. */
 'use strict';
 (() => {
-    const C = window.DREAM_CONTENT, AIR = window.DREAM_AIR, W = 1440, H = 810, GROUND = 651, SAVE_KEY = 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
+    const C = window.DREAM_CONTENT, AIR = window.DREAM_AIR, W = 1440, H = 810, GROUND = 651, SAVE_KEY = window.DREAM_W2_PREVIEW ? (window.DREAM_W2_PREVIEW.saveKey || 'dreamy-nights-w2-preview-'+window.DREAM_W2_PREVIEW.map) : 'dreamy-nights-chapter-one-v1', SETTINGS_KEY = 'dreamy-nights-settings-v1';
     const $ = id => document.getElementById(id), clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const imageKeys = [...new Set([...Object.keys(window.DREAM_ART_V49.files), ...(window.DREAM_ART_V44?.imageKeys || []), 'wearBeretV42', 'wearCrownV42', 'wearSatchelV42', 'wearBowV42', 'wearCreamScarfV42', 'wearTideScarfV42', 'wearCapeV42', 'ariWalkV41', 'popoWalkV41', 'ariClimbV41', 'popoClimbV41', 'popoFrontV41', 'chestClosedV41', 'chestOpenV41', 'crateV41', 'parcelV41', 'heroAriSprite', 'heroPopoSprite', ...C.remaster.icons.map(k => 'item-' + k), 'ari', 'ariSide', 'ariBody', 'ariLegBack', 'ariLegFront', 'ariAttack', 'popo', 'popoSide', 'popoAttack', 'sand', 'crab', 'box', 'boss', 'sky', 'sea', 'harbor', 'grass', 'platform', 'npcLumen', 'npcBaker', 'npcPost'])];
     let orientationBlocked = false, orientationGate;
-    let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby, growthUI;
+    let sessionStarted = false, rpg, world, remaster, controls, journey, opening, lobby, growthUI, world2;
     let cameraY = 0, dialogueKey = '', autoClimb = 0;
     let images = {}, renderer, mode = 'loading', modalKind = '', beforeModal = 'play', state, player, enemies = [], particles = [], texts = [], waves = [], rings = [], camera = 0, clock = 0, lastTime = 0, uiTime = 0, saveTime = 0, hitstop = 0, shake = 0, transition = 0, autoWalk = false, interaction = null, dialogue = null, dialogueIndex = 0, dialogueDone = null, lastQuest = -1, dialogueBefore = 'play';
     let impacts = [];
@@ -30,6 +30,8 @@
     const audio = new window.DreamAudioEngine({settings,getScene:()=>({mode,theme:C.maps[state?.map||0].theme,hero:state?.active||'ari',clock,playerX:player?.x||0})});
     function defaultState() {
         const s = remaster.initialize(world.initialize(rpg.initialize({ version: 3, map: 0, x: 185, hp: 6, active: 'ari', xp: 0, light: 0, snacks: 3, killed: [], memories: [], claimed: [], visited: [0], flags: { introSeen: false, firstMemory: false, metLumen: false, bossIntroduced: false, completed: false, walkHint: false, skillHint: false, jumped: false, pomiRescue: false }, time: 0 })));
+        window.DREAM_WORLD2?.initialize(s);
+        window.DREAM_W2_PREVIEW?.initialize(s);
         return window.DREAM_PROGRESS.initialize(s);
     }
     function validateSave(raw) {
@@ -58,6 +60,7 @@
         window.DREAM_PROGRESS.initialize(s, raw);
         const limit=Math.min(8,6+Math.floor((window.DREAM_PROGRESS.level(s)-1)/3))+gearHP;
         s.hp=clamp(Number(raw.hp)||6,.5,limit);
+        window.DREAM_WORLD2?.initialize(s, raw);
         return migrated;
     }
     function loadSave() {
@@ -219,11 +222,12 @@
         return { x, y: GROUND, vx: 0, vy: 0, facing: 1, grounded: true, coyote: .12, jumpBuffer: 0, invincible: 1, attackT: 0, attackLength: .38, dodgeT: 0, combo: 0, comboT: 0, walkTime: 0, walkBlend: 0, lean: 0, landSquash: 0, groundY: GROUND, pendingStrike: null, stepDistance: 0, attackBuffer: 0, hitT: 0, recoilV: 0, climbDetachT: 0, moveAxis: 0, motionSpeed: 0, chargeHeld: false, chargeT: 0, chargeLevel: 0, chargeReady: false, airJumpUsed: false, airJumpT: 0, plungeUsed: false, plunge: null, plungeLandT: 0 };
     }
     function makeEnemies() {
-        return currentMap().enemies.map(e => ({ ...e, home: e.x, y: e.y ?? GROUND, floorY: e.y ?? GROUND, hp: Math.round(C.creatures[e.type].hp * (e.hpScale || 1)), max: Math.round(C.creatures[e.type].hp * (e.hpScale || 1)), dead: !e.wild && state.killed.includes(e.id), fade: 0, hurt: 0, stun: 0, timer: e.type === 'boss' ? 2.2 : 1 + Math.random(), windup: 0, phase: 'rest', phaseT: 2.4, pattern: 0, face: -1, zone: null, elapsed: Math.random() * 4 }));
+        return currentMap().enemies.map(e => ({ ...e, home: e.x, y: e.y ?? GROUND, floorY: e.y ?? GROUND, hp: Math.round(C.creatures[e.type].hp * (e.hpScale || 1)), max: Math.round(C.creatures[e.type].hp * (e.hpScale || 1)), dead: !e.wild && state.killed.includes(e.id), fade: 0, hurt: 0, stun: 0, timer: e.type === 'boss' ? 2.2 : 1 + Math.random(), windup: 0, phase: 'rest', phaseT: 2.4, pattern: 0, face: -1, zone: null, elapsed: Math.random() * 4 })).map(e=>window.DREAM_BOSS?.is(e)&&!e.dead?DREAM_BOSS.initialize(e):e);
     }
     function enterMap(index, fromRight = false, x = null, y = GROUND) {
         remaster?.stopVoice();
         state.map = index;
+        world2?.sync();
         C.syncHeroItems(state.active);
         state.x = x ?? (fromRight ? C.maps[index].width - 180 : 180);
         player = makePlayer(state.x);
@@ -255,6 +259,7 @@
         save();
     }
     function start(fresh = false, hero = 'ari') {
+        if (!window.DREAM_W2_PREVIEW && opening && !opening.canStart()) { opening.open(); return; }
         sessionStarted = true;
         audio.unlock();
         state = fresh ? defaultState() : loadSave() || defaultState();
@@ -297,6 +302,7 @@
         $('saveSummary').textContent = s ? `${C.maps[s.map].name} · 반짝 기억 ${s.memories.length}/${C.memories.length} · 자동 저장됨` : '키보드와 터치로 플레이 · 자동 저장';
     }
     function newGame() {
+        if (!window.DREAM_W2_PREVIEW && opening && !opening.canStart()) { opening.open(); return; }
         if (loadSave()) {
             openModal('new', '새로운 꿈을 시작할까요?', '<p>현재 순찰의 진행 기록이 새 기록으로 바뀝니다.<br>이어서 진행하려면 돌아가기를 눌러주세요.</p><div class="modal-actions"><button class="primary" id="confirmNew">새 순찰 시작</button><button class="secondary" id="cancelNew">돌아가기</button></div>');
             $('confirmNew').onclick = () => {
@@ -324,8 +330,8 @@
     }
     function renderDialogue() {
         const [who, line] = dialogue[dialogueIndex];
-        const names = {ari:'아리',popo:'포포',lumen:'루멘 반장',madeleine:'마들렌',post:'뒤뚱',narrator:'잠의 바다'};
-        const art = {ari:'ari',popo:'popoFrontV41',lumen:'npcLumen',madeleine:'npcBaker',post:'npcPost'};
+        const names = {...window.DREAM_WORLD2_NAMES,ari:'아리',popo:'포포',lumen:'루멘 반장',madeleine:'마들렌',post:'뒤뚱',narrator:'잠의 바다'};
+        const art = {...window.DREAM_WORLD2_PORTRAITS,ari:'ari',popo:'popoFrontV41',lumen:'npcLumen',madeleine:'npcBaker',post:'npcPost'};
         conversation.render({who,name:names[who]||who,portrait:images[art[who]]?.src,line,index:dialogueIndex,total:dialogue.length,active:state.active,key:dialogueKey});
         remaster.readVoice(dialogueKey, dialogueIndex, who, line);
     }
@@ -582,16 +588,16 @@
         audio.sfx('purify');
         floatText('정화 완료!  +' + c.light + ' ✧', e.x, e.y - c.size - 25);
         growthNotice(oldLevel);
-        if (e.type === 'boss') {
+        if (window.DREAM_BOSS?.is(e)||e.type==='boss') {
             waves = [];
-            rpg.recoverJournal();
+            if(e.type==='boss')rpg.recoverJournal();
         }
-        else if (!state.flags.firstMemory) {
+        else if (state.map < 10 && !state.flags.firstMemory) {
             state.flags.firstMemory = true;
             memory('pillow');
             startDialogue('firstMemory', () => say('발판 위의 반짝임도 찾아보자. Space로 폴짝!'));
         }
-        else if (questComplete(activeQuest() === -1 ? C.quests.length - 1 : Math.max(0, lastQuest))) {
+        else if (state.map < 10 && questComplete(activeQuest() === -1 ? C.quests.length - 1 : Math.max(0, lastQuest))) {
             say('잘했어! 수첩에 꿈도장을 찍고 다음 길로 가자.');
         }
         save();
@@ -600,15 +606,16 @@
     function hit(e, power, impact = 'skill', feedback = null) {
         if (e.dead)
             return;
+        const isBoss=window.DREAM_BOSS?.is(e)||e.type==='boss';
         feedback = feedback || window.DREAM_COMBAT.profile(state, impact);
         const charged = impact === 'charged', heavy = impact !== 'light', finish = e.hp <= power, dir = Math.sign(e.x - player.x) || player.facing;
         rpg.hit();
         e.hp = Math.max(0, e.hp - power);
         e.hurt = .28;
-        e.stun = e.type === 'boss' ? (charged ? .24 : .08) : charged ? .65 : .24;
-        e.knockV = dir * (e.type === 'boss' ? (charged ? 145 : heavy ? 75 : 28) : charged ? 510 : heavy ? 290 : 95);
+        e.stun = isBoss ? (charged ? .24 : .08) : charged ? .65 : .24;
+        e.knockV = dir * (isBoss ? (charged ? 145 : heavy ? 75 : 28) : charged ? 510 : heavy ? 290 : 95);
         // Interrupted leaps fall under gravity instead of freezing or snapping to the floor.
-        if (e.type !== 'boss' && e.y < (e.floorY ?? GROUND) - 4) {
+        if (!isBoss && e.y < (e.floorY ?? GROUND) - 4) {
             e.airFall = true;
             e.fallVy = 0;
             e.action = 'recover';
@@ -616,16 +623,17 @@
             e.windup = 0;
         }
         e.poise = (e.poise || 0) + power;
-        const threshold = e.type === 'boss' ? 28 : 10;
+        const threshold = isBoss ? 28 : 10;
         if (e.poise >= threshold && !finish) {
             e.poise = 0;
-            e.stun = e.type === 'boss' ? .7 : .85;
+            e.stun = isBoss ? .7 : .85;
             e.windup = 0;
             e.action = e.airFall ? 'recover' : null;
             if (!e.airFall) e.y = e.floorY ?? GROUND;
-            if (e.type === 'boss') {
-                e.phase = 'rest';
-                e.phaseT = .9;
+            if (isBoss) {
+                e.phase = 'recover';
+                e.phaseT = 1.6;
+                e.action = 'recover';e.actionT=1.6;e.zone=null;
             }
             floatText('걱정이 흔들려요!', e.x, e.y - C.creatures[e.type].size - 45, '#ffeac0');
         }
@@ -705,6 +713,7 @@
             }
         }
         if (landed) {
+            world2?.strike('plunge');
             player.plunge = null;
             player.plungeLandT = .28;
             player.landSquash = .18;
@@ -774,6 +783,7 @@
         const power = (swing.power || (swing.combo === 3 ? 4 : 2) + rpg.stats().attack) + (swing.combo === 3 && window.DREAM_PROGRESS.passive(state,'attack') ? 1 : 0);
         if (!swing.started) {
             swing.started = true;
+            world2?.strike(swing.impact || 'light');
             if (swing.impact === 'charged') {
                 spark(player.x + swing.facing * 95, player.y - 18, player.chargeLevel === 2 ? 55 : 32, '#fff0b6', 420);
                 ring(player.x + swing.facing * 95, player.y - 7, swing.reach, '#fff0bf');
@@ -808,6 +818,7 @@
             return attack();
         }
         if (name === 'burst') {
+            if (world2?.resonance()) return;
             player.plunge = null;
             cancelCharge();
             return rpg.teamBurst();
@@ -878,6 +889,7 @@
         if (mode !== 'play' || !interaction)
             return;
         autoWalk = false;
+        if (interaction.type === 'w2') { world2.interact(interaction.object); return; }
         if (interaction.type === 'device') {
             remaster.interact(interaction.device);
             return;
@@ -889,7 +901,7 @@
         rpg.handleInteraction(interaction);
     }
     function updateInteraction() {
-        interaction = rpg.nearest() || remaster.nearest();
+        interaction = world2?.nearest() || rpg.nearest() || remaster.nearest();
         if (!interaction) {
             const ex = world.nearestExit();
             if (ex)
@@ -1042,7 +1054,9 @@
         else
             player.coyote -= dt;
         if (player.jumpBuffer > 0) {
+            const doughBoost=window.DREAM_W2_ROUTES?.jumpBoost(state,player);
             const jump = AIR.jump(player);
+            if(jump==='ground'&&doughBoost)player.vy=-1050;
             if (jump) {
                 companion.jumpDelay = .14;
                 audio.sfx(jump === 'air' ? 'doubleJump' : 'jump');
@@ -1167,46 +1181,12 @@
             e.face = e.zone?.face || e.face;
         else if (Math.abs(dx) > 12)
             e.face = Math.sign(dx);
+        if (window.DREAM_BOSS?.is(e)) {
+            if(e.type==='boss'&&!state.flags.bossIntroduced)return;
+            return DREAM_BOSS.update(e,dt,{player,waves,width:currentMap().width,damage,ring,say,sound:name=>audio.sfx(name,e)});
+        }
         if (C.regionCreatures?.[e.variant]) return window.updateDreamRegionEnemy(e,dt,{player,waves,advance:advanceEnemyAttack,damage,sound:name=>audio.sfx(name,e)});
         if (e.variant === 'tideBell') return updateTideBell(e, dt);
-        if (e.type === 'boss') {
-            if (!state.flags.bossIntroduced)
-                return;
-            e.phaseT -= dt;
-            if (e.phase === 'rest') {
-                if (Math.abs(dx) > 325)
-                    e.x = clamp(e.x + e.face * c.speed * dt, 300, currentMap().width - 250);
-                if (e.phaseT <= 0) {
-                    e.phase = 'warn';
-                    e.pattern++;
-                    e.phaseT = e.hp < e.max * .5 ? .9 : 1.2;
-                    e.zone = e.pattern % 2 ? { kind: 'sneeze', face: e.face } : { kind: 'stomp', x: player.x };
-                    say(e.zone.kind === 'sneeze' ? '들숨… 들숨… 재채기는 점프로 피해!' : '별빛이 모인 바닥에서 살짝 비켜서!', 2);
-                }
-            }
-            else if (e.phase === 'warn' && e.phaseT <= 0) {
-                e.phase = 'release';
-                audio.sfx(e.zone.kind==='sneeze'?'bossSneeze':'bossStomp',e);
-                e.phaseT = .55;
-                if (e.zone.kind === 'sneeze') {
-                    waves.push({ x: e.x + e.zone.face * 100, y: GROUND - 35, vx: e.zone.face * 460, life: 2.5, r: 36, hit: false });
-                    spark(e.x + e.zone.face * 80, GROUND - 95, 15, '#e2c7e7', 220);
-                }
-                else {
-                    ring(e.zone.x, GROUND - 5, 165, '#e9bfdc');
-                    spark(e.zone.x, GROUND - 10, 24, '#dec3e3', 270);
-                    if (Math.abs(player.x - e.zone.x) < 155 && player.y > GROUND - 100)
-                        damage(1.5, e.zone.x);
-                }
-                shake = settings.reducedMotion ? 0 : 4;
-            }
-            else if (e.phase === 'release' && e.phaseT <= 0) {
-                e.phase = 'rest';
-                e.phaseT = e.hp < e.max * .5 ? 1.15 : 1.7;
-                e.zone = null;
-            }
-            return;
-        }
         const floor = e.floorY ?? GROUND, sameLevel = Math.abs(player.y - floor) < 150 && !player.climbing;
         e.timer -= dt;
         if (e.action === 'strike') {
@@ -1389,10 +1369,11 @@
             const prepared=(C.chapterBridge?.steps||[]).filter(step=>state.flags[step.flag]).length;
             $('questCard').querySelector('.eyebrow').firstChild.textContent='후일담 · 다음 밤의 약속 ';
             $('questTitle').textContent=bridge?'다음 밤을 준비하는 마음':state.flags.ovenRouteReady?'몽글 항로 · 출항 준비 완료':'순찰 완료—!';
-            $('questDetail').textContent=bridge?.label||'다음 세계는 아직 개방 전이에요. 남은 기억을 찾아보세요.';
+            $('questDetail').textContent=bridge?.label||(window.DREAM_WORLD2_CONTENT?'항구 선착장의 몽글 항로 포털로 출항하세요.':'출항 준비가 끝났어요. 다음 밤의 항로는 준비 중이에요.');
             $('questStep').textContent=prepared+' / 3';$('questCount').textContent='출항 준비 '+prepared+' / 3';$('questFill').style.width=(prepared/3*100)+'%';
         }
         journey?.update();
+        world2?.hud();
         show('rewardDot', C.quests.some((_, i) => questComplete(i) && !state.claimed.includes(i)));
         for (const [id, key, duration] of [['skillControl', 'skill', equippedSkill.cooldown]]) {
             $(id).querySelector('i').style.height = cooldowns[key] / duration * 100 + '%';
@@ -1406,12 +1387,13 @@
         $('attackControl').setAttribute('aria-label', air ? '공중 내려찍기 · 아래쪽 적 공격' : '정화 · 짧게 기본 공격, 길게 모아 강한 공격');
         $('jumpControl').querySelector('b').textContent = air && !player.airJumpUsed && !player.plunge ? '2단 점프' : '점프';
         $('jumpControl').setAttribute('aria-label', player.plunge ? '내려찍는 중 · 착지 후 점프' : air ? (player.airJumpUsed ? '공중 점프 사용 완료 · 착지하면 회복' : '이단 점프 가능') : '점프 · 공중에서 한 번 더 누르면 이단 점프');
-        const boss = enemies.find(e => e.type === 'boss' && !e.dead);
-        show('bossHud', state.map === 4 && !!boss && state.flags.bossIntroduced);
+        const boss = enemies.find(e => (window.DREAM_BOSS?.is(e)||e.type==='boss') && !e.dead);
+        show('bossHud', !!boss && (state.map===19 || state.map===4&&state.flags.bossIntroduced));
         if (boss) {
             $('bossFill').style.width = boss.hp / boss.max * 100 + '%';
-            $('bossCount').textContent = '남은 걱정 ' + Math.ceil(boss.hp / boss.max * 100) + '%';
-            $('bossMood').textContent = boss.phase === 'warn' ? (boss.zone?.kind === 'sneeze' ? '들숨… 들숨… 점프할 준비!' : '발밑 별빛을 피하세요!') : '잊어둔 걱정이 모인';
+            $('bossHud').querySelector('b').textContent=C.creatures[boss.type].name;
+            $('bossCount').textContent = (boss.bossStage||1)+'/3 단계 · 남은 걱정 ' + Math.ceil(boss.hp / boss.max * 100) + '%';
+            $('bossMood').textContent = window.DREAM_BOSS?.hint(boss)||'잊어둔 걱정이 모인';
         }
         if (lastQuest !== qi) {
             if (lastQuest >= 0 && qi !== lastQuest && mode === 'play')
@@ -1463,7 +1445,9 @@
                 return;
             }
             const oldPlayerX = player.x;
+            world2?.sync();
             updatePlayer(dt);
+            world2?.tick(dt);
             if (mode === 'play') {
                 for (const e of enemies) {
                     const oldEnemyX = e.x;
@@ -1641,9 +1625,13 @@
         }
     }
     addEventListener('blur', releaseInputs);
+    // Recover from notification sheets, browser dialogs and restored tabs.
+    addEventListener('focus', clearControls);
+    addEventListener('pageshow', clearControls);
+    document.addEventListener('touchcancel', clearControls, {passive:true});
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden)
-            releaseInputs();
+        if (document.hidden) releaseInputs();
+        else clearControls();
     });
     addEventListener('pagehide', save);
     function refitViewport() {
@@ -1728,7 +1716,7 @@
     // Read-only inspection is useful for verifying a playthrough without changing game state.
     window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.43.0' });
     opening = window.createDreamOpening({
-        mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
+        hasSavedGame: () => !!loadSave(), mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
         onClose() { toTitle(); $('startButton').focus({preventScroll:true}); }
     });
@@ -1770,19 +1758,20 @@
         $('levelText').onclick=()=>{if(mode==='play')growthUI.open();};
         $('levelText').onkeydown=e=>{if(['Enter',' '].includes(e.key)&&mode==='play'){e.preventDefault();e.stopPropagation();growthUI.open();}};
         state = defaultState();
-        player = makePlayer(185);
+        player = makePlayer(state.x);
+        player.y = state.y ?? GROUND;
         enemies = [];
         loadingScreen.finish();
         show('loading', false);
         toTitle();
         if(window.DREAM_SOUND_POLICY.mobile()&&!settings.soundChosen){
             openModal('soundChoice','소리와 함께 꿈길을 걸을까요?', '<div class="sound-choice-copy"><p>원하는 소리 설정을 한 번 골라주세요.<br>다음에 접속해도 이 선택을 기억해요.</p><p>휴대폰의 무음 상태를 따르는 기능은 브라우저마다 달라요. 조용히 플레이하려면 ‘소리 없이 시작’을 선택해주세요.</p><div class="sound-choice-actions"><button id="chooseSoundOn" class="primary">소리 켜고 시작 ♫</button><button id="chooseSoundOff" class="secondary">소리 없이 시작</button></div></div>','OUR DREAMY NIGHTS');
-            const choose=enabled=>{setSound(enabled);closeModal();opening.maybeShow();};
+            const choose=enabled=>{setSound(enabled);closeModal();if(!window.DREAM_W2_PREVIEW)opening.maybeShow();};
             $('chooseSoundOn').onclick=()=>choose(true);$('chooseSoundOff').onclick=()=>choose(false);$('chooseSoundOn').focus({preventScroll:true});
-        }else opening.maybeShow();
+        }else if(!window.DREAM_W2_PREVIEW)opening.maybeShow();
         requestAnimationFrame(loop);
     }
-    rpg = window.createDreamRPG({ get state() {
+    rpg = window.createDreamRPG({ get reducedMotion(){return settings.reducedMotion;}, get state() {
             return state;
         }, get player() {
             return player;
@@ -1821,5 +1810,6 @@
         if(blocked){audio.silence();remaster?.stopVoice();}
         opening?.setOrientationBlocked(blocked);
     });
+    world2 = window.createDreamWorld2?.({get state(){return state;},get player(){return player;},get mode(){return mode;},get enemies(){return enemies;},maxHP,openModal,closeModal,dialogue:startDialogue,add:rpg.add,own:rpg.own,save,toast,refresh:updateHUD});
     boot();
 })();

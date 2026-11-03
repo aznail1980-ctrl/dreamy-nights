@@ -1,0 +1,58 @@
+/* The constellation and training alcove share the patrol chrome. */
+#stage #modal[data-kit="true"][data-kind="growth"] .st-layout{grid-template-columns:minmax(0,1fr) 355px;gap:18px}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-map{border:1px solid #bba36c;border-radius:14px 4px;background:radial-gradient(ellipse at 50% 0,#51786644,transparent 70%),#142f3b;box-shadow:inset 0 0 0 3px #bca57415}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-detail{border:1px solid #c7a76c;border-radius:14px 4px;padding:14px;background:linear-gradient(#2a4d53,#193641);box-shadow:inset 0 0 0 3px #bca57415}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual{height:205px;position:relative;margin:0 0 6px;border:1px solid #ba9d6380;border-radius:10px 3px;background:url('assets/skill-training-room.png') center/100% 100%;overflow:hidden}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual canvas{position:absolute;right:13%;bottom:8%;width:165px;height:178px;object-fit:contain}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual .st-art{position:absolute;left:6%;top:12%;width:70px;box-shadow:0 0 18px #fff1af55;border:2px solid #e2bf7a}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-preview-caption{display:block;text-align:center;color:#c9d9cb;font-size:11px;margin:4px 0 12px}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:0 0 12px;border:1px solid #c6aa6a70;border-left:3px solid #edcf89;background:linear-gradient(90deg,#355a59,#1d3a46);border-radius:7px 2px;font-size:13px}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip span,#stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip small{color:#bcd5cc;font-size:11px}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip b{color:#ffe3a4}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip small{margin-left:auto}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 12px}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-facts>div{background:#15333e;border:1px solid #c5aa6a50;padding:9px;border-radius:7px 2px}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-facts dt{font-size:11px;color:#bfd1c8}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-facts dd{margin:5px 0 0;font-size:17px;font-weight:750;color:#ffe2a6;line-height:1.4}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-node.is-selected{border-color:#efd08a;background:linear-gradient(#506b6155,#325052);border-radius:10px 3px;box-shadow:inset 0 0 0 2px #d2b47b20}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-medallion{border-radius:12px 4px;border-color:#b2a57d}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-medallion .st-art{border-radius:8px 2px}
+#stage #modal[data-kit="true"][data-kind="growth"] .is-learned .st-medallion{border-color:#9bddbd}
+#stage #modal[data-kit="true"][data-kind="growth"] .is-ready .st-medallion{border-color:#ffe0a1}
+#stage #modal[data-kit="true"][data-kind="growth"] .st-description{font-size:13px;line-height:1.65}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-layout{display:block}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip{font-size:calc(var(--su)*.25);padding:calc(var(--su)*.12);gap:calc(var(--su)*.18);margin-bottom:calc(var(--su)*.14)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip span,#stage #modal[data-kit="true"][data-kind="growth"] .st-equipped-strip small{font-size:calc(var(--su)*.22)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail{padding:calc(var(--su)*.2)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual{height:calc(var(--su)*3.5);max-width:calc(var(--su)*8);margin:calc(var(--su)*.16) auto}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual canvas{width:calc(var(--su)*2.7);height:calc(var(--su)*2.92);right:24%;bottom:8%}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual .st-art{width:calc(var(--su)*1.2);left:10%}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-preview-caption{font-size:calc(var(--su)*.23)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-facts{gap:calc(var(--su)*.15);margin:calc(var(--su)*.2) 0}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-facts>div{padding:calc(var(--su)*.15)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-facts dt{font-size:calc(var(--su)*.24)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-facts dd{font-size:calc(var(--su)*.34)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-description{font-size:calc(var(--su)*.28)}
+}
+#stage #modal[data-kit="true"][data-kind="growth"] .kit-footer .st-actions{display:flex;justify-content:flex-end;gap:12px;margin:0}
+#stage #modal[data-kit="true"][data-kind="growth"] .kit-footer .st-actions button{width:auto;min-width:220px;padding:10px 20px}
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"][data-kind="growth"] .kit-footer .st-actions button{flex:1;min-width:0;min-height:var(--ku);font-size:calc(var(--ku)*.28);padding:calc(var(--ku)*.13)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-screen[data-view="detail"] .st-detail{display:block}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-screen[data-view="tree"] .st-detail{display:none}
+}
+/* Phone detail dedicates its viewport to the chosen skill, like the bag detail flow. */
+@media(pointer:coarse){
+ #stage #modal[data-kit="true"][data-kind="growth"]:has(.st-screen[data-view="detail"]) .kit-nav{display:none}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-screen[data-view="detail"] :is(.st-overview,.st-equipped-strip){display:none}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-screen[data-view="detail"] .st-detail{display:grid;grid-template-columns:minmax(0,.4fr) minmax(0,.6fr);gap:calc(var(--su)*.1) calc(var(--su)*.3)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail>*{grid-column:2;min-width:0}
+ #stage #modal[data-kit="true"][data-kind="growth"] #growthTreeBack{grid-column:1/-1;grid-row:1;position:static;width:100%;margin:0 0 calc(var(--su)*.1)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual{grid-column:1;grid-row:2/8;width:100%;height:calc(var(--su)*3.1);margin:0}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual canvas{width:calc(var(--su)*2.3);height:calc(var(--su)*2.5);right:8%}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-detail-visual .st-art{width:calc(var(--su)*.8)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-preview-caption{grid-column:1;grid-row:8;font-size:calc(var(--su)*.2);margin:0}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-facts{margin:calc(var(--su)*.1) 0;gap:calc(var(--su)*.12)}
+ #stage #modal[data-kit="true"][data-kind="growth"] .st-status{font-size:calc(var(--su)*.25);margin:calc(var(--su)*.1) 0}
+}

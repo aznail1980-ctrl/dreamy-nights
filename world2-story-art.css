@@ -1,0 +1,11 @@
+#dialogue .w2-memory-scene{position:absolute;inset:0;margin:0;background:#392a21;overflow:hidden;pointer-events:none}
+#dialogue .w2-memory-scene[hidden]{display:none}
+#dialogue .w2-memory-scene img{width:100%;height:100%;object-fit:contain;object-position:center top;animation:w2-memory-arrive 1s ease-out both}
+#dialogue .w2-memory-scene:after{content:'';position:absolute;inset:50% 0 0;background:linear-gradient(transparent,#302015b8)}
+#dialogue .w2-memory-scene figcaption{position:absolute;top:22px;left:50%;transform:translateX(-50%);padding:9px 20px;border-radius:30px;background:#483123d9;color:#ffedc7;font-size:18px;white-space:nowrap}
+#dialogue.w2-memory-active .conversation,#dialogue.w2-memory-active .skip{z-index:1}
+@keyframes w2-memory-arrive{from{opacity:0;transform:scale(1.025)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){#dialogue .w2-memory-scene img{animation:none}}
+/* Keep transient rewards and preview navigation out of the cinematic dialogue. */
+body:has(#dialogue.w2-memory-active:not(.hidden)) #toast,
+body:has(#dialogue:not(.hidden)) .w2-playtest{visibility:hidden;pointer-events:none}

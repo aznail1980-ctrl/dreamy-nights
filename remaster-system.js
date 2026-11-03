@@ -35,6 +35,13 @@ window.createDreamRemaster = function (api) {
                 return false;
         }
         if (p.climbing && !dir && Math.abs(p.moveAxis || 0) > .55) {
+            // Let a sideways step finish the last few pixels of a ladder climb.
+            // Mid-ladder exits and removed ledges must still fall normally.
+            const ladder = p.climbing;
+            const end = Math.abs(p.y - ladder.top) <= 12 ? ladder.top : Math.abs(p.y - ladder.bottom) <= 12 ? ladder.bottom : null;
+            const supported = end !== null && (end === G || m().platforms.some(f => f.y === end && p.x >= f.x && p.x <= f.x + f.w));
+            p.grounded = supported;
+            if (supported) { p.y = end; p.groundY = end; }
             p.climbing = null;
             p.climbSpeed = 0;
             p.climbDetachT = .25;

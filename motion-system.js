@@ -30,7 +30,7 @@ window.DREAM_MOTION = {
     enemyFrame(e, reduced) {
         const id = e.variant || e.type;
         const walk = (e.motionSpeed || 0) > 2 ? Math.floor((e.walkPhase || 0) * 2) % 2 : 0;
-        if (id === 'boss') return e.hurt > 0 ? 5 : e.phase === 'warn' ? (e.zone?.kind === 'stomp' ? 4 : 2) : e.phase === 'release' ? (e.zone?.kind === 'stomp' ? 5 : 3) : e.poseRecovery > 0 ? 5 : walk;
+        if (id === 'boss') return e.hurt > 0 ? 5 : e.phase === 'warn' ? (['stomp','leap'].includes(e.zone?.kind) ? 4 : 2) : e.phase === 'release' ? (['stomp','leap'].includes(e.zone?.kind) ? 5 : 3) : e.poseRecovery > 0 ? 5 : walk;
         if (['sand','crab','box'].includes(id)) return e.hurt > 0 || e.windup > 0 ? 2 : e.action === 'strike' ? 3 : walk;
         if (e.hurt > 0) return 'hurt';
         if (e.windup > 0) return 'warn';

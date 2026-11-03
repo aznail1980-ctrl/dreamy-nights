@@ -41,9 +41,11 @@ window.createDreamControls = function ({ keys, keyMap, playing, action, activate
             if (event.button > 0 || !playing() || (kind === 'stick' && stickId !== null)) return;
             event.preventDefault();
             activate();
-            element.setPointerCapture(event.pointerId);
             const alreadyHeld = kind === 'action' && held(name);
             pointers.set(event.pointerId, { element, hold: kind === 'hold' ? name : null, action: kind === 'action' ? name : null });
+            // Capture can be rejected while the browser interrupts a touch.
+            // Window-level release listeners below still clean up that pointer.
+            try { element.setPointerCapture(event.pointerId); } catch {}
             element.classList.add('pressed');
             syncKeys();
             if (kind === 'stick') { stickId = event.pointerId; move(event); }
@@ -61,19 +63,23 @@ window.createDreamControls = function ({ keys, keyMap, playing, action, activate
     stick.addEventListener('pointermove', move);
     document.querySelectorAll('[data-hold]').forEach(element => bind(element, 'hold', element.dataset.hold));
     document.querySelectorAll('[data-action]').forEach(element => bind(element, 'action', element.dataset.action));
+    // A release may land outside a control after a notification or lost capture.
+    for (const type of ['pointerup', 'pointercancel'])
+        window.addEventListener(type, event => release(event.pointerId, type !== 'pointerup'), true);
     function clear() {
-        keyboard.clear();
-        directionTap = null;
-        for (const [id, value] of [...pointers]) {
-            // Clear state before releasing capture; lostpointercapture can run synchronously.
-            pointers.delete(id);
-            value.element.classList.remove('pressed');
-            if (value.element.hasPointerCapture(id)) value.element.releasePointerCapture(id);
-        }
-        stickId = null;
-        x = y = 0;
+        const active = [...pointers], attackHeld = held('attack'), jumpHeld = held('jump');
+        // Reset logical state FIRST: capture APIs may throw or emit synchronous events.
+        pointers.clear(); keyboard.clear(); keys.clear(); directionTap = null;
+        stickId = null; x = y = 0;
         knob.style.transform = 'translate(-50%, -50%)';
-        keys.clear();
+        for (const [id, value] of active) {
+            value.element.classList.remove('pressed');
+            try {
+                if (value.element.hasPointerCapture(id)) value.element.releasePointerCapture(id);
+            } catch { /* The browser may already have invalidated the touch. */ }
+        }
+        if (attackHeld) releaseAttack(true);
+        if (jumpHeld) releaseJump();
     }
     return {
         touch, clear, held,

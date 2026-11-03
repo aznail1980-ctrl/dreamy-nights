@@ -8,6 +8,8 @@ window.createDreamJourney=function(api){
   }}));return options.sort((a,b)=>(a.map===s().map?0:1)-(b.map===s().map?0:1)||Math.abs(a.x-api.player.x)-Math.abs(b.x-api.player.x))[0];
  }
  function target(){
+  const w2=window.DREAM_WORLD2?.target(s());if(w2)return w2;
+  if(s().map>=10&&window.DREAM_WORLD2)return null;
   const local=C.dungeonObjective?.(s(),api.player,api.enemies);if(local)return local;
   const q=C.quests[api.activeQuest()];if(!q)return C.chapterBridge?.target(s())||null;
   if(q.ids)return enemyTarget(q.ids);
@@ -27,6 +29,7 @@ window.createDreamJourney=function(api){
   if(!t)return'자유 탐험 · 남은 기억과 부탁을 찾아보세요';
   const p=api.player;
   if(t.map!==s().map){const ex=api.route(t.map);if(!ex)return C.maps[t.map].name+' · 수첩에서 길의 단서 확인';t={map:s().map,x:ex.x,y:ex.y??651,label:C.maps[ex.to].name+' 방면 출구로',kind:'exit'};}
+  const routeHint=window.DREAM_W2_ROUTES?.instruction?.(s(),p,t);if(routeHint)return routeHint;
   const route=C.nextRouteLadder?.(C.maps[s().map],p,t);
   if(route)return(route.ladder.x<p.x?'← ':'→ ')+'사다리로 '+(route.up?'위층':'아래층')+' · '+t.label;
 
@@ -41,11 +44,11 @@ window.createDreamJourney=function(api){
  function update(){if(!s())return;const t=target(),line=instruction(t);if($('nextAction').textContent!==line)$('nextAction').textContent=line;
   if(t?.dungeon){$('questTitle').textContent=t.dungeon;$('questDetail').textContent=t.detail;$('questCard').querySelector('.eyebrow').firstChild.textContent='현재 던전 · ';$('questStep').textContent='지역 조사';$('questCount').textContent='조사 '+t.progress+' / '+t.total;$('questFill').style.width=(t.progress/t.total*100)+'%';}
   $('questCard').setAttribute('aria-label','현재 목표: '+line+' · 수첩 열기');$('questHint').textContent='수첩 열기 ↗';
-  const key=s().map+':'+s().visited.join(',')+':'+t?.map;if(key===miniKey)return;miniKey=key;
+  const key=s().map+':'+s().visited.join(',')+':'+t?.map+(s().map>=10?':'+[Math.round(api.player.x/80),Math.round(api.player.y/80),s().w2?.ovens,s().w2?.cracks,s().killed.length].join(','):'');if(key===miniKey)return;miniKey=key;
   $('journeyCompactName').textContent=C.maps[s().map].name;
-  const [mx,my]=C.mapPositions[s().map];$('journeyPreview').innerHTML='<img src="assets/atlas-island-v48.png" alt=""><i style="left:'+mx+'%;top:'+my+'%"></i>';
-  $('journeyVisited').textContent='발견 '+s().visited.length+' / '+C.maps.length;
-  $('journeyOverview').innerHTML=window.DreamAtlas.mini(s(),t);
+  const [mx,my]=C.mapPositions[s().map];$('journeyPreview').innerHTML='<img src="'+(s().map>=10?DREAM_ART_V49.files[C.maps[s().map].backdrop]:'assets/atlas-island-v48.png')+'" alt=""><i style="left:'+mx+'%;top:'+my+'%"></i>';
+  $('journeyVisited').textContent='발견 '+s().visited.filter(i=>(i>=10)===(s().map>=10)).length+' / 10';
+  $('journeyOverview').innerHTML=window.DreamAtlas.mini(s().map>=10?{...s(),x:api.player.x,y:api.player.y}:s(),t);
   $('journeyOverview').setAttribute('aria-label',C.maps[s().map].name+' · 현재 위치 · 방문 '+s().visited.length+'곳 · 섬 지도 열기');
  }
  function switchTo(fn){api.closeModal();fn();}
@@ -55,7 +58,7 @@ window.createDreamJourney=function(api){
    $('seaDetail').innerHTML=window.DreamAtlas.worldDetail(i,s()); $('worldSelect').value=i;
    document.querySelectorAll('[data-world]').forEach(b=>{const active=Number(b.dataset.world)===i;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});
   }
-  detail(0); document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>detail(Number(b.dataset.world)));
+  detail(s().map>=10?1:0); document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>detail(Number(b.dataset.world)));
   $('worldSelect').onchange=e=>detail(Number(e.target.value));
   $('seaIsland').onclick=()=>switchTo(api.islandMap);$('seaLocal').onclick=()=>switchTo(localMap);$('seaLore').onclick=()=>switchTo(api.archive);
  }

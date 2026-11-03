@@ -64,21 +64,22 @@
         const swing = r.settings.reducedMotion ? 0 : Math.sin(p.walkTime || 0) * (p.walkBlend || 0) * .035;
         if (layer === 'back') {
             if (look.neck && this.scarf) this.scarf(look.neck, pose, 'back');
-            if (look.back === 'nightCape')
-                this.wear('nightCape', view, nx - 1, ny + 3, pose.who === 'ari' ? .88 : 1, swing + fit.lean);
+            if (look.back === 'nightCape') {
+                const a=DREAM_ATTACHMENTS.backFit(pose,look.back,swing);
+                this.wear(look.back,a.view,a.x,a.y,a.size,a.angle);
+            }
             return;
         }
         if (look.back && look.back !== 'nightCape') {
-            const bx = fit.back ? fit.back[0] - (look.back === 'lampPack' ? 3 : 0) : rear ? nx : nx - (look.back === 'lampPack' ? 28 : 24);
-            const by = fit.back ? fit.back[1] : ny + (rear ? 12 : 9);
-            // A visible shoulder attachment keeps the bag/lantern connected to the torso.
+            const a=DREAM_ATTACHMENTS.backFit(pose,look.back,swing);
+            // End the strap at the same transformed anchor used by the accessory.
             c.strokeStyle = look.back === 'lampPack' ? '#bd9561' : '#66546a';
             c.lineWidth = 1;
             c.beginPath();
             c.moveTo(nx - 3, ny + 5);
-            c.quadraticCurveTo(bx - 3, ny + 3, bx, by + 5);
+            c.quadraticCurveTo(a.x - 3, ny + 3, a.x, a.y);
             c.stroke();
-            this.wear(look.back, rear && look.back === 'mailBag' ? 1 : view, bx, by, rear ? .95 : 1, swing + fit.lean * .25);
+            this.wear(look.back,a.view,a.x,a.y,a.size,a.angle);
         }
         if (look.neck) {
             if (this.scarf) this.scarf(look.neck, pose, 'front');
@@ -104,7 +105,11 @@
             const ribbon = look.head === 'roseBow', point = ribbon ? fit.bow : fit.head;
             const size = ribbon ? 1 : fit.scale;
             const lift = look.head === 'starCrown' ? 5 * size : 0;
+            if(look.head==='seaBeret' && DREAM_ATTACHMENTS.beretFit){
+                const a=DREAM_ATTACHMENTS.beretFit(pose);this.wear(look.head,a.view,a.x,a.y,a.size,a.angle);
+            }else{
             this.wear(look.head, fit.view, point[0], point[1] - lift, size, ribbon ? pins.angle : fit.angle - (look.head === 'starCrown' ? .22 : 0));
+            }
             if (rear && pose.who === 'ari' && !ribbon) {
                 // Trace the ponytail's painted outline, rather than clipping a rectangular patch.
                 const tail=[[-2,-130],[-6,-126],[-6,-121],[-3,-117],[2,-115],[4,-107],[2,-97],[-4,-86],[-4,-78],[-1,-70],[10,-66],[17,-69],[18,-75],[14,-72],[8,-74],[7,-79],[13,-90],[20,-99],[23,-109],[21,-120],[13,-127],[6,-129]];
@@ -159,7 +164,9 @@
             else {
                 const im = this.images[who === 'ari' ? 'heroAriSprite' : 'heroPopoSprite'], box = rects[who], sc = h / box[3], pivot = (who === 'ari' ? 500 : 560) - box[0];
                 c.scale(-1, 1);
-                c.drawImage(im, ...box, -pivot * sc, -h, box[2] * sc, h);
+                if (this.bodyCostume === 'nightCape')
+                    c.drawImage(im, -(pivot + box[0]) * sc, -(box[1] + box[3]) * sc, im.width * sc, im.height * sc);
+                else c.drawImage(im, ...box, -pivot * sc, -h, box[2] * sc, h);
             }
             c.restore();
         };
@@ -193,12 +200,22 @@
         preview.r = { state, clock: 1, settings: { reducedMotion: true }, player: { grounded: true, groundY: 210, y: 210, walkBlend: 0, walkTime: 0, motionSpeed: 0, attackT: 0, dodgeT: 0, chargeT: 0, chargeHeld: false, invincible: 0 }, companion: {} };
         const poses = {run:{motionSpeed:240,walkTime:options.phase??2,walkBlend:1},walk:{motionSpeed:100,walkTime:options.phase??2,walkBlend:1},jump:{grounded:false,vy:-350},climb:{climbing:{},climbPhase:options.phase??2},dash:{dodgeT:.13,dodgeFacing:options.face||1},attack:{attackT:.19,attackLength:.38},charge:{chargeHeld:true,chargeT:.6}};
         Object.assign(preview.r.player,poses[options.pose]||{});
+        // Optional normalized preview progress; omitted options keep existing still previews.
+        const progress=Number.isFinite(options.progress)?Math.max(0,Math.min(1,options.progress)):null;
+        let lift=0;
+        if(progress!==null){
+            if(options.pose==='attack')Object.assign(preview.r.player,{attackT:Math.max(.001,.38*(1-progress)),attackLength:.38});
+            if(options.pose==='dash')preview.r.player.dodgeT=Math.max(.001,.28*(1-progress));
+            if(options.pose==='charge')preview.r.player.chargeT=.2+progress*.75;
+            if(options.pose==='jump'){preview.r.player.vy=-400+800*progress;lift=Math.sin(progress*Math.PI)*32;}
+        }
+
         const c = preview.ctx;
         c.clearRect(0, 0, canvas.width, canvas.height);
         c.save();
         c.scale(1.9, 1.9);
         preview.r.player.groundY = 186;
-        preview.actor(state.active, 94, 186, options.face||1, true);
+        preview.actor(state.active, 94, 186-lift, options.face||1, true);
         c.restore();
     };
     R.drawNPC = function (id) {
