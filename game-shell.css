@@ -1,0 +1,84 @@
+/* v4.45: scene-first entry and full-screen illustrated game shell. */
+#stage #title.entry-scene .title-shade{background:linear-gradient(0deg,#061b31c9,transparent 48%),url('assets/entry-dream-sea.png') center/cover}
+#stage #title.entry-scene .title-copy{inset:13% 25% 11%;width:50%;text-align:center;justify-content:space-between;align-items:center;z-index:3}
+#stage #title.entry-scene .lobby-heading{width:100%}
+#stage #title.entry-scene h1{font-size:64px;line-height:1.1;margin:12px 0;filter:drop-shadow(0 5px 10px #05182d)}
+#stage #title.entry-scene h1 br{display:none}
+#stage #title.entry-scene h1 span{display:block;font-size:1.12em}
+#stage #title.entry-scene .chapter-pill{font-size:13px;letter-spacing:.2em}
+#stage #title.entry-scene .title-description{display:none}
+#stage #title.entry-scene .title-en{margin:12px 0;font-size:12px}
+#stage #title.entry-scene .start-actions{width:80%;align-items:center;gap:10px;margin:0}
+#stage #title.entry-scene .start-actions .dream-game-button{width:100%;border:0;border-radius:0;background:url('assets/dream-button.svg') center/100% 100% no-repeat;box-shadow:none;min-height:84px;padding:18px 38px;justify-content:center;color:#392b1c;filter:drop-shadow(0 6px 10px #00162a);text-shadow:0 1px #ffeabc}
+#stage #title.entry-scene .start-actions .game-button-icon,#stage #title.entry-scene .start-actions .game-button-arrow,#stage #title.entry-scene .start-actions .game-button-copy small{display:none}
+#stage #title.entry-scene .start-actions .game-button-copy b{font-size:26px;letter-spacing:.12em}
+#stage #title.entry-scene .start-actions button::before{display:none}
+#stage #title.entry-scene[data-has-save="true"] #startButton{min-height:44px;width:65%;padding:8px 24px;order:2;background:#092b3dba;border:1px solid #bfa571;clip-path:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%)}
+#stage #title.entry-scene .save-summary{margin:5px 0;font-size:12px}
+#stage #title.entry-scene .title-characters{inset:31% 4% 13%;width:92%;height:56%;z-index:2}
+#stage #title.entry-scene .lobby-keeper{width:26%;height:100%}
+#stage #title.entry-scene .title-popo{left:0;top:0}#stage #title.entry-scene .title-ari{right:0;top:0}
+#stage #title.entry-scene .lobby-keeper-name{border:0;border-radius:0;background:linear-gradient(90deg,transparent,#102a37d9,transparent);border-bottom:1px solid #e6ce98;font-size:18px;min-width:100px}
+#stage #title.entry-scene .character-note{left:30%;right:30%;bottom:20%;background:none;text-shadow:0 2px 3px #071b2c;font-size:15px}
+#stage #title.entry-scene .title-bottom{left:3%;right:3%;bottom:2%;width:auto;justify-content:space-between}
+#stage #title.entry-scene .title-bottom .dream-game-button{flex:none;border-radius:0;background:#102b3cb0;border:0;border-bottom:1px solid #bfa571;box-shadow:none}
+/* Navigation occupies its own rail; no floating strip over the character. */
+#stage #modal[data-kit="true"][data-kind] .modal-card{display:grid;grid-template-columns:116px minmax(0,1fr);grid-template-rows:54px minmax(0,1fr) auto;gap:14px 22px;width:96%;height:94%;max-width:none;max-height:none;padding:24px 28px;border:24px solid transparent;border-image:url('assets/dream-frame.svg') 30 stretch;border-radius:0;background:radial-gradient(ellipse at 40% 0,#31585e,#0d2434 80%);background-clip:padding-box;box-shadow:0 12px 70px #041423;overflow:hidden}
+#stage #modal[data-kit="true"][data-kind] .modal-card::before{display:none}
+#stage #modal[data-kit="true"][data-kind] #modalEyebrow{display:none}
+#stage #modal[data-kit="true"][data-kind] #modalTitle{grid-column:1/3;grid-row:1;align-self:center;margin:0;padding:0 64px 12px 10px;font-size:30px;border-bottom:1px solid #c9a769;color:#ffebbb}
+#stage #modal[data-kit="true"][data-kind] #modalTitle::before{content:'✦';display:inline-block;margin-right:16px;color:#f3cc83}
+#stage #modal[data-kit="true"][data-kind] .kit-nav{grid-column:1;grid-row:2/4;display:flex;flex-direction:column;gap:10px;overflow:auto;margin:0;padding:0 8px 8px 0;border:0;border-right:1px solid #aa8c5655;position:static;background:none}
+#stage #modal[data-kit="true"][data-kind] .kit-nav-note{display:none}
+#stage #modal[data-kit="true"][data-kind] .kit-nav button{flex:0 0 auto;width:100%;min-height:76px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:10px 4px;border:1px solid #ad915c;border-radius:0;clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);background:linear-gradient(110deg,#1f414c,#102b3b);box-shadow:inset 3px 0 #aa8d57;color:#e4d5b3}
+#stage #modal[data-kit="true"][data-kind] .kit-nav button[aria-current]{background:linear-gradient(110deg,#f0d897,#b98c46);color:#24373b;box-shadow:inset 4px 0 #fff0bc;text-shadow:none}
+#stage #modal[data-kit="true"][data-kind] .kit-nav button::after{display:none}
+#stage #modal[data-kit="true"][data-kind] .kit-nav svg{width:26px;height:26px}
+#stage #modal[data-kit="true"][data-kind] #modalContent{grid-column:2;grid-row:2;min-width:0;min-height:0;height:auto;overflow:auto;margin:0;padding:0 6px 8px 0;overscroll-behavior:contain}
+#stage #modal[data-kit="true"][data-kind] .kit-footer{grid-column:2;grid-row:3;position:static;margin:0;padding:10px 0 0;border-top:1px solid #b39760;background:none;box-shadow:none}
+#stage #modal[data-kit="true"][data-kind] .modal-close{top:24px;right:27px;width:48px;height:48px;border-radius:0;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:linear-gradient(#63817b,#163443);border:2px solid #e3bd73;color:#ffe6ae;z-index:5}
+#stage #modal[data-kit="true"][data-kind] .modal-card :is(.primary,.pet-name button){background:url('assets/dream-button.svg') center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;color:#382b1e;padding:14px 30px;min-height:52px;text-shadow:0 1px #ffeac2}
+#stage #modal[data-kit="true"][data-kind] .modal-card :is(.secondary,.keeper-pose-buttons button,.bag-tabs button,.look-tabs button,.forge-tabs button,.kit-list-back){border-radius:0;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);background:linear-gradient(#345860,#142e40);border:1px solid #b89b61;box-shadow:inset 0 0 0 3px #0d293555}
+#stage #modal[data-kit="true"][data-kind] :is(.keeper-preview,.pet-portrait,.wardrobe-preview,.item-detail,.costume-detail){border-radius:0;border:1px solid #bba16b;background-color:#102b39;box-shadow:inset 0 0 0 4px #c2a56b18}
+#stage #modal[data-kit="true"][data-kind] :is(.keeper-slot,.shelter-collection button,.look-slots button){border-radius:0;background:radial-gradient(ellipse at 50% 30%,#567c77,#142e40 70%);border:2px ridge #c8a96a;box-shadow:inset 0 0 0 3px #0a2433,0 2px 6px #061725}
+@media(pointer:coarse){
+ #stage #title.entry-scene .title-copy{inset:15% 25% 16%;width:50%}
+ #stage #title.entry-scene h1{font-size:calc(var(--u)*.62);margin:calc(var(--u)*.1) 0}
+ #stage #title.entry-scene .chapter-pill{font-size:calc(var(--u)*.18);padding-bottom:4px}
+ #stage #title.entry-scene .title-en{display:none}
+ #stage #title.entry-scene .start-actions{width:100%;gap:calc(var(--u)*.08)}
+ #stage #title.entry-scene .start-actions .dream-game-button{min-height:var(--u);padding:calc(var(--u)*.15) calc(var(--u)*.4)}
+ #stage #title.entry-scene .start-actions .game-button-copy b{font-size:calc(var(--u)*.36)}
+ #stage #title.entry-scene[data-has-save="true"] #startButton{min-height:var(--u);width:85%;padding:0}
+ #stage #title.entry-scene .title-bottom .dream-game-button{min-height:var(--u)}
+ #stage #title.entry-scene .character-note{display:none}
+ #stage #modal[data-kit="true"][data-kind] .modal-card{--ku:var(--touch-size);width:calc(var(--stage-width) - var(--safe-left) - var(--safe-right) - var(--ku)*.16);height:calc(var(--stage-height) - var(--safe-top) - var(--safe-bottom) - var(--ku)*.16);padding:calc(var(--ku)*.12);border-width:calc(var(--ku)*.2);grid-template-columns:calc(var(--ku)*1.35) minmax(0,1fr);grid-template-rows:var(--ku) minmax(0,1fr) auto;gap:calc(var(--ku)*.12)}
+ #stage #modal[data-kit="true"][data-kind] #modalTitle{font-size:calc(var(--ku)*.45);padding:0 var(--ku) calc(var(--ku)*.12) 0}
+ #stage #modal[data-kit="true"][data-kind] #modalTitle::before{margin-right:calc(var(--ku)*.15)}
+ #stage #modal[data-kit="true"][data-kind] .modal-close{width:var(--ku);height:var(--ku);top:calc(var(--ku)*.25);right:calc(var(--ku)*.25)}
+ #stage #modal[data-kit="true"][data-kind] .kit-nav{gap:calc(var(--ku)*.08);padding:0 calc(var(--ku)*.08) 0 0}
+ #stage #modal[data-kit="true"][data-kind] .kit-nav button{min-height:var(--ku);height:var(--ku);padding:calc(var(--ku)*.06);flex-direction:row;gap:calc(var(--ku)*.05);font-size:calc(var(--ku)*.24)}
+ #stage #modal[data-kit="true"][data-kind] .kit-nav svg{width:calc(var(--ku)*.35);height:calc(var(--ku)*.35)}
+ #stage #modal[data-kit="true"][data-kind] .kit-footer{padding:calc(var(--ku)*.08) 0 0}
+ #stage #modal[data-kit="true"][data-kind] .modal-card :is(.primary,.pet-name button){min-height:var(--ku);padding:calc(var(--ku)*.14) calc(var(--ku)*.35)}
+}
+
+#stage #title.entry-scene .start-actions .dream-game-button{display:flex;align-items:center;justify-content:center}
+#stage #title.entry-scene .start-actions .game-button-copy{text-align:center;display:block;flex:none;width:auto}
+/* The first keeper choice belongs to the same visual language. */
+#stage #modal[data-kind="character"] .modal-card{border:24px solid transparent;border-image:url('assets/dream-frame.svg') 30 stretch;border-radius:0;background:radial-gradient(ellipse at 40% 0,#31585e,#0d2434 80%);background-clip:padding-box;box-shadow:0 12px 70px #041423}
+#stage #modal[data-kind="character"] .hero-choice{border-radius:0;border:2px ridge #b99b62;box-shadow:inset 0 0 0 5px #081f33;background:linear-gradient(0deg,#0d263a,#45666b);clip-path:polygon(15px 0,100% 0,100% calc(100% - 15px),calc(100% - 15px) 100%,0 100%,0 15px)}
+#stage #modal[data-kind="character"] .hero-choice.selected{border-color:#ffe1a0;box-shadow:inset 0 0 0 4px #80683e,0 0 22px #ffe1a033;background:radial-gradient(ellipse at 50% 35%,#7c8e78,#1e3f4e)}
+#stage #modal[data-kind="character"] #confirmHero{border:0;border-radius:0;background:url('assets/dream-button.svg') center/100% 100% no-repeat;box-shadow:none;color:#382b1e;padding:20px 40px}
+#stage #modal[data-kind="character"] #confirmHero::before{display:none}
+#stage #modal[data-kind="character"] .modal-close{border-radius:0;background:#163443;color:#ffe6ae;border-color:#d4b376}
+@media(pointer:coarse){#stage #modal[data-kind="character"] .modal-card{border-width:calc(var(--touch-size)*.16)}#stage #modal[data-kind="character"] #confirmHero{padding:calc(var(--touch-size)*.18) calc(var(--touch-size)*.45)}}
+
+#stage #modal[data-kit="true"][data-kind] .modal-card .primary{background-color:transparent;background-image:url('assets/dream-button.svg');border:0;box-shadow:none;border-radius:0;clip-path:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%)}
+#stage #modal[data-kit="true"][data-kind] .st-node{border-radius:0}
+#stage #modal[data-kind="character"] #confirmHero{display:flex;align-items:center;justify-content:center;gap:0;text-align:center}
+#stage #modal[data-kind="character"] #confirmHero .game-button-copy{display:block;text-align:center;flex:none;width:auto}
+#stage #modal[data-kind="character"] #confirmHero :is(.game-button-icon,.game-button-arrow),#stage #modal[data-kind="character"] #confirmHero small{display:none}
+@media(pointer:coarse){#stage #modal[data-kind="character"] #confirmHero .game-button-copy b{font-size:calc(var(--touch-size)*.34)}}
+#stage .dream-opening .opening-play{border:0;border-radius:0;background:url('assets/dream-button.svg') center/100% 100% no-repeat;box-shadow:none;color:#382b1e}
+#stage .dream-opening .opening-play::before{display:none}
