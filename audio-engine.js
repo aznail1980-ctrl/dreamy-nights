@@ -128,7 +128,7 @@ window.DreamAudioEngine=class DreamAudioEngine{
         if(!this.ctx)return;
         const s=this.settings,scene=this.getScene(),blocked=this.hidden||!s.sound||['loading','opening'].includes(scene.mode);
         if(blocked){this.silence();return;}
-        const theme=['title','character'].includes(scene.mode)?'town':scene.theme;
+        const theme=['title','character'].includes(scene.mode)?'town':scene.musicTheme||scene.theme;
         if((theme!==this.scoreTheme||!this.decks.some(d=>d.theme===theme&&!d.failed))&&this.ctx.currentTime>=this.nextRetry)this.switchTrack(theme);
         const quiet=this.ducked?.24:['modal','pause'].includes(scene.mode)?.55:1;
         this.musicLevel=(this.musicLevel??quiet)+(quiet-(this.musicLevel??quiet))*Math.min(1,dt*(this.ducked?12:3));

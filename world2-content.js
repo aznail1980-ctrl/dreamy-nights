@@ -33,6 +33,7 @@
    return Array.from({length:n},(_,j)=>({id:`w2-${key}-${variant}-${k}-${j}`,variant,type:d.type,x:Math.min(widths[i]-500,850+k*620+j*290),y:651,level:d.level+3,hpScale:1,wild:false}));
   });
   C.maps.push({id:'w2-'+key,name:names[i],world:2,theme:'w2',backdrop:'w2Backdrop_'+key,width:widths[i],platforms,ladders,enemies,devices:[],decorations:[],buildings:[],sections:['발견하는 길','단서와 갈림길','돌아오는 지름길'],description:['반죽 언덕을 정화하면 폭신한 길이 열려요.','봉순의 화덕을 중심으로 탐험을 준비해요.','네 오븐에 불씨를 옮기고 두 사람의 흔적을 찾아요.','비탈을 내려가 지워진 이름을 찾아요.','겹겹의 초코 층을 내려찍으며 증인을 찾아요.','세 단서를 저울에 올리고 레시피의 주인을 알아봐요.','풍차 날개를 타고 올라 밀대로 저장고 입구를 열어요.','세 항아리를 데우고 잠든 효모를 깨워요.','포미와 두 작업대를 공명해 대기실을 열어요.','반죽·부풀기·굽기, 마지막 걱정을 함께 정화해요.'][i],region:'몽글 오븐 마을'});
+  C.maps[index].musicTheme=['garden','town','alley','trail','tide','archive','observatory','waterway','archive','boss'][i];
   C.exits[index]=[];C.mapPositions[index]=coords[i];DREAM_ART_V49.files['w2Backdrop_'+key]='assets/world2/backdrop-'+key+'-w2.png';
  });
  function link(a,x,b,xx,gate=''){C.exits[a].push({x,y:651,to:b,arrivalX:xx+130,gate,hint:'현재 의뢰의 단서를 먼저 확인해요.'});C.exits[b].push({x:xx,y:651,to:a,arrivalX:x-130,gate:a===2?'':gate,hint:'현재 의뢰의 단서를 먼저 확인해요.'});}
