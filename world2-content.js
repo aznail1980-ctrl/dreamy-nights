@@ -75,5 +75,5 @@
   w2Applications:['이제는 함께 도전하기로 했어요. 같은 팀 이름으로 적은 새 신청서 두 장이에요.','몽글 오븐 마을 이야기 완료 기념']
  };
  for(const[id,name,type]of items)C.items[id]={name,type,icon:id,grade:'common',rarity:type==='story'?'이야기':'일반',lore:itemDetails[id][0],effect:itemDetails[id][1],...(type==='supply'?{heal:4}:{})};
- window.DREAM_WORLD2_CONTENT={keys,names,quests,coords,defs,jarSpots:[{x:750,y:651},{x:1800,y:431},{x:2800,y:211}],butterSpots:[{x:650,y:651},{x:1250,y:431},{x:1850,y:211},{x:2450,y:431},{x:2900,y:651}],recipeClues:[{x:650,y:431,name:'두 줄의 쟁반'},{x:2350,y:431,name:'지워진 이름'},{x:1550,y:211,name:'자신 있던 반죽'}]};
+ window.DREAM_WORLD2_CONTENT={keys,names,quests,coords,defs,jarSpots:[{x:750,y:651},{x:1800,y:431},{x:2800,y:211}],butterSpots:[{x:650,y:651},{x:1100,y:431},{x:1850,y:211},{x:2450,y:411},{x:2900,y:651}],recipeClues:[{x:650,y:431,name:'두 줄의 쟁반'},{x:2350,y:431,name:'지워진 이름'},{x:1550,y:211,name:'자신 있던 반죽'}]};
 })();

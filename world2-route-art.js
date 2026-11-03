@@ -6,3 +6,5 @@ DREAM_W2_ROUTE_ART.baguette={"key": "w2BaguetteRoute", "file": "assets/world2/np
 DREAM_ART_V49.files.w2BaguetteRoute="assets/world2/npc-baguette-route.png";
 window.DREAM_WORLD2_NAMES={...window.DREAM_WORLD2_NAMES,baguette:"바게트 영감"};
 window.DREAM_WORLD2_PORTRAITS={baguette:"w2BaguetteRoute"};
+
+DREAM_ART_V49.files.w2WindmillPretzel='assets/world2/windmill-pretzel-v447.png';

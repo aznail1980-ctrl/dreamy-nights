@@ -1363,6 +1363,7 @@
         $('lightCount').textContent = state.light;
         $('snackCount').textContent = Object.keys(C.items).filter(id=>C.items[id].type==='supply').reduce((total,id)=>total+rpg.own(id),0);
         $('locationName').textContent = currentMap().name;
+        document.querySelector('.location > span').textContent=state.map>=10?'두 번째 밤':'첫 번째 밤';
         $('petLabel').textContent = '↑ ↓ 사다리 · L 탐험 지도';
         const bridge=qi<0?C.chapterBridge?.next(state):null;
         $('questCard').querySelector('.eyebrow').firstChild.textContent = C.acts[q.act] + ' ';
@@ -1452,6 +1453,7 @@
             }
             const oldPlayerX = player.x;
             world2?.sync();
+            window.DREAM_W2_ROUTES?.carry(state,player,dt);
             updatePlayer(dt);
             world2?.tick(dt);
             if (mode === 'play') {
@@ -1720,7 +1722,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.46.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.47.0' });
     opening = window.createDreamOpening({
         hasSavedGame: () => !!loadSave(), mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },

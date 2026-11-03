@@ -2,9 +2,21 @@
 (()=>{
  const R=DreamRenderer.prototype,oldSurface=R.drawSurface,oldDecorations=R.drawDecorations;
  R.w2Prop=function(kind,frame,x,y,width,top=false){const spec=DREAM_W2_ROUTE_ART[kind],b=spec.frames[frame],im=this.images[spec.key];if(!im)return;const h=width*b[3]/b[2];this.ctx.drawImage(im,...b,x-width/2,y-(top?0:h),width,h);};
+ const oldTerrain=R.terrain;
+ R.terrain=function(map){
+  if(this.r.state.map===16)this.drawMillRoute();
+  return oldTerrain.call(this,map);
+ };
+ R.drawMillRoute=function(){
+  const c=this.ctx,M=DREAM_W2_ROUTES.mill,im=this.images.w2WindmillPretzel;if(!im)return;
+  c.save();c.strokeStyle='#76502b';c.lineWidth=26;c.lineCap='round';c.beginPath();c.moveTo(M.x-65,651);c.lineTo(M.x,M.y);c.lineTo(M.x+65,651);c.stroke();c.strokeStyle='#c49a59';c.lineWidth=12;c.stroke();
+  c.translate(M.x,M.y);c.rotate(this.r.state.time*Math.PI*2/M.period);c.drawImage(im,0,106,768,768,-215,-215,430,430);c.restore();
+  c.save();c.globalAlpha=.88;c.drawImage(im,768,300,768,400,2100,190,1080,450);c.restore();
+ };
  R.drawSurface=function(p,map){
   if(map.world!==2)return oldSurface.call(this,p,map);
   const c=this.ctx,left=Math.max(p.x,this.r.camera-50),right=Math.min(p.x+p.w,this.r.camera+1490);if(right<=left)return;
+  if(p.mill!==undefined){this.w2Prop('proofing',2,p.x+p.w/2,p.y-3,p.w,true);this.round(p.x+8,p.y-4,p.w-16,5,2,'#fff0be');return;}
   const cave=map.routeType==='descent',kind=cave?'choco':'proofing',frame=p.seal!==undefined?1:p.dough!==undefined?1:cave?0:2;
   if(p.ground){const g=c.createLinearGradient(0,p.y,0,p.y+400);g.addColorStop(0,cave?'#80543c':'#b58d61');g.addColorStop(1,cave?'#3c281f':'#785d42');c.fillStyle=g;c.fillRect(left,p.y,right-left,500);}
   if(p.rolled){this.ctx.save();this.ctx.beginPath();this.ctx.rect(p.x,p.y-2,p.w,80);this.ctx.clip();for(let x=p.x;x<p.x+p.w;x+=300)this.w2Prop('roller',2,x+150,p.y-2,305,true);this.ctx.restore();return;}
@@ -16,6 +28,7 @@
  R.drawDecorations=function(map){
   if(map.world!==2)return oldDecorations.call(this,map);
   const s=this.r.state,M=DREAM_W2_ROUTES,t=this.r.clock;
+  if(s.map===16){this.text('풍차 끝 빵 발판 · 올라타서 기다려요',1460,170,16,'#fff1ce','center',650);this.text('두 길은 다시 만나요 · 점프해서 건너요',2640,150,16,'#fff1ce','center',650);}
   for(const prop of window.DREAM_W2_PROP_VIEW?.(s,window.DREAM_W2_OBJECTS||[])||[]){
    this.w2Prop(prop.kind,prop.frame,prop.x,prop.y,prop.width);
    if(prop.label){const b=DREAM_W2_ROUTE_ART[prop.kind].frames[prop.frame],h=prop.width*b[3]/b[2];this.text(prop.label,prop.x,prop.y-h-17,14,'#fff1ce','center',650);}

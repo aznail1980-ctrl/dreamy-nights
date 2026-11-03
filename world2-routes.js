@@ -9,7 +9,7 @@
  const bases={
   13:[{x:100,y:91,w:700},{x:850,y:251,w:750},{x:1650,y:431,w:800}],
   17:[{x:1250,y:431,w:1350},{x:2400,y:211,w:1100}],
-  16:[{x:900,y:431,w:1250},{x:1600,y:211,w:550},{x:2250,y:431,w:500},{x:3150,y:431,w:550},{x:4000,y:431,w:370}],
+  16:[{x:900,y:431,w:340},{x:1770,y:211,w:390},{x:2150,y:311,w:220},{x:2350,y:411,w:220},{x:2550,y:311,w:220},{x:2750,y:211,w:220},{x:2950,y:321,w:220},{x:2150,y:541,w:220},{x:2550,y:541,w:220},{x:2850,y:531,w:260},{x:3150,y:431,w:550},{x:4000,y:431,w:370}],
   18:[{x:350,y:431,w:650},{x:1150,y:311,w:600}],
   15:[{x:400,y:431,w:700},{x:2000,y:431,w:700},{x:1300,y:211,w:500}],
   10:[{x:1350,y:431,w:750},{x:2200,y:211,w:800},{x:2900,y:91,w:350}],
@@ -21,8 +21,8 @@
  Object.assign(C.exits[11].find(e=>e.to===13),{arrivalX:230,arrivalY:91});Object.assign(C.exits[13].find(e=>e.to===11),{x:160,y:91});
  C.maps[17].routeType='cellarLoop';C.maps[17].sections=['온기를 준비하는 저장실','위층의 잠든 효모','회색 항아리로 내려오는 길'];
  C.maps[17].enemies.forEach((e,i)=>Object.assign(e,{x:[1050,2050,3100,3100][i%4],y:[651,431,211,651][i%4]}));
- C.maps[16].routeType='rollerBridge';C.maps[16].sections=['풍차의 재료 길','휘핑 산사태','반죽을 펴는 다리'];
- C.maps[16].enemies.forEach((e,i)=>Object.assign(e,e.variant==='whipAvalanche'?{x:3050,y:651}:{x:[800,1450,2050,2550][i%4],y:[651,431,211,651][i%4]}));
+ C.maps[16].routeType='rollerBridge';C.maps[16].sections=['천천히 도는 풍차','두 고리가 만나는 프레첼 길','반죽을 펴는 다리'];
+ C.maps[16].enemies.forEach((e,i)=>Object.assign(e,e.variant==='whipAvalanche'?{x:3050,y:651}:{x:[800,1100,2000,2550][i%4],y:651}));
  Object.assign(C.exits[16].find(e=>e.to===17),{x:4250,y:431});Object.assign(C.exits[17].find(e=>e.to===16),{arrivalX:4180,arrivalY:431});
  C.maps[18].routeType='backstage';C.maps[18].sections=['빈 관람석','두 사람의 작업대','잊힌 대기실'];
  C.maps[18].enemies.forEach((e,i)=>Object.assign(e,{x:[650,1400,1050,1700][i%4],y:[431,311,651,651][i%4]}));
@@ -49,6 +49,16 @@
  const litCount=s=>s.flags.w2_coldOvenAlley?4:s.w2.ovens;
  const cracked=s=>s.flags.w2_chocoCave?3:s.w2.cracks;
  function risen(s,i){return s.flags.w2_proofingYard||s.killed.includes(flour[i].id);}
+ const mill={x:1460,y:431,radius:200,period:18};
+ function millPlatforms(time=0){return [0,1,2,3].map(i=>{const a=(Number.isFinite(time)?time:0)*Math.PI*2/mill.period+i*Math.PI/2;return{x:mill.x+Math.cos(a)*mill.radius-85,y:mill.y+Math.sin(a)*mill.radius,w:170,w2:true,mill:i};});}
+ // Compute the same displacement as the rendered rotor. Only a grounded rider is carried;
+ // jumping, recoil, falling and walking off retain the normal movement rules.
+ function carry(s,p,dt){
+  if(s.map!==16||!p.grounded||p.climbing||p.vy<0||dt<=0)return false;
+  const old=millPlatforms(s.time-dt).find(q=>Math.abs(p.y-q.y)<5&&p.x>q.x-8&&p.x<q.x+q.w+8);
+  if(!old)return false;
+  const next=millPlatforms(s.time)[old.mill];p.x+=next.x-old.x;p.y+=next.y-old.y;p.groundY=p.y;return true;
+ }
  function sync(s){
   if(!s?.w2)return;const map=C.maps[s.map];if(!bases[s.map])return;
   const platforms=bases[s.map].map(p=>({...p,w2:true}));let ladders=[];
@@ -66,7 +76,8 @@
   }
   if(s.map===13){ladders=[{x:250,top:91,bottom:651},{x:1100,top:251,bottom:651},{x:1950,top:431,bottom:651}];if(s.w2.snow||s.flags.w2_sugarSnowSlope){platforms.push({x:800,y:91,w:1550,w2:true,warm:true});ladders.push({x:2200,top:91,bottom:431});}}
   if(s.map===16){
-   ladders=[{x:1100,top:431,bottom:651},{x:1700,top:211,bottom:431},{x:2300,top:431,bottom:651},{x:3300,top:431,bottom:651},{x:4200,top:431,bottom:651}];
+   // No ladders: the wheel, crossed bread shelves and two safe approach steps form the route.
+   platforms.push({x:680,y:541,w:220,w2:true},{x:3100,y:541,w:220,w2:true},{x:4000,y:541,w:250,w2:true},...millPlatforms(s.time));
    const length=Math.min(400,Math.max(0,(s.w2.roller?500:s.w2.rollerProgress)-100));
    if(length>0)platforms.push({x:3700,y:431,w:length,w2:true,rolled:true});
   }
@@ -92,6 +103,6 @@
   for(const o of objects){if(o.id==='snow')Object.assign(o,{x:2200,y:431});if(o.kind==='jar')Object.assign(o,DREAM_WORLD2_CONTENT.jarSpots[o.i]);if(o.kind==='butter')Object.assign(o,DREAM_WORLD2_CONTENT.butterSpots[o.i]);if(o.id==='roller'){o.x=3500;o.y=431;}if(o.kind==='recipeClue')Object.assign(o,recipeClues[o.i]);if(o.kind==='oven')Object.assign(o,ovens[o.i]);if(o.id==='ember')o.x=550;if(o.id==='baguette')o.x=2200;}
  }
  function jumpBoost(s,p){return s.map===10&&pads.some((q,i)=>risen(s,i)&&Math.abs(p.y-(q.y-125))<8&&Math.abs(p.x-q.x)<q.w/2+8);}
- function instruction(s,p,t){if(t.map!==s.map)return null;if(s.map===10&&t.y<p.y-85)return '부푼 반죽 위에서 점프해 위쪽 길로 올라가요 · '+t.label;if(s.map===14&&t.y>p.y+85)return '열린 틈으로 아래층에 내려가요 · '+t.label;if(s.map===14&&Math.abs(t.x-p.x)<140&&Math.abs(t.y-p.y)<85&&cracked(s)<3)return '점프한 뒤 공격 버튼으로 금 간 층을 내려찍어요';return null;}
- window.DREAM_W2_ROUTES={recipeClues,instruction,pads,ovens,seals,sync,breakSeal,target,bindObjects,risen,litCount,cracked,jumpBoost,emberDuration:22};
+ function instruction(s,p,t){if(t.map!==s.map)return null;if(s.map===16&&t.y>p.y+85)return '발판 옆으로 내려가 아래쪽 길을 따라가요 · '+t.label;if(s.map===16&&t.y<p.y-85&&t.x>=3150)return '낮은 빵 발판부터 점프해 밀대 쪽으로 올라가요 · '+t.label;if(s.map===16&&t.y<p.y-85&&t.x<2200)return '풍차 끝 발판에 올라 기다린 뒤, 오른쪽 위 길로 점프해요 · '+t.label;if(s.map===16&&t.x>=2200&&t.x<3150)return '프레첼의 위·아래 길은 다시 만나요. 가까운 빵 발판으로 점프해요 · '+t.label;if(s.map===10&&t.y<p.y-85)return '부푼 반죽 위에서 점프해 위쪽 길로 올라가요 · '+t.label;if(s.map===14&&t.y>p.y+85)return '열린 틈으로 아래층에 내려가요 · '+t.label;if(s.map===14&&Math.abs(t.x-p.x)<140&&Math.abs(t.y-p.y)<85&&cracked(s)<3)return '점프한 뒤 공격 버튼으로 금 간 층을 내려찍어요';return null;}
+ window.DREAM_W2_ROUTES={mill,millPlatforms,carry,recipeClues,instruction,pads,ovens,seals,sync,breakSeal,target,bindObjects,risen,litCount,cracked,jumpBoost,emberDuration:22};
 })();
