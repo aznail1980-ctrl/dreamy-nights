@@ -383,7 +383,7 @@ window.createDreamRPG = function (api) {
         let choices = choice('petNursery','작은 꿈 친구들을 만나고 싶어요.','꿈의 알 선택 · 부화 · 펫 성장') + choice('gearWorkshop','기억 수선대를 이용할게요.','남는 장비 분해 · 꿈빛 잔해물로 장비 강화') + choice('regionWorkshop','지역 재료로 만들고 싶어요.','순찰 간식 3종 · 항구 기념 장비 3종'), message = n.greeting;
         const bridge=C.chapterBridge?.next(s);
         if(bridge?.npc===id)choices=choice('ovenContinue',bridge.label,'첫 밤의 후일담 · 몽글 오븐 마을 출항 준비')+choices;
-        if(s.flags.ovenRouteReady)message='“다음 항로 준비는 끝났어요. 문이 열릴 때까지 이 항구의 남은 꿈들을 돌봐주세요.”';
+        if(s.flags.ovenRouteReady)message='“몽글 마을로 출항할 준비가 끝났어요. 항구 왼쪽 몽글 항로 포털에서 상호작용하면 떠날 수 있어요.”';
         if (id === 'lumen') {
             if (s.flags.letterRead && !s.flags.readyForBoss)
                 choices += choice('truth', '반장님, 이 편지를 봐주세요.', '뒤뚱이 이어 붙인 편지의 주인을 만나요.');
