@@ -11,7 +11,9 @@
  DreamAtlas.world=s=>{
   const opened=!!s.flags.ovenRouteReady||s.map>=10,here=s.map>=10,done=!!s.flags.w2_completed;
   const route=`<svg class="atlas-routes w2-sea-route" viewBox="0 0 1000 666.7" role="img" aria-label="포근등대에서 몽글 오븐 마을까지 · ${opened?'열린 항로':'출항 준비가 필요한 항로'}"><path d="M210 426 Q340 300 200 160" style="filter:drop-shadow(0 1px 2px #382a1c)" fill="none" stroke="${opened?'#fff0a0':'#e1d6c1'}" stroke-width="7" stroke-dasharray="${opened?'14 8':'4 14'}"/><circle cx="${here?200:210}" cy="${here?160:426}" r="13" fill="#fff7c6" stroke="#876033" stroke-width="4"/></svg>`;
-  let html=sea(s).replace(/(<div class="painted-atlas sea-atlas">)/,'$1'+route).replace('첫 번째 섬 탐험 지도','현재 지역 탐험 지도');
+  let html=sea(s);
+  if(opened)html=html.replace('src="assets/atlas-world-v48.png"','src="assets/world2/atlas-world-w2.png"');
+  html=html.replace(/(<div class="painted-atlas sea-atlas">)/,'$1'+route).replace('첫 번째 섬 탐험 지도','현재 지역 탐험 지도');
   const start=html.indexOf('<div class="atlas-objective">'),end=html.indexOf('<div class="atlas-tabs">',start);
   if(start>=0&&end>start)html=html.slice(0,start)+`<div class="atlas-objective"><span>우리의 발자국</span><b>포근등대 · ${s.visited.filter(i=>i<10).length} / 10곳</b><b>몽글 오븐 마을 · ${s.visited.filter(i=>i>=10&&i<20).length} / 10곳</b><small>${done?'두 번째 밤 완료 · 열린 길을 자유롭게 탐험해요.':here?'두 번째 밤 탐험 중 · 현재 지역 지도에서 다음 목표를 확인해요.':opened?'항로 개방 · 잠의 항구 왼쪽 포털에서 출항해요.':'출항 준비 · 첫 번째 밤을 마친 뒤 마들렌, 뒤뚱, 루멘을 만나요.'}</small></div>`+html.slice(end);
   return html;
