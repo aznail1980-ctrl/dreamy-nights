@@ -7,7 +7,17 @@
  DreamAtlas.mini=(s,t)=>s.map>=10?terrain(s,t):original(s,t);
  const detail=DreamAtlas.worldDetail;
  DreamAtlas.worldDetail=(i,s)=>i===1?'<span>'+(s.flags.ovenRouteReady?'항로 개방':'첫 번째 밤 이후 출항 준비')+'</span><h3>몽글 오븐 마을</h3><p>봉순과 마들렌의 잊힌 약속을 따라 다시 굽는 용기를 찾아요.</p><small>'+(s.flags.ovenRouteReady?'잠의 항구 왼쪽 몽글 항로 포털에서 출항할 수 있어요.':'포근등대의 이야기를 마친 뒤 마들렌, 뒤뚱, 루멘과 출항을 준비하세요.')+'</small>':detail(i,s);
- const sea=DreamAtlas.world;DreamAtlas.world=s=>sea(s).replace('첫 번째 섬 탐험 지도','현재 지역 탐험 지도').replace('출항 준비를 마쳤어요. 다음 항로가 열리기 전까지 남은 기억을 찾아보세요.','잠의 항구에서 몽글 오븐 마을로 출항할 수 있어요.');
+ const sea=DreamAtlas.world;
+ DreamAtlas.world=s=>{
+  const opened=!!s.flags.ovenRouteReady||s.map>=10,here=s.map>=10,done=!!s.flags.w2_completed;
+  const route=`<svg class="atlas-routes w2-sea-route" viewBox="0 0 1000 666.7" role="img" aria-label="포근등대에서 몽글 오븐 마을까지 · ${opened?'열린 항로':'출항 준비가 필요한 항로'}"><path d="M210 426 Q340 300 200 160" style="filter:drop-shadow(0 1px 2px #382a1c)" fill="none" stroke="${opened?'#fff0a0':'#e1d6c1'}" stroke-width="7" stroke-dasharray="${opened?'14 8':'4 14'}"/><circle cx="${here?200:210}" cy="${here?160:426}" r="13" fill="#fff7c6" stroke="#876033" stroke-width="4"/></svg>`;
+  let html=sea(s).replace(/(<div class="painted-atlas sea-atlas">)/,'$1'+route).replace('첫 번째 섬 탐험 지도','현재 지역 탐험 지도');
+  const start=html.indexOf('<div class="atlas-objective">'),end=html.indexOf('<div class="atlas-tabs">',start);
+  if(start>=0&&end>start)html=html.slice(0,start)+`<div class="atlas-objective"><span>우리의 발자국</span><b>포근등대 · ${s.visited.filter(i=>i<10).length} / 10곳</b><b>몽글 오븐 마을 · ${s.visited.filter(i=>i>=10&&i<20).length} / 10곳</b><small>${done?'두 번째 밤 완료 · 열린 길을 자유롭게 탐험해요.':here?'두 번째 밤 탐험 중 · 현재 지역 지도에서 다음 목표를 확인해요.':opened?'항로 개방 · 잠의 항구 왼쪽 포털에서 출항해요.':'출항 준비 · 첫 번째 밤을 마친 뒤 마들렌, 뒤뚱, 루멘을 만나요.'}</small></div>`+html.slice(end);
+  return html;
+ };
+ const worldInfo=DreamAtlas.worldDetail;
+ DreamAtlas.worldDetail=(i,s)=>i===0?'<span>'+(s.map<10?'현재 위치':'방문한 첫 번째 땅')+'</span><h3>포근등대와 잠의 항구</h3><p>등대의 빛을 되찾으며 첫 순찰의 기억을 모은 곳이에요.</p><small>몽글 선착장 왼쪽 포털에서 돌아갈 수 있어요.</small>':i===1&&s.map>=10?'<span>'+(s.flags.w2_completed?'두 번째 밤 완료':'현재 탐험 중')+'</span><h3>몽글 오븐 마을</h3><p>봉순과 마들렌의 잊힌 약속을 따라 다시 굽는 용기를 찾아요.</p><small>현재 지역 탐험 지도를 열어 다음 목적지를 확인하세요.</small>':worldInfo(i,s);
  const positions=[[20,77],[49,54],[16,45],[84,31],[82,74],[43,18],[70,12],[51,84],[82,47],[39,33]];
  const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const base=DreamAtlas.island;

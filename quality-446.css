@@ -193,3 +193,5 @@
 }
 
 #stage #modal[data-kit="true"][data-kind] .modal-card button.primary:not(:disabled){background:linear-gradient(#ffe9b0,#d9b36a)!important;color:#30281d!important;border-color:#fff1bd;text-shadow:none}
+#stage .sea-atlas .w2-sea-route{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+#stage .sea-atlas .map-pin{z-index:2}
