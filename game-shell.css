@@ -82,3 +82,7 @@
 @media(pointer:coarse){#stage #modal[data-kind="character"] #confirmHero .game-button-copy b{font-size:calc(var(--touch-size)*.34)}}
 #stage .dream-opening .opening-play{border:0;border-radius:0;background:url('assets/dream-button.svg') center/100% 100% no-repeat;box-shadow:none;color:#382b1e}
 #stage .dream-opening .opening-play::before{display:none}
+/* Remove the surrounding website header/footer; retain the game's aspect ratio. */
+body{background:#061b2d}
+.outside-header,.outside-footer{display:none}
+#shell{border-radius:0;box-shadow:none}
