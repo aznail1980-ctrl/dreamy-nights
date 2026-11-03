@@ -55,8 +55,14 @@
             g.skillCD = finite(source.skillCD, 12); g.guardCD = finite(source.guardCD, 25);
             g.tutorialSeen = source.tutorialSeen === true;
         }
+        const saved=source?.attributes||{}, budget=Math.max(0,level(s)-1);
+        g.attributes={heart:0,power:0,focus:0};let remaining=budget;
+        for(const key of ['heart','power','focus']){const n=Math.min(remaining,Math.floor(finite(saved[key],10000)));g.attributes[key]=n;remaining-=n;}
         return s;
     }
+    function attributeInfo(s){const a=s.growth.attributes||{heart:0,power:0,focus:0};return {values:a,earned:Math.max(0,level(s)-1),available:Math.max(0,level(s)-1-Object.values(a).reduce((n,v)=>n+v,0))};}
+    function allocateAttribute(s,key){if(!['heart','power','focus'].includes(key)||attributeInfo(s).available<1)return false;s.growth.attributes ||= {heart:0,power:0,focus:0};s.growth.attributes[key]++;return true;}
+    function resetAttributes(s){s.growth.attributes={heart:0,power:0,focus:0};}
     function gain(s, amount) { amount = finite(amount, 1000); s.xp = finite(s.xp + amount, 1e7); s.growth.xp = finite(s.growth.xp + amount); return amount; }
     function sync(s) {
         let gained = 0;
@@ -122,5 +128,5 @@
         p.dashGift = Math.max(0, (p.dashGift || 0) - dt);
         if (p.skillVisual) { p.skillVisual.life -= dt; if (p.skillVisual.life <= 0) p.skillVisual = null; }
     }
-    window.DREAM_PROGRESS = { branches, names, colors, threshold, level, points, info, initialize, gain, sync, rewards, learned, mastered, passive, reason, learn, safe, equip, reset, skill, cast, tick };
+    window.DREAM_PROGRESS = { attributeInfo, allocateAttribute, resetAttributes, branches, names, colors, threshold, level, points, info, initialize, gain, sync, rewards, learned, mastered, passive, reason, learn, safe, equip, reset, skill, cast, tick };
 })();

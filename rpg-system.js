@@ -91,6 +91,8 @@ window.createDreamRPG = function (api) {
                 for (const [k, v] of Object.entries(G.stats(G.equipped(r,C.items[id].slot)||{itemId:id,level:0})))
                     result[k] += v;
             }
+        const a=state()?.growth?.attributes;
+        if(a){result.hp+=a.heart||0;result.attack+=(2+result.attack)*(a.power||0)*.04;result.skill+=(7+result.skill)*(a.focus||0)*.05;}
         return result;
     }
     function add(id, qty = 1, notify = true) {

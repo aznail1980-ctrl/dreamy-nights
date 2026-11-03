@@ -58,7 +58,7 @@
         const migrated=remaster.initialize(world.migrate(rpg.migrate(s, raw), raw), raw);
         const gearHP=['weapon','charm','keepsake'].reduce((n,slot)=>n+(DREAM_GEAR.stats(DREAM_GEAR.equipped(s.rpg,slot)).hp||0),0);
         window.DREAM_PROGRESS.initialize(s, raw);
-        const limit=Math.min(8,6+Math.floor((window.DREAM_PROGRESS.level(s)-1)/3))+gearHP;
+        const limit=Math.min(8,6+Math.floor((window.DREAM_PROGRESS.level(s)-1)/3))+gearHP+(s.growth.attributes.heart||0);
         s.hp=clamp(Number(raw.hp)||6,.5,limit);
         window.DREAM_WORLD2?.initialize(s, raw);
         return migrated;
@@ -155,7 +155,7 @@
         if (level() <= before) return;
         state.hp = maxHP();
         const points = window.DREAM_PROGRESS.info(state).available;
-        toast('Lv. ' + level() + ' · ' + (points ? '성장 포인트 ' + points + '개! 캐릭터 → 꿈빛 성장에서 배워요.' : '마음이 한층 더 단단해졌어요!'), 4);
+        toast('Lv. '+level()+' · 능력 포인트 '+DREAM_PROGRESS.attributeInfo(state).available+'개! 캐릭터창에서 배분해요.'+(points?' 스킬 포인트 '+points+'개도 있어요.':''),5);
         audio.sfx('memory');
     }
     function toast(text, duration = 3) {
@@ -1720,7 +1720,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.45.3' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.46.0' });
     opening = window.createDreamOpening({
         hasSavedGame: () => !!loadSave(), mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
