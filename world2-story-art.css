@@ -38,3 +38,15 @@ body:has(#dialogue:not(.hidden)) .w2-playtest{visibility:hidden;pointer-events:n
 }
 
 @media(pointer:coarse){#stage #modal[data-kind="journal"] .w2-next-step p{font-size:calc(var(--ku)*.32);line-height:1.5}#stage #modal[data-kind="journal"] .w2-mission-record small{font-size:calc(var(--ku)*.28);line-height:1.5}}
+
+.w2-region-scroll{overflow:auto;overscroll-behavior:contain;border:2px solid #b2945d;border-radius:12px;touch-action:pan-x pan-y}
+.w2-region-atlas{background:#c8a16b;border-radius:8px}
+.w2-region-atlas .atlas-routes path{stroke-width:2;stroke:#493321;fill:none;filter:drop-shadow(0 1px 1px #fff0c6)}
+.w2-region-atlas .atlas-routes .closed{stroke-dasharray:8 10;opacity:.6}
+.w2-region-atlas .atlas-routes .open{stroke:#ffe5a0;stroke-width:2.5;opacity:.8}
+.w2-region-atlas .map-pin.selected .pin-disc{outline-color:#5c3e29}
+.w2-region-atlas .map-pin.selected>b{background:#5c3e29}
+@media(pointer:coarse){.w2-region-atlas{min-width:calc(var(--touch-size)*12)}.w2-region-layout .atlas-legend{font-size:calc(var(--touch-size)*.29);line-height:1.5}.w2-region-layout #atlasTravel{min-height:var(--touch-size);font-size:calc(var(--touch-size)*.28)}}
+
+.w2-region-layout .atlas-tabs button{background:linear-gradient(#f7e5bc,#d6b579);border:1px solid #947244;color:#4a3425;box-shadow:0 3px 0 #80613c;border-radius:8px}
+.w2-region-layout #atlasTravel{border:1px solid #bca57f;background:#e7d9be;color:#715d43;opacity:1;min-height:44px;border-radius:8px;cursor:default}

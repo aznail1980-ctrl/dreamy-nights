@@ -176,12 +176,15 @@ window.createDreamWorld = function (api) {
         if (api.mode !== 'play' && !(api.mode === 'modal' && api.modalKind === 'map'))
             return;
         const m = C.maps[selected], known = s().visited.includes(selected), qi = api.activeQuest(), q = C.quests[qi] || (C.chapterBridge?.next(s())?{name:'다음 밤을 준비하는 마음',map:2}:null), goal = window.DreamGame?.inspect().journey, next = route(goal?.map ?? q?.map ?? s().map);
-        api.openModal('map', s().map>=10?'몽글 오븐 마을 · 탐험 지도':'포근등대와 잠의 항구 · 탐험 지도', window.DreamAtlas.island({state:s(),selected,goal,quest:q,next,gateOpen}), 'OUR FIRST NIGHT · FIELD ATLAS');
+        api.openModal('map', s().map>=10?'몽글 오븐 마을 · 탐험 지도':'포근등대와 잠의 항구 · 탐험 지도', window.DreamAtlas.island({state:s(),selected,goal,quest:q,next,gateOpen}), s().map>=10?'OUR SECOND NIGHT · FIELD ATLAS':'OUR FIRST NIGHT · FIELD ATLAS');
         document.querySelectorAll('[data-place]').forEach(b => b.onclick = () => map(Number(b.dataset.place)));
         $('atlasSelect').onchange = event => { map(Number(event.target.value)); $('atlasSelect').focus(); };
         $('islandSea').onclick = () => { api.closeModal(); $('journeyWorld').click(); };
         $('islandLocal').onclick = () => { api.closeModal(); $('journeyLocal').click(); };
+        const mapScroll=document.querySelector('.w2-region-scroll'), selectedPin=document.querySelector('.w2-region-atlas .map-pin.selected');
+        if(mapScroll&&selectedPin)mapScroll.scrollLeft=Math.max(0,selectedPin.offsetLeft-mapScroll.clientWidth/2);
         $('atlasTravel').onclick = () => {
+            if(s().map>=10)return;
             if (!known || !s().flags.metLumen)
                 return;
             if (selected === 4 && !gateOpen('bossReady')) {
