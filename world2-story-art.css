@@ -9,3 +9,32 @@
 /* Keep transient rewards and preview navigation out of the cinematic dialogue. */
 body:has(#dialogue.w2-memory-active:not(.hidden)) #toast,
 body:has(#dialogue:not(.hidden)) .w2-playtest{visibility:hidden;pointer-events:none}
+
+.w2-mission-record{border:1px solid #c9ae72;border-radius:14px;overflow:hidden;background:#193c48;color:#fff0ce;margin-bottom:18px}
+.w2-mission-record header{padding:28px;background:linear-gradient(90deg,#162f3af2,#162f3a70),var(--mission-art) center/cover}
+.w2-mission-record h3{margin:10px 0;font-size:28px;color:#ffe6a6}
+.w2-next-step{padding:22px;display:grid;gap:10px}.w2-next-step strong{font-size:22px;color:#ffe6a6}.w2-next-step p{margin:0;color:#e4e6d7}
+.w2-mission-record details,.w2-first-record{padding:16px}.w2-mission-record summary,.w2-first-record summary{cursor:pointer;min-height:44px;display:flex;align-items:center}.w2-mission-record li{margin:10px 0}
+/* The field journal uses the same readable game frame as the preparation room. */
+#stage #modal[data-kind="journal"] .modal-card{width:min(1200px,94%);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+#stage #modal[data-kind="journal"] #modalContent{min-height:0;overflow:auto;overscroll-behavior:contain}
+#stage #modal[data-kind="journal"] .journal-tabs{display:flex;gap:8px;position:sticky;top:0;z-index:2;padding:8px 0;background:#193b47}
+#stage #modal[data-kind="journal"] .journal-tabs button{flex:1;min-height:44px;background:#2c5058;border:1px solid #bda36d;color:#fff0ce;border-radius:8px 3px}
+#stage #modal[data-kind="journal"] .journal-tabs button.active{background:linear-gradient(#ffedb2,#dfb363);color:#243e47}
+#stage #modal[data-kind="journal"] .w2-first-record{color:#f6e8c9}
+@media(pointer:coarse){
+ #stage #modal[data-kind="journal"]{--ku:var(--touch-size)}
+ #stage #modal[data-kind="journal"] .modal-card{width:calc(var(--stage-width) - var(--safe-left) - var(--safe-right) - var(--ku)*.5);height:calc(var(--stage-height) - var(--safe-top) - var(--safe-bottom) - var(--ku)*.5);max-height:none;padding:calc(var(--ku)*.3);font-size:calc(var(--ku)*.32)}
+ #stage #modal[data-kind="journal"] #modalEyebrow{display:none}
+ #stage #modal[data-kind="journal"] #modalTitle{font-size:calc(var(--ku)*.52);margin:0 0 calc(var(--ku)*.2);padding-right:var(--ku)}
+ #stage #modal[data-kind="journal"] .modal-close{width:var(--ku);height:var(--ku);font-size:calc(var(--ku)*.65);top:calc(var(--ku)*.12);right:calc(var(--ku)*.12)}
+ #stage #modal[data-kind="journal"] .journal-tabs{gap:calc(var(--ku)*.12);margin:0;padding:0 0 calc(var(--ku)*.2)}
+ #stage #modal[data-kind="journal"] .journal-tabs button{min-height:var(--ku);font-size:calc(var(--ku)*.3);padding:calc(var(--ku)*.12)}
+ #stage #modal[data-kind="journal"] .w2-mission-record header{padding:calc(var(--ku)*.35)}
+ #stage #modal[data-kind="journal"] .w2-mission-record h3{font-size:calc(var(--ku)*.48);margin:calc(var(--ku)*.15) 0}
+ #stage #modal[data-kind="journal"] .w2-next-step{padding:calc(var(--ku)*.35);gap:calc(var(--ku)*.2)}
+ #stage #modal[data-kind="journal"] .w2-next-step strong{font-size:calc(var(--ku)*.4)}
+ #stage #modal[data-kind="journal"] :is(.w2-mission-record summary,.w2-first-record summary){min-height:var(--ku)}
+}
+
+@media(pointer:coarse){#stage #modal[data-kind="journal"] .w2-next-step p{font-size:calc(var(--ku)*.32);line-height:1.5}#stage #modal[data-kind="journal"] .w2-mission-record small{font-size:calc(var(--ku)*.28);line-height:1.5}}

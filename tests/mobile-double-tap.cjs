@@ -1,7 +1,7 @@
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const url=process.env.GAME_URL||'http://127.0.0.1:8769/';
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN});try{
-const p=await b.newPage({viewport:{width:852,height:393},isMobile:true,hasTouch:true}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>localStorage.setItem('dreamy-nights-opening-v1','seen'));await p.goto(url);await p.waitForFunction(()=>window.DreamGame?.inspect().mode==='title');
+const p=await b.newPage({viewport:{width:852,height:393},isMobile:true,hasTouch:true}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>{localStorage.setItem('dreamy-nights-opening-complete-v2','complete');localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:false,voice:false,soundChosen:true}));});await p.goto(url);await p.waitForFunction(()=>window.DreamGame?.inspect().mode==='title');
 const c=await p.context().newCDPSession(p),touch=(type,touchPoints)=>c.send('Input.dispatchTouchEvent',{type,touchPoints});
 await p.evaluate(()=>{window.ends=[];document.addEventListener('touchend',e=>ends.push(e.defaultPrevented));window.clicks=0;const probe=document.createElement('button');probe.id='tapProbe';probe.textContent='tap';probe.style.cssText='position:fixed;left:300px;top:160px;width:150px;height:55px;z-index:999999';probe.onclick=()=>clicks++;document.body.append(probe);});
 const tap=async(x,y)=>{await touch('touchStart',[{x,y,id:1}]);await touch('touchEnd',[]);};

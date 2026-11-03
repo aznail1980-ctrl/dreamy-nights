@@ -3,7 +3,7 @@ const fs=require('fs'),path=require('path'),assert=require('assert/strict'),{chr
 const root=path.resolve(__dirname,'..'),url=process.env.GAME_URL||'http://127.0.0.1:8769/';
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN});try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.addInitScript(()=>{localStorage.setItem('dreamy-nights-opening-v1','seen');localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:false,voice:false}));});
+ await page.addInitScript(()=>{localStorage.setItem('dreamy-nights-opening-complete-v2','complete');localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:false,voice:false,soundChosen:true}));});
  await page.goto(url);await page.waitForFunction(()=>window.DreamGame?.inspect().mode==='title',null,{timeout:60000});
  await page.evaluate(()=>{const old=DreamRenderer.prototype.actor;DreamRenderer.prototype.actor=function(...a){window.__fitRenderer=this;return old.apply(this,a)};});
  await page.click('#startButton');await page.click('#confirmHero');await page.waitForFunction(()=>DreamGame.inspect().mode==='dialogue');await page.click('#dialogueSkip');await page.waitForFunction(()=>window.__fitRenderer);
@@ -44,6 +44,6 @@ const root=path.resolve(__dirname,'..'),url=process.env.GAME_URL||'http://127.0.
  await page.keyboard.down('ArrowRight');await page.waitForTimeout(1000);await page.keyboard.up('ArrowRight');
  const running=await page.evaluate(()=>__runningHat);assert(running.length>10);assert.equal(new Set(running.map(v=>v.frame)).size,4);assert(Math.max(...running.map(v=>v.x))-Math.min(...running.map(v=>v.x))>100);assert(Math.max(...running.map(v=>v.hat))-Math.min(...running.map(v=>v.hat))>50);
  await page.screenshot({path:path.join(root,'test-results/attachment-play.png')});
- await page.click('#tagPortrait');await page.click('[data-keeper-pose="run"]');assert.equal(await page.locator('#keeperPoseLabel').innerText(),'달리기');await page.click('[data-keeper-pose="walk"]');assert.equal(await page.locator('#keeperPoseLabel').innerText(),'걷기');assert.deepEqual(errors,[]);
+ await page.click('#tagPortrait');await page.click('.keeper-more-poses summary');await page.click('[data-keeper-pose="run"]');assert.equal(await page.locator('#keeperPoseLabel').innerText(),'달리기');await page.click('[data-keeper-pose="walk"]');assert.equal(await page.locator('#keeperPoseLabel').innerText(),'걷기');assert.deepEqual(errors,[]);
  console.log('PASS',result.count,'hero / direction / pose / wearable combinations; head contact; frame tracking; exact world translation; distinct walk/run previews');
 }finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

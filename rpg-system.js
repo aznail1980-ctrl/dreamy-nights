@@ -219,7 +219,7 @@ window.createDreamRPG = function (api) {
         return true;
     }
     function quickHeal() {
-        const id = ['cookie','shoreBiscuit','lunch','canalCake','tea','bloomTea'].find(id=>own(id)>0);
+        const id = ['cookie','shoreBiscuit','lunch','canalCake','tea','bloomTea',...Object.keys(C.items).filter(id=>C.items[id].type==='supply')].find(id=>own(id)>0);
         if (id)
             use(id);
         else

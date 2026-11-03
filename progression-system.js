@@ -26,6 +26,7 @@
             if (done) found.push(['quest:' + (q.flag || q.ids.join('/')), 28]);
         }
         for (const q of Object.values(C.sideQuests)) if (s.flags[q.flag]) found.push(['side:' + q.flag, 35]);
+        for (const q of window.DREAM_WORLD2_CONTENT?.quests || []) if (s.flags[q.flag]) found.push(['world2:' + q.id, 12]);
         return found;
     }
     function initialize(s, raw = null) {
@@ -33,10 +34,17 @@
         // Keep legacy level and progress through that level; retain the original total XP too.
         const legacyLevel = 1 + Math.floor(xp / 75);
         s.growth = { version: 1, xp: source?.version === 1 ? finite(source.xp) : raw ? threshold(legacyLevel) + (xp % 75) / 75 * (threshold(legacyLevel + 1) - threshold(legacyLevel)) : xp,
-            nodes: [], active: 'base', passives: [], rewards: [], skillCD: 0, guardCD: 0, tutorialSeen: false };
+            w2QuestVersion: 1, nodes: [], active: 'base', passives: [], rewards: [], skillCD: 0, guardCD: 0, tutorialSeen: false };
         const g = s.growth;
         const validRewards = new Set(rewards(s).map(([key]) => key));
         g.rewards = source?.version === 1 && Array.isArray(source.rewards) ? [...new Set(source.rewards.filter(k => validRewards.has(k)))] : raw ? [...validRewards] : [];
+        // v4.44 added Act2 XP only to legacy xp. Repair the growth balance once,
+        // without awarding currency/items or incrementing legacy XP a second time.
+        if (source?.version === 1 && source.w2QuestVersion !== 1) {
+            for (const [key, amount] of rewards(s).filter(([key]) => key.startsWith('world2:'))) {
+                if (!g.rewards.includes(key)) { g.xp = finite(g.xp + amount); g.rewards.push(key); }
+            }
+        }
         if (source?.version === 1) {
             const wanted = new Set(Array.isArray(source.nodes) ? source.nodes : []);
             for (let stage = 1; stage <= 3; stage++) for (const branch of branches) {

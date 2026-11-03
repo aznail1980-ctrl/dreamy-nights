@@ -2,7 +2,7 @@ const {chromium}=require('playwright'),assert=require('assert/strict');
 const url=process.env.GAME_URL||'http://127.0.0.1:8769/';
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN});try{
  const p=await b.newPage({viewport:{width:852,height:393},isMobile:true,hasTouch:true}),errors=[];p.on('pageerror',e=>errors.push(e.message));
- await p.addInitScript(()=>{localStorage.setItem('dreamy-nights-opening-v1','seen');localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:false,voice:false}));});await p.goto(url);await p.waitForFunction(()=>window.DreamGame?.inspect().mode==='title');await p.click('#startButton');await p.click('#confirmHero');await p.click('#dialogueSkip');
+ await p.addInitScript(()=>{localStorage.setItem('dreamy-nights-opening-complete-v2','complete');localStorage.setItem('dreamy-nights-settings-v1',JSON.stringify({sound:false,voice:false,soundChosen:true}));});await p.goto(url);await p.waitForFunction(()=>window.DreamGame?.inspect().mode==='title');await p.click('#startButton');await p.click('#confirmHero');await p.click('#dialogueSkip');
  const c=await p.context().newCDPSession(p),touch=(type,points)=>c.send('Input.dispatchTouchEvent',{type,touchPoints:points});
  const metrics=()=>p.evaluate(()=>{const b=document.getElementById('shell').getBoundingClientRect();return {x:scrollX,y:scrollY,scale:visualViewport.scale,left:b.x,top:b.y,w:b.width,h:b.height,transform:document.getElementById('stage').style.transform}});
  const before=await metrics();assert.equal(before.w,852);assert.equal(before.h,393);

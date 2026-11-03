@@ -469,7 +469,8 @@
             tab = 'missions';
         let content = '';
         if (tab === 'missions') {
-            content = (C.chapterBridge?C.chapterBridge.journal(state):'')+world.missionsHTML();
+            const firstNight=(C.chapterBridge?C.chapterBridge.journal(state):'')+world.missionsHTML();
+            content=state.map>=10&&window.DREAM_WORLD2?.journalHTML?DREAM_WORLD2.journalHTML(state,journey.instruction())+'<details class="w2-first-record"><summary>첫 번째 밤 · 이전 의뢰 보기</summary>'+firstNight+'</details>':firstNight;
         }
         else if (tab === 'memories') {
             content = '<div class="memory-grid">' + C.memories.map(m => {
@@ -483,12 +484,14 @@
         else {
             content = '<div class="creature-list">' + Object.entries(C.creatures).map(([key, c]) => {
                 const seen = C.maps.flatMap(m => m.enemies).some(e => e.type === key && state.killed.includes(e.id));
-                const art=window.DREAM_DUNGEON_ART?.[key];
-                const portrait=art?`<svg viewBox="${art.frames[0].join(' ')}" role="img" aria-label="${c.name}" style="width:110px;height:110px;flex-shrink:0;opacity:${seen?1:.35}"><image href="assets/${art.key}.png" width="${art.size[0]}" height="${art.size[1]}"/></svg>`:`<img src="assets/${key}.webp" alt="${c.name}" style="opacity:${seen?1:.35}">`;
-                return `<article class="creature-card">${portrait}<div><b>${c.name}</b><p>${seen ? '“' + c.worry + '”<br>' + c.memory : '처음 정화하면 걱정의 정체를 알 수 있어요.'}</p></div></article>`;
+                const pair=window.DREAM_WORLD2_ART?.pairs[key.replace(/^w2_/,'')];
+                const frame=pair&&(seen?pair.calm:pair.hostile);
+                const art=frame?{key:frame.key,frames:frame.frames,size:frame.sheetSize}:window.DREAM_DUNGEON_ART?.[key];
+                const portrait=art?`<svg viewBox="${art.frames[0].join(' ')}" role="img" aria-label="${c.name}" style="width:110px;height:110px;flex-shrink:0;opacity:${seen?1:.35}"><image href="${frame?DREAM_ART_V49.files[art.key]:`assets/${art.key}.png`}" width="${art.size[0]}" height="${art.size[1]}"/></svg>`:`<img src="assets/${key}.webp" alt="${c.name}" style="opacity:${seen?1:.35}">`;
+                return `<article class="creature-card">${portrait}<div><b>${c.name}</b><p>${seen ? '“' + (pair?C.regionCreatures[key.slice(3)].hint:c.worry) + '”<br>' + (pair?'걱정을 걷어 내고 본래 모습을 되찾았어요.':c.memory) : '처음 정화하면 걱정의 정체를 알 수 있어요.'}</p></div></article>`;
             }).join('') + '</div>';
         }
-        openModal('journal', '지킴이 수첩', `<div class="journal-tabs"><button data-tab="missions" class="${tab === 'missions' ? 'active' : ''}">첫 순찰 의뢰</button><button data-tab="memories" class="${tab === 'memories' ? 'active' : ''}">반짝 기억 ${state.memories.length}/${C.memories.length}</button><button data-tab="creatures" class="${tab === 'creatures' ? 'active' : ''}">어둑이 도감</button><button data-tab="people" class="${tab === 'people' ? 'active' : ''}">마을의 부탁</button></div>${content}`, 'OUR LITTLE MEMORIES');
+        openModal('journal', '지킴이 수첩', `<div class="journal-tabs"><button data-tab="missions" class="${tab === 'missions' ? 'active' : ''}">${state.map>=10?'두 번째 밤 의뢰':'첫 순찰 의뢰'}</button><button data-tab="memories" class="${tab === 'memories' ? 'active' : ''}">반짝 기억 ${state.memories.length}/${C.memories.length}</button><button data-tab="creatures" class="${tab === 'creatures' ? 'active' : ''}">어둑이 도감</button><button data-tab="people" class="${tab === 'people' ? 'active' : ''}">마을의 부탁</button></div>${content}`, 'OUR LITTLE MEMORIES');
         document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => journal(b.dataset.tab));
         document.querySelectorAll('[data-claim]').forEach(b => b.onclick = () => {
             const i = Number(b.dataset.claim);
@@ -1355,7 +1358,7 @@
         $('skillControl').querySelector('b').textContent=equippedSkill.name;
         $('burstControl').querySelector('b').textContent='공명 정화';
         $('lightCount').textContent = state.light;
-        $('snackCount').textContent = rpg.own('cookie') + rpg.own('lunch') + rpg.own('tea');
+        $('snackCount').textContent = Object.keys(C.items).filter(id=>C.items[id].type==='supply').reduce((total,id)=>total+rpg.own(id),0);
         $('locationName').textContent = currentMap().name;
         $('petLabel').textContent = '↑ ↓ 사다리 · L 탐험 지도';
         const bridge=qi<0?C.chapterBridge?.next(state):null;
@@ -1714,7 +1717,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.43.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.44.1' });
     opening = window.createDreamOpening({
         hasSavedGame: () => !!loadSave(), mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1753,7 +1756,7 @@
         }
         lobby=window.createDreamLobby({stage:$('stage'),settings});
         renderer = new window.DreamRenderer($('world'), images, C);
-        growthUI=window.createDreamProgressUI({get state(){return state;},get player(){return player;},get mode(){return mode;},openModal,save,refresh:updateHUD,sound:k=>audio.sfx(k),back:()=>rpg.details(),preview:(canvas,options)=>renderer.previewHero(canvas,state,options),changed:()=>{player.skillShield=false;player.skillShieldT=0;player.dashGift=0;}});
+        growthUI=window.createDreamProgressUI({get reducedMotion(){return settings.reducedMotion;},get state(){return state;},get player(){return player;},get mode(){return mode;},openModal,save,refresh:updateHUD,sound:k=>audio.sfx(k),back:()=>rpg.details(),preview:(canvas,options)=>renderer.previewHero(canvas,state,options),changed:()=>{player.skillShield=false;player.skillShieldT=0;player.dashGift=0;}});
         $('levelText').classList.add('growth-hud-link');$('levelText').setAttribute('role','button');$('levelText').tabIndex=0;
         $('levelText').onclick=()=>{if(mode==='play')growthUI.open();};
         $('levelText').onkeydown=e=>{if(['Enter',' '].includes(e.key)&&mode==='play'){e.preventDefault();e.stopPropagation();growthUI.open();}};

@@ -44,7 +44,7 @@ window.createDreamJourney=function(api){
  function update(){if(!s())return;const t=target(),line=instruction(t);if($('nextAction').textContent!==line)$('nextAction').textContent=line;
   if(t?.dungeon){$('questTitle').textContent=t.dungeon;$('questDetail').textContent=t.detail;$('questCard').querySelector('.eyebrow').firstChild.textContent='현재 던전 · ';$('questStep').textContent='지역 조사';$('questCount').textContent='조사 '+t.progress+' / '+t.total;$('questFill').style.width=(t.progress/t.total*100)+'%';}
   $('questCard').setAttribute('aria-label','현재 목표: '+line+' · 수첩 열기');$('questHint').textContent='수첩 열기 ↗';
-  const key=s().map+':'+s().visited.join(',')+':'+t?.map+(s().map>=10?':'+[Math.round(api.player.x/80),Math.round(api.player.y/80),s().w2?.ovens,s().w2?.cracks,s().killed.length].join(','):'');if(key===miniKey)return;miniKey=key;
+  const key=s().map+':'+s().visited.join(',')+':'+[t?.map,t?.x,t?.y,t?.label].join(',')+(s().map>=10?':'+[Math.round(api.player.x/80),Math.round(api.player.y/80),s().w2?.ovens,s().w2?.cracks,s().killed.length].join(','):'');if(key===miniKey)return;miniKey=key;
   $('journeyCompactName').textContent=C.maps[s().map].name;
   const [mx,my]=C.mapPositions[s().map];$('journeyPreview').innerHTML='<img src="'+(s().map>=10?DREAM_ART_V49.files[C.maps[s().map].backdrop]:'assets/atlas-island-v48.png')+'" alt=""><i style="left:'+mx+'%;top:'+my+'%"></i>';
   $('journeyVisited').textContent='발견 '+s().visited.filter(i=>(i>=10)===(s().map>=10)).length+' / 10';

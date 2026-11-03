@@ -56,3 +56,6 @@
  #stage #modal[data-kit="true"][data-kind="growth"] .st-facts{margin:calc(var(--su)*.1) 0;gap:calc(var(--su)*.12)}
  #stage #modal[data-kit="true"][data-kind="growth"] .st-status{font-size:calc(var(--su)*.25);margin:calc(var(--su)*.1) 0}
 }
+
+#stage #modal[data-kind="growth"] #growthMotion{min-height:var(--touch-size,44px);padding:8px 16px;margin:4px 0 8px;font-size:13px;border:1px solid #c7a76c;color:#ffe2a6;background:#203f4c;border-radius:8px}
+@media(pointer:coarse){#stage #modal[data-kind="growth"] #growthMotion{min-height:var(--touch-size);font-size:calc(var(--su)*.23)}}

@@ -51,9 +51,9 @@ test('Boss journal must return home; unfinished main missions cannot silently en
  go(4);clear();rpg.recoverJournal();assert(rpg.own('oldJournal'));rpg.ritual();assert(!s.flags.completed);go(2);action('lumen','returnJournal');assert(s.flags.journalReturned);
  s.killed=s.killed.filter(id=>id!=='sand1');api.mode='play';rpg.ritual();assert.equal(api.mode,'play');assert(lastToast.includes('첫 순찰'));kill('sand1');rpg.ritual();click('note',2);assert(!s.flags.completed);for(let i=0;i<3;i++)click('note',i);assert(s.flags.completed);assert.equal(api.activeQuest(),-1);assert.equal(ended,1);assert.equal(C.chapterBridge.next(s).npc,'madeleine');
 });
-test('Departure conversations advance only on completion, cannot duplicate rewards, and retain the closed-world notice',()=>{
+test('Departure conversations advance only on completion, cannot duplicate rewards, and provide the harbor departure instructions',()=>{
  pending=false;action('madeleine','ovenContinue');assert(!s.flags.ovenInvitationRead);const done=pending;pending=null;done();done();assert.equal(rpg.own('ovenInvitation'),1);assert.equal(C.chapterBridge.next(s).npc,'post');
- action('post','ovenContinue');assert(s.flags.ovenParcelPacked);action('lumen','ovenContinue');assert(s.flags.ovenRouteReady);assert.equal(C.chapterBridge.next(s),null);assert(C.chapterBridge.journal(s).includes('아직 개방 전'));assert.equal(C.maps.length,10);
+ action('post','ovenContinue');assert(s.flags.ovenParcelPacked);action('lumen','ovenContinue');assert(s.flags.ovenRouteReady);assert.equal(C.chapterBridge.next(s),null);assert(C.chapterBridge.journal(s).includes('몽글 항로 포털'));assert.equal(C.maps.length,10);
 });
 test('Existing completion saves and partially prepared departure saves retain inventory and flags',()=>{
  const raw=plain(s);c.C=C;c.GROUND=651;c.rpg=rpg;c.world=world;c.remaster=c.createDreamRemaster(api);c.clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const js=fs.readFileSync(path.join(root,'game.js'),'utf8');vm.runInContext(js.slice(js.indexOf('    function defaultState()'),js.indexOf('    function loadSave()')),c);
