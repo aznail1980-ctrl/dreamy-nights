@@ -904,9 +904,12 @@
         rpg.handleInteraction(interaction);
     }
     function updateInteraction() {
-        interaction = world2?.nearest() || rpg.nearest() || remaster.nearest();
+        const nearbyExit = world.nearestExit();
+        // The harbor camp overlaps the departure portal's interaction radius.
+        const departure = state.map === 2 && nearbyExit?.to === 10 && world.gateOpen(nearbyExit.gate);
+        interaction = departure ? { type: 'portal', dest: 10, exit: nearbyExit, label: '몽글 마을로 출항하기' } : world2?.nearest() || rpg.nearest() || remaster.nearest();
         if (!interaction) {
-            const ex = world.nearestExit();
+            const ex = nearbyExit;
             if (ex)
                 interaction = { type: 'portal', dest: ex.to, exit: ex, label: C.maps[ex.to].name + '로 가기' + (!world.gateOpen(ex.gate) ? ' · 단서 필요' : '') };
         }
@@ -1717,7 +1720,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.45.2' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.45.3' });
     opening = window.createDreamOpening({
         hasSavedGame: () => !!loadSave(), mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1784,6 +1787,10 @@
             return mode;
         }, get modalKind() {
             return modalKind;
+        }, departToMongle: () => {
+            const ex = world.exits(2).find(e => e.to === 10);
+            if (state.map !== 2 || !state.flags.ovenRouteReady || !ex || !world.gateOpen(ex.gate)) return false;
+            closeModal();world.travel(ex);return true;
         }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: (...args) => world.wardrobe(...args), pets:()=>rpg.pets(), growth:()=>growthUI.open(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     world = window.createDreamWorld({ get state() {
             return state;
