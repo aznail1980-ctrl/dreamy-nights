@@ -50,3 +50,26 @@ body:has(#dialogue:not(.hidden)) .w2-playtest{visibility:hidden;pointer-events:n
 
 .w2-region-layout .atlas-tabs button{background:linear-gradient(#f7e5bc,#d6b579);border:1px solid #947244;color:#4a3425;box-shadow:0 3px 0 #80613c;border-radius:8px}
 .w2-region-layout #atlasTravel{border:1px solid #bca57f;background:#e7d9be;color:#715d43;opacity:1;min-height:44px;border-radius:8px;cursor:default}
+
+/* R12: readable story lettering stays in the UI, never baked into artwork. */
+#dialogue .w2-applications{position:absolute;z-index:1;top:76px;left:24px;display:flex;gap:12px;max-width:calc(100% - 48px)}
+#dialogue .w2-applications[hidden]{display:none}
+#dialogue .w2-applications section{display:grid;gap:5px;padding:12px 18px;background:linear-gradient(125deg,#fff2cd,#edd8a7);border:1px solid #bd9859;border-radius:3px;color:#553b26;box-shadow:0 5px 14px #30201555;transform:rotate(-2deg)}
+#dialogue .w2-applications section+section{transform:rotate(2deg)}
+#dialogue .w2-applications span,#dialogue .w2-applications small{font-size:12px}
+#dialogue .w2-applications strong{font-size:22px;color:#674321;border-bottom:1px solid #bb975b;padding-bottom:4px}
+@media(max-height:500px){
+ #dialogue .w2-memory-scene figcaption{top:8px;font-size:12px;padding:5px 12px}
+ #dialogue .w2-applications{top:42px;left:12px;gap:8px;max-width:calc(100% - 24px)}
+ #dialogue .w2-applications section{gap:2px;padding:6px 10px}
+ #dialogue .w2-applications span,#dialogue .w2-applications small{font-size:10px}
+ #dialogue .w2-applications strong{font-size:16px;padding-bottom:2px}
+}
+/* The mobile stage scales its logical canvas; keep lettering legible after scaling. */
+@media(pointer:coarse){
+ #dialogue .w2-memory-scene figcaption{font-size:24px;top:16px;padding:8px 18px}
+ #dialogue .w2-applications{top:88px;left:24px;gap:16px}
+ #dialogue .w2-applications section{gap:6px;padding:12px 18px}
+ #dialogue .w2-applications span,#dialogue .w2-applications small{font-size:22px}
+ #dialogue .w2-applications strong{font-size:32px;padding-bottom:5px}
+}
