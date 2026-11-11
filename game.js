@@ -606,6 +606,11 @@
         save();
         updateHUD();
     }
+    // Visual-only effect sheet (guard shell, resonance burst) at a point; follow keeps it on the player.
+    function fx(x, y, feedback, opts = {}) {
+        const life = feedback.weight?.life || .5;
+        impacts.push({ x, y, life, max: life, dir: player.facing, feedback, floorY: player.y, seed: 0, follow: !!opts.follow, dy: y - player.y });
+    }
     function hit(e, power, impact = 'skill', feedback = null) {
         if (e.dead)
             return;
@@ -640,9 +645,11 @@
             }
             floatText('걱정이 흔들려요!', e.x, e.y - C.creatures[e.type].size - 45, '#ffeac0');
         }
-        hitstop = settings.reducedMotion ? 0 : charged ? .11 : heavy ? .085 : .055;
-        shake = settings.reducedMotion ? 0 : charged ? 10 : heavy ? 6.5 : 3.3;
-        impacts.push({ x: e.x, y: e.y - C.creatures[e.type].size * .5, life: charged ? .46 : heavy ? .32 : .24, max: charged ? .46 : heavy ? .32 : .24, charged, heavy, dir, feedback, floorY:e.floorY??e.y, seed: Math.random() * 6 });
+        // v4.52: every attack kind has its own weight (combat-feedback.js weights).
+        const weight = feedback.weight || DREAM_COMBAT.weights.light;
+        hitstop = settings.reducedMotion ? 0 : Math.max(hitstop, weight.hitstop);
+        shake = settings.reducedMotion ? 0 : Math.max(shake, weight.shake);
+        impacts.push({ x: e.x, y: e.y - C.creatures[e.type].size * .5, life: weight.life, max: weight.life, charged, heavy, dir, feedback, floorY:e.floorY??e.y, seed: Math.random() * 6 });
         spark(e.x, e.y - C.creatures[e.type].size * .5, heavy ? 20 : 11, heavy ? '#fff1ca' : '#ffe4ac', heavy ? 320 : 220);
         audio.impact(e.variant||e.type, heavy, finish, e.x, feedback);
         if (e.hp <= 0)
@@ -692,7 +699,7 @@
         // Each swing has a short active interval, and can hit each enemy only once.
         player.pendingStrike = { delay: player.combo === 3 ? .12 : .085, active: .12, combo: player.combo, facing: player.facing, hits: [], started: false, dreamStep: player.dashGift > 0 };
         player.dashGift = 0;
-        player.pendingStrike.feedback = DREAM_COMBAT.profile(state,player.combo===3?'finisher':'light');
+        player.pendingStrike.feedback = DREAM_COMBAT.profile(state,player.combo===3?'finisher':player.combo===2?'light-2':'light');
         audio.combatSwing(player.pendingStrike.feedback);
     }
     function startPlunge() {
@@ -772,7 +779,7 @@
             reach: player.chargeLevel === 2 ? 255 : 195,
             power: (player.chargeLevel === 2 ? 14 : 8) + Math.round(rpg.stats().attack * 1.5), impact: 'charged'
         };
-        player.pendingStrike.feedback = DREAM_COMBAT.profile(state,'charged');
+        player.pendingStrike.feedback = DREAM_COMBAT.profile(state,'charged',{charge:player.chargeLevel});
         audio.combatSwing(player.pendingStrike.feedback);
     }
     function strike(dt) {
@@ -867,14 +874,16 @@
             cooldowns.skill = state.growth.skillCD;
             player.pendingStrike = null; player.attackLength = .55; player.attackT = .55;
             player.attackFacing = player.facing; player.invincible = .3; autoWalk = false;
-            audio.sfx(spec.id === 'guard' ? 'playerGuard' : spec.id === 'control' ? 'playerControl' : 'skill');
+            const skillFeedback=DREAM_COMBAT.profile(state,'skill-'+spec.id);
+            audio.skillCast(skillFeedback);
 
             ring(player.x,player.y-45,spec.range,spec.color);spark(player.x,player.y-75,28,spec.color,260);
+            if(spec.id==='guard')fx(player.x,player.y-68,skillFeedback,{follow:true});
             if(spec.damage)for(const e of enemies){
                 if(mode!=='play')break;
                 const dx=e.x-player.x, forward=spec.id==='attack'&&state.active==='ari';
                 if(!e.dead&&Math.abs(dx)<spec.range&&Math.abs(e.y-player.y)<160&&(!forward||dx*player.facing>=-30)){
-                    hit(e,spec.damage+rpg.stats().skill);
+                    hit(e,spec.damage+rpg.stats().skill,'skill',skillFeedback);
                     if(spec.id==='control'){
                         e.growthSlow=e.type==='boss'?.7:spec.master?3.2:2.2;
                         if(state.active==='popo')e.knockV=Math.sign(dx||player.facing)*(e.type==='boss'?60:240);
@@ -1419,8 +1428,10 @@
         if (mode === 'dialogue') conversation.update(dt);
         if(mode==='play'||mode==='dialogue')for(const e of enemies)window.DREAM_PURIFICATION.tick(e,dt);
         if (mode === 'play') {
-            for (const v of impacts)
+            for (const v of impacts) {
                 v.life -= dt;
+                if (v.follow) { v.x = player.x; v.y = player.y + v.dy; }
+            }
             impacts = impacts.filter(v => v.life > 0);
         }
         audio.update(dt);
@@ -1722,7 +1733,7 @@
         }
     });
     // Read-only inspection is useful for verifying a playthrough without changing game state.
-    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.51.0' });
+    window.DreamGame = Object.freeze({ inspect: () => state ? JSON.parse(JSON.stringify({ mode, orientationBlocked, modalKind, state, player, enemies, cooldowns, controls: controls?.inspect(), interaction, camera, cameraY, autoWalk, solo: true, companions: [], hitstop, impacts, audioEvents: audio.events || [], audioMix:audio.inspect(), musicTheme: audio.scoreTheme, musicChanges: audio.musicChanges || [], journey: journey?.target(), nextAction: journey?.instruction(), loot: rpg.view().loot, voice: remaster.voiceStatus(), opening: opening?.inspect(), lobby:lobby?.inspect(), dialogue: mode === 'dialogue' ? conversation.inspect() : null, quest: activeQuest() })) : { mode }, version: '4.52.0' });
     opening = window.createDreamOpening({
         hasSavedGame: () => !!loadSave(), mount: $('stage'), source: 'assets/intro/first-night.mp4?v=4.27.1', poster: 'assets/intro/first-night-poster.png', settings, setSound,
         onOpen() { remaster?.stopVoice(); setMode('opening'); show('title', false); },
@@ -1793,7 +1804,7 @@
             const ex = world.exits(2).find(e => e.to === 10);
             if (state.map !== 2 || !state.flags.ovenRouteReady || !ex || !world.gateOpen(ex.gate)) return false;
             closeModal();world.travel(ex);return true;
-        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: (...args) => world.wardrobe(...args), pets:()=>rpg.pets(), growth:()=>growthUI.open(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
+        }, maxHP, level, toast, floatText, spark, ring, say, save, refresh: updateHUD, openModal, closeModal, dialogue: startDialogue, memory, ending: showEnding, activeQuest, hit, fx, sound: kind => audio.sfx(kind), isWorldObject: obj => world.isSpecial(obj), worldInteract: obj => world.interact(obj), worldLabel: obj => world.label(obj), wardrobe: (...args) => world.wardrobe(...args), pets:()=>rpg.pets(), growth:()=>growthUI.open(), petReaction:()=>{pet.happy=1.3;}, preview: (canvas, options) => renderer.previewHero(canvas, state, options) });
     world = window.createDreamWorld({ get state() {
             return state;
         }, get player() {

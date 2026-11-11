@@ -297,11 +297,13 @@ window.createDreamRPG = function (api) {
         api.ring(api.player.x, api.player.y - 80, 520, '#ffdf94');
         api.spark(api.player.x, api.player.y - 80, 80, '#f8dcff', 550);
         api.sound('playerBurst');
+        const burstFeedback = window.DREAM_COMBAT.profile(state(), 'burst');
+        api.fx?.(api.player.x, api.player.y - 80, burstFeedback);
         for (const e of api.enemies) {
             if (api.mode !== 'play')
                 break;
             if (!e.dead && Math.abs(e.x - api.player.x) < 540 && Math.abs(e.y - api.player.y) < 160)
-                api.hit(e, 18 + stats().skill);
+                api.hit(e, 18 + stats().skill, 'skill', burstFeedback);
         }
         api.say((window.DREAM_PROGRESS?.names[state().active].burst||'공명 정화')+'—!', 3, state().active === 'ari' ? '아리' : '포포');
         api.save();

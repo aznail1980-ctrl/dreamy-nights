@@ -1,0 +1,31 @@
+우리의 드리미 나이츠 — 전투 효과음 후보 A/B/C (build_candidates.py 로 재생산)
+
+대부분의 소리는 이 스크립트가 오프라인 수학 합성으로 만든 독자 제작물이다
+(잡음 필터링 스냅/스맥, 한 번만 떨어지는 저음 몸통, 조화 배음 반짝임·차임, 공기 소리).
+런타임 오실레이터·MIDI·인터넷 다운로드 없음.
+
+아래 Kenney 소재는 저장소 assets/audio-v426 의 편집본(CC0)을 저역통과로 걸러 일부 레이어로만 섞었다.
+Kenney Impact Sounds — https://kenney.nl/assets/impact-sounds — CC0 1.0
+https://creativecommons.org/publicdomain/zero/1.0/  (저장소 Kenney-impact-LICENSE.txt 참조)
+
+- assets/audio-v426/hit-heavy-0.wav  ← Kenney Impact Sounds: impactWood_heavy_000.ogg (+impactGlass_light, 저장소 편집본)
+    편집: 저역통과 320 Hz(나무 울림·유리음 제거, 몸통만 사용), 속도/음높이 조정
+    사용: light-1
+- assets/audio-v426/hit-heavy-1.wav  ← Kenney Impact Sounds: impactWood_heavy_001.ogg (+impactGlass_light, 저장소 편집본)
+    편집: 저역통과 320 Hz(나무 울림·유리음 제거, 몸통만 사용), 속도/음높이 조정
+    사용: burst, charged-1, finisher, light-2, plunge, skill-attack-s1, skill-attack-s3
+- assets/audio-v426/hit-heavy-2.wav  ← Kenney Impact Sounds: impactWood_heavy_002.ogg (+impactGlass_light, 저장소 편집본)
+    편집: 저역통과 320 Hz(나무 울림·유리음 제거, 몸통만 사용), 속도/음높이 조정
+    사용: charged-2
+- assets/audio-v426/hit-soft-0.wav  ← Kenney Impact Sounds: impactPunch_medium_000.ogg (+impactGlass_light, 저장소 편집본)
+    편집: 저역통과 1.8 kHz(유리음 제거), 속도/음높이 조정, 혼합 비율 낮춤
+    사용: light-1
+- assets/audio-v426/hit-soft-1.wav  ← Kenney Impact Sounds: impactPunch_medium_001.ogg (+impactGlass_light, 저장소 편집본)
+    편집: 저역통과 1.8 kHz(유리음 제거), 속도/음높이 조정, 혼합 비율 낮춤
+    사용: burst, charged-1, finisher, light-2, plunge, skill-attack-s1, skill-attack-s3
+- assets/audio-v426/hit-soft-2.wav  ← Kenney Impact Sounds: impactPunch_medium_002.ogg (+impactGlass_light, 저장소 편집본)
+    편집: 저역통과 1.8 kHz(유리음 제거), 속도/음높이 조정, 혼합 비율 낮춤
+    사용: charged-2
+
+방향별 사용: A(펀치 만화) = Kenney 펀치 저역 레이어, B(마법 타격) = 같은 레이어를 더 작게,
+C(묵직 시네마) = Kenney heavy 저역(320 Hz 이하) 몸통 레이어. 스킬 보호/제어·휘두름은 100% 합성.

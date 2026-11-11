@@ -1,0 +1,162 @@
+{
+ "ari-burst": {
+  "frames": 10,
+  "w": 640,
+  "h": 640
+ },
+ "ari-charged-1": {
+  "frames": 8,
+  "w": 448,
+  "h": 448
+ },
+ "ari-charged-2": {
+  "frames": 10,
+  "w": 512,
+  "h": 512
+ },
+ "ari-finisher": {
+  "frames": 7,
+  "w": 384,
+  "h": 384
+ },
+ "ari-light-1": {
+  "frames": 6,
+  "w": 320,
+  "h": 320
+ },
+ "ari-light-2": {
+  "frames": 6,
+  "w": 320,
+  "h": 320
+ },
+ "ari-plunge": {
+  "frames": 8,
+  "w": 448,
+  "h": 320
+ },
+ "ari-skill-attack-1": {
+  "frames": 8,
+  "w": 448,
+  "h": 384
+ },
+ "ari-skill-attack-2": {
+  "frames": 8,
+  "w": 448,
+  "h": 384
+ },
+ "ari-skill-attack-3": {
+  "frames": 8,
+  "w": 448,
+  "h": 384
+ },
+ "ari-skill-control-1": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "ari-skill-control-2": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "ari-skill-control-3": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "ari-skill-guard-1": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "ari-skill-guard-2": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "ari-skill-guard-3": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "popo-burst": {
+  "frames": 10,
+  "w": 640,
+  "h": 640
+ },
+ "popo-charged-1": {
+  "frames": 8,
+  "w": 448,
+  "h": 448
+ },
+ "popo-charged-2": {
+  "frames": 10,
+  "w": 512,
+  "h": 512
+ },
+ "popo-finisher": {
+  "frames": 7,
+  "w": 384,
+  "h": 384
+ },
+ "popo-light-1": {
+  "frames": 6,
+  "w": 320,
+  "h": 320
+ },
+ "popo-light-2": {
+  "frames": 6,
+  "w": 320,
+  "h": 320
+ },
+ "popo-plunge": {
+  "frames": 8,
+  "w": 448,
+  "h": 320
+ },
+ "popo-skill-attack-1": {
+  "frames": 8,
+  "w": 448,
+  "h": 384
+ },
+ "popo-skill-attack-2": {
+  "frames": 8,
+  "w": 448,
+  "h": 384
+ },
+ "popo-skill-attack-3": {
+  "frames": 8,
+  "w": 448,
+  "h": 384
+ },
+ "popo-skill-control-1": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "popo-skill-control-2": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "popo-skill-control-3": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "popo-skill-guard-1": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "popo-skill-guard-2": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ },
+ "popo-skill-guard-3": {
+  "frames": 8,
+  "w": 384,
+  "h": 384
+ }
+}
